@@ -1432,6 +1432,14 @@ body > * { position: relative; z-index: 1; }
         Output Laporan
         <span class="nav-badge">EXPORT</span>
       </div>
+      <div class="nav-item" onclick="nav('history')" id="nav-history">
+        Riwayat
+        <span class="nav-badge" id="history-badge" style="background:rgba(142,203,106,0.2);color:#8ecb6a;display:none">0</span>
+      </div>
+      <div class="nav-item" onclick="nav('bmkg')" id="nav-bmkg" style="position:relative">
+        Data BMKG
+        <span class="nav-badge" style="background:rgba(90,200,176,0.2);color:#5ac8b0">BARU</span>
+      </div>
     </nav>
 
     <!-- Actions -->
@@ -3548,6 +3556,291 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
 
 
 <!-- ══════════════════════════════════════════════
+     PAGE: DATA BMKG — STATION FINDER + OPEN-METEO
+══════════════════════════════════════════════ -->
+<div class="page" id="page-bmkg">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">🌧 Data Curah Hujan — Stasiun BMKG</div>
+      <div class="page-subtitle">271 stasiun seluruh Indonesia · Data ERA5 Open-Meteo 1940–kini · Import ke Rainfall Analysis</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <a href="https://dataonline.bmkg.go.id" target="_blank"
+        style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font-size:12px;text-decoration:none;border-radius:8px;border:1px solid var(--border);color:var(--blue);background:var(--blue-soft)">
+        🔗 BMKG Data Online
+      </a>
+      <span style="font-size:11px;color:var(--muted);padding:6px 10px;background:rgba(90,200,140,0.08);border:1px solid rgba(90,200,140,0.2);border-radius:8px">
+        📡 ERA5 Reanalysis · 1940–Sekarang
+      </span>
+    </div>
+  </div>
+
+  <!-- Info banner -->
+  <div style="background:rgba(127,187,238,0.07);border:1px solid rgba(127,187,238,0.2);border-radius:12px;padding:12px 18px;margin-bottom:18px;font-size:12.5px;color:var(--text);line-height:1.7">
+    <strong style="color:var(--blue)">ℹ Sumber Data:</strong>
+    <span style="color:var(--muted)">
+      Koordinat dari 271 stasiun BMKG Indonesia (Met, Klimatologi, Geofisika, Hidrologi) dikombinasikan dengan
+      <strong style="color:var(--blue)">Open-Meteo ERA5 Archive API</strong> untuk mengambil data curah hujan harian resolusi ~9 km.
+      Data ERA5 tersedia dari <strong>1940 hingga 5 hari lalu</strong> — cocok untuk analisis ≥10 tahun yang dibutuhkan dalam studi hidrologi tambang.
+    </span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start" id="bmkg-grid">
+
+    <!-- ═══ LEFT: Filter + Station List ═══ -->
+    <div style="display:flex;flex-direction:column;gap:12px">
+
+      <!-- Filter Card -->
+      <div class="card" style="padding:14px 16px">
+        <div class="section-title" style="margin-bottom:12px">
+          <div class="dot" style="background:var(--teal)"></div>
+          Cari Stasiun BMKG
+        </div>
+
+        <!-- Search -->
+        <div style="margin-bottom:10px">
+          <input id="bmkg-search" type="text" placeholder="🔍 Nama stasiun, kota..."
+            oninput="bmkgFilterStations()"
+            style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;box-sizing:border-box">
+        </div>
+
+        <!-- Provinsi -->
+        <div style="margin-bottom:8px">
+          <div style="font-size:10.5px;color:var(--muted);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Provinsi</div>
+          <select id="bmkg-prov" onchange="bmkgOnProvChange()"
+            style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px">
+            <option value="">— Semua Provinsi —</option>
+          </select>
+        </div>
+
+        <!-- Kabupaten/Kota -->
+        <div style="margin-bottom:10px">
+          <div style="font-size:10.5px;color:var(--muted);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Kabupaten / Kota</div>
+          <select id="bmkg-kab" onchange="bmkgFilterStations()"
+            style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px">
+            <option value="">— Semua Kab/Kota —</option>
+          </select>
+        </div>
+
+        <!-- Tipe Stasiun -->
+        <div style="margin-bottom:10px">
+          <div style="font-size:10.5px;color:var(--muted);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Tipe Stasiun</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            <label style="display:inline-flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg2)">
+              <input type="checkbox" id="bmkg-type-met" checked onchange="bmkgFilterStations()" style="width:12px;height:12px"> Met
+            </label>
+            <label style="display:inline-flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg2)">
+              <input type="checkbox" id="bmkg-type-klim" checked onchange="bmkgFilterStations()" style="width:12px;height:12px"> Klimatologi
+            </label>
+            <label style="display:inline-flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg2)">
+              <input type="checkbox" id="bmkg-type-geo" checked onchange="bmkgFilterStations()" style="width:12px;height:12px"> Geofisika
+            </label>
+            <label style="display:inline-flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg2)">
+              <input type="checkbox" id="bmkg-type-hidr" checked onchange="bmkgFilterStations()" style="width:12px;height:12px"> Hidrologi
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span id="bmkg-count" style="font-size:11px;color:var(--muted);font-weight:600">271 stasiun</span>
+          <button onclick="bmkgResetFilter()" style="font-size:10.5px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer">Reset</button>
+        </div>
+      </div>
+
+      <!-- Station List -->
+      <div class="card" style="padding:0;overflow:hidden;max-height:420px">
+        <div id="bmkg-station-list" style="overflow-y:auto;max-height:420px">
+          <div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">Memuat daftar stasiun...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ RIGHT: Map + Data ═══ -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- Map -->
+      <div class="card" style="padding:0;overflow:hidden;height:380px;position:relative">
+        <div id="bmkg-map" style="height:100%;width:100%;border-radius:var(--r)"></div>
+        <div id="bmkg-map-hint" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:500;background:rgba(0,0,0,0.6);color:#fff;font-size:10px;padding:4px 12px;border-radius:20px;pointer-events:none;white-space:nowrap">
+          Klik stasiun untuk memilih · Scroll untuk zoom
+        </div>
+      </div>
+
+      <!-- Selected Station + Fetch -->
+      <div class="card" style="padding:16px" id="bmkg-station-detail">
+        <div id="bmkg-no-selection" style="text-align:center;padding:14px 0;color:var(--muted);font-size:12.5px">
+          ← Pilih stasiun dari daftar atau klik marker pada peta
+        </div>
+        <div id="bmkg-selected-info" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;margin-bottom:14px">
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text)" id="bmkg-sel-name">—</div>
+              <div style="font-size:11.5px;color:var(--muted);margin-top:3px" id="bmkg-sel-loc">—</div>
+              <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap">
+                <span style="font-size:10.5px;font-family:var(--mono);color:var(--blue)" id="bmkg-sel-coord">—</span>
+                <span style="padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700" id="bmkg-sel-type-badge">—</span>
+              </div>
+            </div>
+            <a id="bmkg-open-link" href="#" target="_blank"
+              style="display:inline-flex;align-items:center;gap:5px;padding:7px 12px;font-size:11px;text-decoration:none;border-radius:8px;border:1px solid var(--blue);color:var(--blue);white-space:nowrap;background:var(--blue-soft)">
+              🔗 Buka di BMKG
+            </a>
+          </div>
+
+          <!-- Date range + fetch -->
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-bottom:12px">
+            <div>
+              <div style="font-size:10.5px;color:var(--muted);font-weight:600;margin-bottom:4px">Tanggal Mulai</div>
+              <input type="date" id="bmkg-date-start"
+                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px">
+            </div>
+            <div>
+              <div style="font-size:10.5px;color:var(--muted);font-weight:600;margin-bottom:4px">Tanggal Selesai</div>
+              <input type="date" id="bmkg-date-end"
+                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="font-size:10px;color:var(--muted);font-weight:600">Preset</div>
+              <select id="bmkg-preset" onchange="bmkgApplyPreset()"
+                style="padding:8px 8px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:11px">
+                <option value="">— Pilih —</option>
+                <option value="5">5 Tahun Terakhir</option>
+                <option value="10">10 Tahun Terakhir</option>
+                <option value="15">15 Tahun Terakhir</option>
+                <option value="20">20 Tahun Terakhir</option>
+                <option value="30">30 Tahun Terakhir</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="bmkg-fetch-btn" onclick="bmkgFetchData()"
+            style="width:100%;padding:11px;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--teal),var(--green));color:#0a1a06;font-weight:700;cursor:pointer;transition:all 0.2s">
+            ⚡ Ambil Data ERA5 Open-Meteo
+          </button>
+          <div id="bmkg-fetch-status" style="margin-top:8px;font-size:11.5px;color:var(--muted);text-align:center;min-height:18px"></div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div id="bmkg-result-area" style="display:none">
+
+        <!-- Stats strip -->
+        <div class="card" style="padding:14px 18px;margin-bottom:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div style="font-size:13px;font-weight:700;color:var(--green)" id="bmkg-result-summary"></div>
+            <div style="display:flex;gap:7px">
+              <button onclick="bmkgImportToRainfall()"
+                style="padding:7px 14px;font-size:12px;display:flex;align-items:center;gap:5px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--green),var(--teal));color:#0a1a06;font-weight:700;cursor:pointer">
+                📥 Import ke Rainfall
+              </button>
+              <button onclick="bmkgDownloadCSV()"
+                style="padding:7px 14px;font-size:12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer">
+                ⬇ CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI strip -->
+          <div id="bmkg-stats-strip" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px"></div>
+
+          <!-- Tabs -->
+          <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:14px">
+            <button id="bmkg-tab-chart" onclick="bmkgShowTab('chart')"
+              style="padding:7px 16px;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;border-bottom:2px solid var(--teal);color:var(--teal)">
+              📈 Grafik
+            </button>
+            <button id="bmkg-tab-table" onclick="bmkgShowTab('table')"
+              style="padding:7px 16px;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted)">
+              📋 Tabel Data
+            </button>
+            <button id="bmkg-tab-monthly" onclick="bmkgShowTab('monthly')"
+              style="padding:7px 16px;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted)">
+              📊 Rata-Rata Bulanan
+            </button>
+          </div>
+
+          <!-- Chart panel -->
+          <div id="bmkg-panel-chart" style="height:220px">
+            <canvas id="bmkg-chart-canvas"></canvas>
+          </div>
+
+          <!-- Table panel -->
+          <div id="bmkg-panel-table" style="display:none;overflow-x:auto;max-height:220px;overflow-y:auto;border-radius:8px;border:1px solid var(--border)">
+            <table style="width:100%;border-collapse:collapse;font-size:11.5px">
+              <thead>
+                <tr style="position:sticky;top:0">
+                  <th style="padding:7px 12px;text-align:left;background:var(--bg2);border-bottom:1px solid var(--border);color:var(--muted);font-weight:700">Tanggal</th>
+                  <th style="padding:7px 12px;text-align:right;background:var(--bg2);border-bottom:1px solid var(--border);color:var(--muted);font-weight:700">CH (mm)</th>
+                  <th style="padding:7px 12px;text-align:center;background:var(--bg2);border-bottom:1px solid var(--border);color:var(--muted);font-weight:700">Bar</th>
+                </tr>
+              </thead>
+              <tbody id="bmkg-preview-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- Monthly panel -->
+          <div id="bmkg-panel-monthly" style="display:none;height:220px">
+            <canvas id="bmkg-monthly-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /right -->
+  </div><!-- /grid -->
+</div><!-- /page-bmkg -->
+
+<div class="page" id="page-history">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Riwayat Kalkulasi</div>
+      <div class="page-subtitle">Snapshot hasil analisis yang tersimpan · Bandingkan atau pulihkan kapan saja</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn-secondary" onclick="historySaveSnapshot()" style="display:flex;align-items:center;gap:7px;padding:9px 18px;font-size:13px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Simpan Snapshot
+      </button>
+      <button class="btn-ghost" onclick="historyClearAll()" style="padding:9px 16px;font-size:13px">Hapus Semua</button>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+    <span style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase">Filter:</span>
+    <button class="grpby-btn grpby-active" id="hf-all"      onclick="historyFilter('all')">Semua</button>
+    <button class="grpby-btn"              id="hf-rainfall"  onclick="historyFilter('rainfall')">🌧 Rainfall</button>
+    <button class="grpby-btn"              id="hf-runoff"    onclick="historyFilter('runoff')">🌊 Runoff</button>
+    <button class="grpby-btn"              id="hf-sedpond"   onclick="historyFilter('sedpond')">🏊 Sed. Pond</button>
+    <button class="grpby-btn"              id="hf-retpond"   onclick="historyFilter('retpond')">💧 Ret. Pond</button>
+    <input id="hf-search" type="text" placeholder="🔍 Cari nama snapshot..." oninput="historyRender()"
+      style="margin-left:auto;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12px;width:220px">
+  </div>
+
+  <!-- Empty state -->
+  <div id="history-empty" style="display:none;text-align:center;padding:80px 20px">
+    <div style="font-size:48px;margin-bottom:16px">📋</div>
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">Belum ada riwayat</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:24px">Klik <strong>Simpan Snapshot</strong> untuk menyimpan hasil analisis saat ini,<br>atau lakukan analisis di modul manapun — snapshot otomatis tersimpan.</div>
+    <button class="btn-primary" onclick="historySaveSnapshot()" style="margin:0 auto">⚡ Simpan Snapshot Sekarang</button>
+  </div>
+
+  <!-- History list -->
+  <div id="history-list" style="display:flex;flex-direction:column;gap:12px"></div>
+
+  <!-- Compare panel (hidden by default) -->
+  <div id="history-compare-panel" style="display:none;margin-top:24px">
+    <div class="card" style="border-top:3px solid var(--blue)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-weight:700;font-size:14px;color:var(--blue)">⚖️ Perbandingan Snapshot</div>
+        <button class="btn-ghost" onclick="historyCloseCompare()" style="padding:5px 12px;font-size:12px">✕ Tutup</button>
+      </div>
+      <div id="history-compare-content" style="overflow-x:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
      PAGE: OUTPUT LAPORAN
 ══════════════════════════════════════════════ -->
 <div class="page" id="page-laporan">
@@ -3765,7 +4058,8 @@ function nav(page) {
   if (page === 'retpond') calcRetPond();
   if (page === 'home')   initHMHome();
   if (page === 'rekap')  buildRekap();
-  if (page === 'laporan') buildLaporan();
+  if (page === 'history') { historyUpdateBadge(); historyRender(); }
+  if (page === 'bmkg')    { bmkgInit(); }
 }
 
 /* ═══════════════════════════════════
@@ -8661,7 +8955,1344 @@ document.addEventListener('DOMContentLoaded', function() {
     roAddRow('Area 1', '', '');
     roAddRow('Area 2', '', '');
   }
+  historyUpdateBadge();
 });
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   HYDROMINE — Riwayat Kalkulasi (History Log)
+═══════════════════════════════════════════════════════ */
+
+const HISTORY_KEY    = 'hydromine_history_v1';
+const HISTORY_MAX    = 50;
+let   historyFilter_ = 'all';
+let   historyCompareIds = [];
+
+// ── Helpers ──────────────────────────────────────────
+function historyLoad() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function historySave(list) {
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch(e) {}
+}
+
+// ── Ekstrak ringkasan hasil dari state aktif ──────────
+function historyBuildSummary() {
+  const summary = { modules: [] };
+
+  // Rainfall
+  if (raData && raData.length) {
+    summary.modules.push('rainfall');
+    summary.rainfall = {
+      n: raData.length,
+      max: raStats ? +raStats.max.toFixed(2) : null,
+      mean: raStats ? +raStats.mean.toFixed(2) : null,
+      years: raData.length ? (() => {
+        const yrs = new Set(raData.map(d => new Date(d.date).getFullYear()));
+        return yrs.size;
+      })() : 0
+    };
+  }
+
+  // Runoff
+  const chVal = parseFloat(document.getElementById('ro-ch')?.value);
+  if (roRows && roRows.length && chVal > 0) {
+    summary.modules.push('runoff');
+    const totalQ = roRows.reduce((s, r) => {
+      const c = parseFloat(r.c) || 0;
+      const a = parseFloat(r.a) || 0;
+      return s + (c * a * chVal / 1000);
+    }, 0);
+    summary.runoff = {
+      nCatchment: roRows.length,
+      ch: chVal,
+      totalQ: +totalQ.toFixed(3)
+    };
+  }
+
+  // Sediment Pond
+  const spSf = parseFloat(document.getElementById('sp-sf')?.value);
+  const spDepth = parseFloat(document.getElementById('sp-depth')?.value);
+  if (spSf && spDepth) {
+    summary.modules.push('sedpond');
+    summary.sedpond = { sf: spSf, depth: spDepth };
+  }
+
+  // Retention Pond
+  const rpSf = parseFloat(document.getElementById('rp-sf-val')?.value);
+  const rpFactor = parseFloat(document.getElementById('rp-factor')?.value);
+  if (rpSf && rpFactor && Object.values(spNeedRetPond||{}).some(v=>v)) {
+    summary.modules.push('retpond');
+    summary.retpond = { sf: rpSf, factor: rpFactor };
+  }
+
+  // Groundwater
+  const gwTotal = typeof gwGetTotal === 'function' ? gwGetTotal() : 0;
+  if (gwTotal > 0) {
+    summary.modules.push('groundwater');
+    summary.groundwater = { total: +gwTotal.toFixed(3) };
+  }
+
+  return summary;
+}
+
+// ── Simpan snapshot manual ────────────────────────────
+function historySaveSnapshot(label) {
+  const list    = historyLoad();
+  const summary = historyBuildSummary();
+
+  if (!summary.modules.length) {
+    showToast('⚠ Belum ada data untuk disimpan. Lakukan analisis terlebih dahulu.', 'error');
+    return;
+  }
+
+  const name = label || prompt('Nama snapshot (kosongkan untuk otomatis):', '') ;
+  const snap = {
+    id:        Date.now(),
+    label:     name && name.trim() ? name.trim() : ('Snapshot ' + new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})),
+    createdAt: new Date().toISOString(),
+    summary,
+    state:     collectState()
+  };
+
+  list.unshift(snap);
+  if (list.length > HISTORY_MAX) list.splice(HISTORY_MAX);
+  historySave(list);
+  historyUpdateBadge();
+  historyRender();
+  showToast('✅ Snapshot tersimpan: ' + snap.label, 'success');
+}
+
+// ── Auto-snapshot setelah analisis ───────────────────
+function historyAutoSnapshot(moduleName) {
+  const list    = historyLoad();
+  const summary = historyBuildSummary();
+  if (!summary.modules.length) return;
+
+  // Hindari duplikat dalam 60 detik
+  if (list.length && (Date.now() - list[0].id) < 60000 && list[0].auto) return;
+
+  const snap = {
+    id:        Date.now(),
+    label:     'Auto · ' + moduleName + ' · ' + new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+    createdAt: new Date().toISOString(),
+    auto:      true,
+    summary,
+    state:     collectState()
+  };
+
+  list.unshift(snap);
+  if (list.length > HISTORY_MAX) list.splice(HISTORY_MAX);
+  historySave(list);
+  historyUpdateBadge();
+  if (document.getElementById('page-history')?.classList.contains('active')) historyRender();
+}
+
+// ── Filter ────────────────────────────────────────────
+function historyFilter(type) {
+  historyFilter_ = type;
+  ['all','rainfall','runoff','sedpond','retpond'].forEach(t => {
+    const btn = document.getElementById('hf-'+t);
+    if (!btn) return;
+    btn.classList.toggle('grpby-active', t === type);
+  });
+  historyRender();
+}
+
+// ── Render daftar ─────────────────────────────────────
+function historyRender() {
+  const list     = historyLoad();
+  const listEl   = document.getElementById('history-list');
+  const emptyEl  = document.getElementById('history-empty');
+  const searchQ  = (document.getElementById('hf-search')?.value || '').toLowerCase();
+
+  let filtered = list.filter(s => {
+    if (historyFilter_ !== 'all' && !s.summary.modules.includes(historyFilter_)) return false;
+    if (searchQ && !s.label.toLowerCase().includes(searchQ)) return false;
+    return true;
+  });
+
+  if (!list.length) {
+    emptyEl.style.display = 'block';
+    listEl.style.display  = 'none';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  listEl.style.display  = 'flex';
+
+  listEl.innerHTML = filtered.length ? filtered.map(snap => historyCardHTML(snap)).join('') :
+    `<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Tidak ada snapshot yang cocok dengan filter.</div>`;
+}
+
+function historyCardHTML(snap) {
+  const d = new Date(snap.createdAt);
+  const dateStr = d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+  const timeStr = d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  const s = snap.summary;
+
+  const moduleBadges = (s.modules||[]).map(m => {
+    const map = { rainfall:'🌧 Rainfall', runoff:'🌊 Runoff', sedpond:'🏊 Sed. Pond', retpond:'💧 Ret. Pond', groundwater:'⛰ Groundwater' };
+    return `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:var(--blue-soft);color:var(--blue);margin-right:4px">${map[m]||m}</span>`;
+  }).join('');
+
+  const kpis = [];
+  if (s.rainfall) {
+    kpis.push(`<div class="hst-kpi"><div class="hst-kpi-lbl">CH Maks</div><div class="hst-kpi-val">${s.rainfall.max} <span>mm</span></div></div>`);
+    kpis.push(`<div class="hst-kpi"><div class="hst-kpi-lbl">Rerata</div><div class="hst-kpi-val">${s.rainfall.mean} <span>mm</span></div></div>`);
+    kpis.push(`<div class="hst-kpi"><div class="hst-kpi-lbl">Data</div><div class="hst-kpi-val">${s.rainfall.n.toLocaleString('id-ID')} <span>baris</span></div></div>`);
+  }
+  if (s.runoff) {
+    kpis.push(`<div class="hst-kpi"><div class="hst-kpi-lbl">CH Desain</div><div class="hst-kpi-val">${s.runoff.ch} <span>mm</span></div></div>`);
+    kpis.push(`<div class="hst-kpi"><div class="hst-kpi-lbl">Total Q</div><div class="hst-kpi-val">${s.runoff.totalQ} <span>m³/hari</span></div></div>`);
+  }
+  if (s.sedpond) {
+    kpis.push(`<div class="hst-kpi"><div class="hst-kpi-lbl">SF Sed.</div><div class="hst-kpi-val">${s.sedpond.sf}</div></div>`);
+  }
+  if (s.groundwater) {
+    kpis.push(`<div class="hst-kpi"><div class="hst-kpi-lbl">Q Groundwater</div><div class="hst-kpi-val">${s.groundwater.total} <span>m³/hari</span></div></div>`);
+  }
+
+  const isComparing = historyCompareIds.includes(snap.id);
+  const autoTag = snap.auto ? `<span style="font-size:10px;padding:1px 7px;border-radius:8px;background:rgba(90,200,176,0.12);color:var(--teal);font-weight:600;margin-left:6px">AUTO</span>` : '';
+
+  return `
+  <div class="card hst-card" id="hst-${snap.id}" style="border-left:3px solid ${snap.auto ? 'var(--teal)' : 'var(--green)'}">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <div style="font-weight:700;font-size:13.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${snap.label}</div>
+          ${autoTag}
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">🕐 ${dateStr} ${timeStr}</div>
+        <div style="margin-bottom:10px">${moduleBadges}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">${kpis.join('')}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+        <button class="btn-primary" onclick="historyRestore(${snap.id})" style="padding:6px 14px;font-size:12px">↩ Pulihkan</button>
+        <button class="btn-secondary ${isComparing?'hst-cmp-active':''}" onclick="historyToggleCompare(${snap.id})" style="padding:6px 14px;font-size:12px" id="hst-cmp-btn-${snap.id}">⚖ Bandingkan</button>
+        <button onclick="historyRename(${snap.id})" style="padding:5px 14px;font-size:11px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer">✏ Rename</button>
+        <button onclick="historyDelete(${snap.id})" style="padding:5px 14px;font-size:11px;background:transparent;border:1px solid rgba(224,92,92,0.3);border-radius:8px;color:var(--red);cursor:pointer">🗑 Hapus</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Pulihkan state dari snapshot ─────────────────────
+function historyRestore(id) {
+  const list = historyLoad();
+  const snap = list.find(s => s.id === id);
+  if (!snap) return;
+  if (!confirm(`Pulihkan snapshot "${snap.label}"?\nData yang sedang aktif akan diganti.`)) return;
+  restoreState(snap.state);
+  showToast('↩ State dipulihkan dari: ' + snap.label, 'success');
+  nav('home');
+}
+
+// ── Rename snapshot ───────────────────────────────────
+function historyRename(id) {
+  const list = historyLoad();
+  const snap = list.find(s => s.id === id);
+  if (!snap) return;
+  const newName = prompt('Nama baru:', snap.label);
+  if (!newName || !newName.trim()) return;
+  snap.label = newName.trim();
+  snap.auto  = false;
+  historySave(list);
+  historyRender();
+}
+
+// ── Hapus satu snapshot ───────────────────────────────
+function historyDelete(id) {
+  if (!confirm('Hapus snapshot ini?')) return;
+  const list = historyLoad().filter(s => s.id !== id);
+  historySave(list);
+  historyCompareIds = historyCompareIds.filter(i => i !== id);
+  historyUpdateBadge();
+  historyRender();
+  historyCloseCompare();
+}
+
+// ── Hapus semua ───────────────────────────────────────
+function historyClearAll() {
+  if (!confirm('Hapus SEMUA riwayat snapshot?')) return;
+  localStorage.removeItem(HISTORY_KEY);
+  historyCompareIds = [];
+  historyUpdateBadge();
+  historyRender();
+  historyCloseCompare();
+  showToast('🗑 Semua riwayat dihapus', 'success');
+}
+
+// ── Compare ───────────────────────────────────────────
+function historyToggleCompare(id) {
+  const idx = historyCompareIds.indexOf(id);
+  if (idx >= 0) {
+    historyCompareIds.splice(idx, 1);
+  } else {
+    if (historyCompareIds.length >= 3) {
+      showToast('⚠ Maksimal 3 snapshot untuk dibandingkan', 'error');
+      return;
+    }
+    historyCompareIds.push(id);
+  }
+  historyRender();
+  if (historyCompareIds.length >= 2) historyShowCompare();
+  else historyCloseCompare();
+}
+
+function historyShowCompare() {
+  const list   = historyLoad();
+  const snaps  = historyCompareIds.map(id => list.find(s => s.id === id)).filter(Boolean);
+  const panel  = document.getElementById('history-compare-panel');
+  const content= document.getElementById('history-compare-content');
+  if (!panel || !content || snaps.length < 2) return;
+
+  const params = [
+    { key: 'rainfall.max',   label: 'CH Maks (mm)',         fmt: v => v != null ? v : '—' },
+    { key: 'rainfall.mean',  label: 'CH Rerata (mm)',        fmt: v => v != null ? v : '—' },
+    { key: 'rainfall.n',     label: 'Jumlah Data (baris)',   fmt: v => v != null ? v.toLocaleString('id-ID') : '—' },
+    { key: 'rainfall.years', label: 'Jumlah Tahun',          fmt: v => v != null ? v : '—' },
+    { key: 'runoff.ch',      label: 'CH Desain (mm)',        fmt: v => v != null ? v : '—' },
+    { key: 'runoff.totalQ',  label: 'Total Q Runoff (m³/hr)',fmt: v => v != null ? v : '—' },
+    { key: 'runoff.nCatchment', label: 'Jumlah Catchment',  fmt: v => v != null ? v : '—' },
+    { key: 'sedpond.sf',     label: 'SF Sediment Pond',     fmt: v => v != null ? v : '—' },
+    { key: 'sedpond.depth',  label: 'Kedalaman SP (m)',     fmt: v => v != null ? v : '—' },
+    { key: 'groundwater.total', label: 'Q Groundwater (m³/hr)', fmt: v => v != null ? v : '—' },
+  ];
+
+  function getVal(snap, keyPath) {
+    return keyPath.split('.').reduce((o, k) => (o && o[k] !== undefined ? o[k] : null), snap.summary);
+  }
+
+  const headers = snaps.map(s => `<th style="padding:10px 16px;font-weight:700;font-size:12px;min-width:140px;border-bottom:2px solid var(--border2);color:var(--text)">${s.label}</th>`).join('');
+
+  const rows = params.map(p => {
+    const vals = snaps.map(s => getVal(s, p.key));
+    if (vals.every(v => v === null)) return '';
+
+    // Highlight max numeric value
+    const numVals = vals.map(v => typeof v === 'number' ? v : null);
+    const maxVal  = numVals.reduce((a, b) => (b !== null && (a === null || b > a) ? b : a), null);
+
+    const cells = vals.map((v, i) => {
+      const isMax = numVals[i] !== null && numVals[i] === maxVal && snaps.length > 1 && numVals.filter(x => x !== null).length > 1;
+      return `<td style="padding:9px 16px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:12.5px;${isMax ? 'color:var(--green);font-weight:700' : 'color:var(--text)'}">${p.fmt(v)}</td>`;
+    }).join('');
+
+    return `<tr>
+      <td style="padding:9px 16px;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);font-weight:600">${p.label}</td>
+      ${cells}
+    </tr>`;
+  }).filter(Boolean).join('');
+
+  content.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead>
+        <tr>
+          <th style="padding:10px 16px;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border2);min-width:160px;text-align:left">Parameter</th>
+          ${headers}
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="margin-top:10px;font-size:11px;color:var(--muted)">💡 Nilai tertinggi ditampilkan dalam warna hijau</div>
+  `;
+
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function historyCloseCompare() {
+  const panel = document.getElementById('history-compare-panel');
+  if (panel) panel.style.display = 'none';
+  historyCompareIds = [];
+}
+
+// ── Badge update ──────────────────────────────────────
+function historyUpdateBadge() {
+  const count = historyLoad().length;
+  const badge = document.getElementById('history-badge');
+  if (!badge) return;
+  badge.textContent  = count;
+  badge.style.display = count > 0 ? 'inline-flex' : 'none';
+}
+
+// ── CSS tambahan untuk History cards ─────────────────
+(function() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .hst-card { padding: 16px 18px; transition: box-shadow 0.2s; }
+    .hst-card:hover { box-shadow: var(--shadow-md); }
+    .hst-kpi {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 12px;
+      min-width: 90px;
+    }
+    .hst-kpi-lbl { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+    .hst-kpi-val { font-size: 14px; font-weight: 700; color: var(--text); font-family: var(--mono); line-height: 1.3; }
+    .hst-kpi-val span { font-size: 10px; color: var(--muted); font-weight: 400; }
+    .hst-cmp-active { background: var(--blue) !important; color: white !important; border-color: var(--blue) !important; }
+  `;
+  document.head.appendChild(style);
+})();
+
+// ── Patch raAnalyze untuk auto-snapshot ──────────────
+const _raAnalyze_hist = raAnalyze;
+raAnalyze = function() {
+  _raAnalyze_hist();
+  setTimeout(() => historyAutoSnapshot('Rainfall'), 200);
+};
+
+// ── Patch calcSedPond untuk auto-snapshot ─────────────
+const _calcSedPond_hist = calcSedPond;
+calcSedPond = function() {
+  _calcSedPond_hist();
+  setTimeout(() => historyAutoSnapshot('Sediment Pond'), 200);
+};
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   HYDROMINE — BMKG Station Finder + Open-Meteo Fetcher
+═══════════════════════════════════════════════════════ */
+
+// ── Database Stasiun BMKG (~180 stasiun utama seluruh Indonesia) ──
+// Format: [id, nama, provinsi, kab/kota, lat, lon, tipe]
+const BMKG_STATIONS = [
+  // ═══════════════════════════════════════════════════════════
+  // ACEH
+  // ═══════════════════════════════════════════════════════════
+  [1,'Stasiun Meteorologi Sultan Iskandar Muda','Aceh','Kab. Aceh Besar',5.5228,95.4205,'Met'],
+  [2,'Stasiun Klimatologi Aceh Besar','Aceh','Kab. Aceh Besar',5.5506,95.3348,'Klim'],
+  [3,'Stasiun Meteorologi Cut Nyak Dhien','Aceh','Kab. Nagan Raya',4.0708,96.2498,'Met'],
+  [4,'Stasiun Meteorologi Maimun Saleh','Aceh','Kota Sabang',5.8742,95.3397,'Met'],
+  [5,'Stasiun Meteorologi Rembele','Aceh','Kab. Bener Meriah',4.7295,96.8502,'Met'],
+  [6,'Stasiun Meteorologi Malikussaleh','Aceh','Kab. Aceh Utara',5.2267,97.0033,'Met'],
+  [7,'Stasiun Geofisika Mata Ie','Aceh','Kab. Aceh Besar',5.4700,95.3300,'Geo'],
+  [8,'Pos Hujan Banda Aceh','Aceh','Kota Banda Aceh',5.5477,95.3233,'Hidr'],
+  [9,'Pos Hujan Lhokseumawe','Aceh','Kota Lhokseumawe',5.1800,97.1500,'Hidr'],
+  [10,'Pos Hujan Langsa','Aceh','Kota Langsa',4.4667,97.9833,'Hidr'],
+  [11,'Pos Hujan Blangpidie','Aceh','Kab. Aceh Barat Daya',3.7400,96.8200,'Hidr'],
+  [12,'Pos Hujan Tapak Tuan','Aceh','Kab. Aceh Selatan',3.2600,97.1800,'Hidr'],
+  [13,'Stasiun Meteorologi Lasikin','Aceh','Kab. Simeulue',2.5878,95.9559,'Met'],
+  // ═══════════════════════════════════════════════════════════
+  // SUMATERA UTARA
+  // ═══════════════════════════════════════════════════════════
+  [14,'Stasiun Meteorologi Kualanamu','Sumatera Utara','Kab. Deli Serdang',3.6415,98.8755,'Met'],
+  [15,'Stasiun Klimatologi Deli Serdang','Sumatera Utara','Kab. Deli Serdang',3.5547,98.6749,'Klim'],
+  [16,'Stasiun Meteorologi Ferdinand Lumban Tobing','Sumatera Utara','Kota Sibolga',1.5590,98.8916,'Met'],
+  [17,'Stasiun Meteorologi Dr. FL Tobing Pinangsori','Sumatera Utara','Kab. Tapanuli Tengah',1.5580,98.8910,'Met'],
+  [18,'Stasiun Meteorologi Binaka','Sumatera Utara','Kab. Nias Selatan',0.7253,97.7048,'Met'],
+  [19,'Stasiun Meteorologi Aek Godang','Sumatera Utara','Kab. Padang Lawas Utara',1.4002,99.4305,'Met'],
+  [20,'Stasiun Geofisika Deli Serdang','Sumatera Utara','Kab. Deli Serdang',3.5500,98.7000,'Geo'],
+  [21,'Pos Hujan Medan','Sumatera Utara','Kota Medan',3.5896,98.6731,'Hidr'],
+  [22,'Pos Hujan Tebing Tinggi','Sumatera Utara','Kota Tebing Tinggi',3.3292,99.1581,'Hidr'],
+  [23,'Pos Hujan Pematang Siantar','Sumatera Utara','Kota Pematang Siantar',2.9595,99.0687,'Hidr'],
+  [24,'Pos Hujan Tanjung Balai','Sumatera Utara','Kota Tanjung Balai',2.9667,99.8000,'Hidr'],
+  [25,'Pos Hujan Balige','Sumatera Utara','Kab. Toba',2.3333,99.0667,'Hidr'],
+  [26,'Pos Hujan Nias','Sumatera Utara','Kab. Nias',1.1500,97.5500,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // SUMATERA BARAT
+  // ═══════════════════════════════════════════════════════════
+  [27,'Stasiun Meteorologi Minangkabau','Sumatera Barat','Kab. Padang Pariaman',-0.7869,100.2803,'Met'],
+  [28,'Stasiun Klimatologi Padang Pariaman','Sumatera Barat','Kab. Padang Pariaman',-0.6833,100.3000,'Klim'],
+  [29,'Stasiun Meteorologi Tabing','Sumatera Barat','Kota Padang',-0.8760,100.3517,'Met'],
+  [30,'Stasiun Meteorologi Rokot','Sumatera Barat','Kab. Kepulauan Mentawai',-2.6997,100.0013,'Met'],
+  [31,'Pos Hujan Padang','Sumatera Barat','Kota Padang',-0.9471,100.4172,'Hidr'],
+  [32,'Pos Hujan Bukittinggi','Sumatera Barat','Kota Bukittinggi',-0.3063,100.3695,'Hidr'],
+  [33,'Pos Hujan Solok','Sumatera Barat','Kota Solok',-0.7903,100.6547,'Hidr'],
+  [34,'Pos Hujan Payakumbuh','Sumatera Barat','Kota Payakumbuh',-0.2217,100.6392,'Hidr'],
+  [35,'Pos Hujan Muaro Sijunjung','Sumatera Barat','Kab. Sijunjung',-0.6922,100.9506,'Hidr'],
+  [36,'Stasiun Geofisika Padang Panjang','Sumatera Barat','Kota Padang Panjang',-0.4500,100.4000,'Geo'],
+  // ═══════════════════════════════════════════════════════════
+  // RIAU
+  // ═══════════════════════════════════════════════════════════
+  [37,'Stasiun Meteorologi Sultan Syarif Kasim II','Riau','Kota Pekanbaru',0.4608,101.4449,'Met'],
+  [38,'Stasiun Klimatologi Pekanbaru','Riau','Kota Pekanbaru',0.5000,101.4500,'Klim'],
+  [39,'Stasiun Meteorologi Japura','Riau','Kab. Indragiri Hulu',-0.3597,102.3354,'Met'],
+  [40,'Stasiun Meteorologi Pinang Kampai','Riau','Kota Dumai',1.6078,101.4353,'Met'],
+  [41,'Pos Hujan Pekanbaru','Riau','Kota Pekanbaru',0.5103,101.4480,'Hidr'],
+  [42,'Pos Hujan Bengkalis','Riau','Kab. Bengkalis',1.4833,102.1167,'Hidr'],
+  [43,'Pos Hujan Rengat','Riau','Kab. Indragiri Hulu',-0.3500,102.5500,'Hidr'],
+  [44,'Pos Hujan Tembilahan','Riau','Kab. Indragiri Hilir',-0.3500,103.1500,'Hidr'],
+  [45,'Pos Hujan Siak','Riau','Kab. Siak',0.8667,102.0000,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // KEPULAUAN RIAU
+  // ═══════════════════════════════════════════════════════════
+  [46,'Stasiun Meteorologi Raja Haji Fisabilillah','Kepulauan Riau','Kota Tanjung Pinang',0.9219,104.5319,'Met'],
+  [47,'Stasiun Meteorologi Hang Nadim','Kepulauan Riau','Kota Batam',1.1218,104.1188,'Met'],
+  [48,'Stasiun Meteorologi Dabo Singkep','Kepulauan Riau','Kab. Lingga',-0.4783,104.5786,'Met'],
+  [49,'Pos Hujan Batam','Kepulauan Riau','Kota Batam',1.1500,104.0500,'Hidr'],
+  [50,'Pos Hujan Tanjung Pinang','Kepulauan Riau','Kota Tanjung Pinang',0.9167,104.4667,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // JAMBI
+  // ═══════════════════════════════════════════════════════════
+  [51,'Stasiun Meteorologi Sultan Thaha','Jambi','Kota Jambi',-1.6383,103.6441,'Met'],
+  [52,'Stasiun Klimatologi Muaro Jambi','Jambi','Kab. Muaro Jambi',-1.5700,103.6400,'Klim'],
+  [53,'Pos Hujan Jambi','Jambi','Kota Jambi',-1.6100,103.6167,'Hidr'],
+  [54,'Pos Hujan Muara Bungo','Jambi','Kab. Bungo',-1.5667,102.1333,'Hidr'],
+  [55,'Pos Hujan Sungai Penuh','Jambi','Kota Sungai Penuh',-2.0667,101.4000,'Hidr'],
+  [56,'Pos Hujan Kuala Tungkal','Jambi','Kab. Tanjung Jabung Barat',-0.8500,103.4667,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // SUMATERA SELATAN
+  // ═══════════════════════════════════════════════════════════
+  [57,'Stasiun Meteorologi Sultan Mahmud Badaruddin II','Sumatera Selatan','Kota Palembang',-2.8983,104.6997,'Met'],
+  [58,'Stasiun Klimatologi Kenten','Sumatera Selatan','Kota Palembang',-2.9333,104.7833,'Klim'],
+  [59,'Stasiun Meteorologi Atung Bungsu','Sumatera Selatan','Kab. Lahat',-3.9594,103.5261,'Met'],
+  [60,'Pos Hujan Palembang','Sumatera Selatan','Kota Palembang',-2.9761,104.7754,'Hidr'],
+  [61,'Pos Hujan Lubuklinggau','Sumatera Selatan','Kota Lubuklinggau',-3.2928,102.8614,'Hidr'],
+  [62,'Pos Hujan Lahat','Sumatera Selatan','Kab. Lahat',-3.7833,103.5333,'Hidr'],
+  [63,'Pos Hujan Muara Enim','Sumatera Selatan','Kab. Muara Enim',-3.6667,103.7500,'Hidr'],
+  [64,'Pos Hujan OKU Timur','Sumatera Selatan','Kab. OKU Timur',-4.0833,103.9167,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // BENGKULU
+  // ═══════════════════════════════════════════════════════════
+  [65,'Stasiun Meteorologi Fatmawati Soekarno','Bengkulu','Kota Bengkulu',-3.8620,102.3381,'Met'],
+  [66,'Stasiun Klimatologi Pulau Baai','Bengkulu','Kota Bengkulu',-3.9167,102.3500,'Klim'],
+  [67,'Pos Hujan Bengkulu','Bengkulu','Kota Bengkulu',-3.7889,102.2600,'Hidr'],
+  [68,'Pos Hujan Curup','Bengkulu','Kab. Rejang Lebong',-3.4667,102.5333,'Hidr'],
+  [69,'Pos Hujan Manna','Bengkulu','Kab. Bengkulu Selatan',-4.4167,103.0833,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // LAMPUNG
+  // ═══════════════════════════════════════════════════════════
+  [70,'Stasiun Meteorologi Radin Intan II','Lampung','Kab. Lampung Selatan',-5.2405,105.1756,'Met'],
+  [71,'Stasiun Klimatologi Masgar','Lampung','Kab. Pesawaran',-5.3167,105.1833,'Klim'],
+  [72,'Stasiun Meteorologi Cut Nyak Dien Krui','Lampung','Kab. Pesisir Barat',-5.1958,103.9275,'Met'],
+  [73,'Pos Hujan Bandar Lampung','Lampung','Kota Bandar Lampung',-5.4306,105.2611,'Hidr'],
+  [74,'Pos Hujan Metro','Lampung','Kota Metro',-5.1167,105.3000,'Hidr'],
+  [75,'Pos Hujan Kotabumi','Lampung','Kab. Lampung Utara',-4.8333,104.9000,'Hidr'],
+  [76,'Pos Hujan Tulang Bawang','Lampung','Kab. Tulang Bawang',-4.1667,105.5833,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // BANGKA BELITUNG
+  // ═══════════════════════════════════════════════════════════
+  [77,'Stasiun Meteorologi Depati Amir','Bangka Belitung','Kab. Bangka',-2.1622,106.1388,'Met'],
+  [78,'Stasiun Meteorologi Buluh Tumbang','Bangka Belitung','Kab. Belitung',-2.7458,107.7547,'Met'],
+  [79,'Pos Hujan Pangkal Pinang','Bangka Belitung','Kota Pangkal Pinang',-2.1500,106.1333,'Hidr'],
+  [80,'Pos Hujan Tanjung Pandan','Bangka Belitung','Kab. Belitung',-2.7500,107.6667,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // BANTEN
+  // ═══════════════════════════════════════════════════════════
+  [81,'Stasiun Meteorologi Soekarno Hatta','Banten','Kota Tangerang',-6.1177,106.6520,'Met'],
+  [82,'Stasiun Meteorologi Serang','Banten','Kota Serang',-6.1186,106.1533,'Met'],
+  [83,'Pos Hujan Serang','Banten','Kota Serang',-6.1200,106.1500,'Hidr'],
+  [84,'Pos Hujan Pandeglang','Banten','Kab. Pandeglang',-6.3000,106.1167,'Hidr'],
+  [85,'Pos Hujan Rangkasbitung','Banten','Kab. Lebak',-6.3500,106.2500,'Hidr'],
+  [86,'Pos Hujan Tangerang','Banten','Kota Tangerang',-6.1783,106.6319,'Hidr'],
+  [87,'Stasiun Klimatologi Pondok Betung','Banten','Kota Tangerang Selatan',-6.2883,106.7275,'Klim'],
+  // ═══════════════════════════════════════════════════════════
+  // DKI JAKARTA
+  // ═══════════════════════════════════════════════════════════
+  [88,'Stasiun Meteorologi Kemayoran','DKI Jakarta','Kota Jakarta Pusat',-6.1580,106.8451,'Met'],
+  [89,'Stasiun Klimatologi Pondok Betung (DKI)','DKI Jakarta','Kota Jakarta Selatan',-6.2917,106.7472,'Klim'],
+  [90,'Stasiun Geofisika Tangerang','DKI Jakarta','Kota Tangerang',-6.1778,106.6278,'Geo'],
+  [91,'Pos Hujan Halim Perdanakusuma','DKI Jakarta','Kota Jakarta Timur',-6.2669,106.8912,'Hidr'],
+  [92,'Pos Hujan Tanjung Priok','DKI Jakarta','Kota Jakarta Utara',-6.1067,106.8714,'Hidr'],
+  [93,'Pos Hujan Pluit','DKI Jakarta','Kota Jakarta Utara',-6.1200,106.7833,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // JAWA BARAT
+  // ═══════════════════════════════════════════════════════════
+  [94,'Stasiun Meteorologi Husein Sastranegara','Jawa Barat','Kota Bandung',-6.9003,107.5760,'Met'],
+  [95,'Stasiun Klimatologi Bandung','Jawa Barat','Kota Bandung',-6.9167,107.6000,'Klim'],
+  [96,'Stasiun Meteorologi Jatiwangi','Jawa Barat','Kab. Majalengka',-6.7425,108.2369,'Met'],
+  [97,'Stasiun Geofisika Bandung','Jawa Barat','Kota Bandung',-6.8910,107.6267,'Geo'],
+  [98,'Pos Hujan Bandung','Jawa Barat','Kota Bandung',-6.9000,107.6167,'Hidr'],
+  [99,'Pos Hujan Bogor','Jawa Barat','Kota Bogor',-6.5971,106.8060,'Hidr'],
+  [100,'Pos Hujan Sukabumi','Jawa Barat','Kota Sukabumi',-6.9167,106.9333,'Hidr'],
+  [101,'Pos Hujan Cianjur','Jawa Barat','Kab. Cianjur',-6.8167,107.1500,'Hidr'],
+  [102,'Pos Hujan Garut','Jawa Barat','Kab. Garut',-7.2167,107.9000,'Hidr'],
+  [103,'Pos Hujan Tasikmalaya','Jawa Barat','Kota Tasikmalaya',-7.3500,108.2167,'Hidr'],
+  [104,'Pos Hujan Karawang','Jawa Barat','Kab. Karawang',-6.3167,107.3333,'Hidr'],
+  [105,'Pos Hujan Depok','Jawa Barat','Kota Depok',-6.4000,106.8167,'Hidr'],
+  [106,'Pos Hujan Cirebon','Jawa Barat','Kota Cirebon',-6.7320,108.5523,'Hidr'],
+  [107,'Pos Hujan Bekasi','Jawa Barat','Kota Bekasi',-6.2383,107.0000,'Hidr'],
+  [108,'Stasiun Klimatologi Bogor','Jawa Barat','Kota Bogor',-6.5589,106.7984,'Klim'],
+  // ═══════════════════════════════════════════════════════════
+  // JAWA TENGAH
+  // ═══════════════════════════════════════════════════════════
+  [109,'Stasiun Meteorologi Ahmad Yani','Jawa Tengah','Kota Semarang',-6.9733,110.3747,'Met'],
+  [110,'Stasiun Klimatologi Semarang','Jawa Tengah','Kab. Semarang',-7.0667,110.3833,'Klim'],
+  [111,'Stasiun Meteorologi Adi Sumarmo','Jawa Tengah','Kab. Boyolali',-7.5164,110.7569,'Met'],
+  [112,'Stasiun Meteorologi Tunggul Wulung','Jawa Tengah','Kab. Cilacap',-7.6452,109.0327,'Met'],
+  [113,'Stasiun Geofisika Banjarnegara','Jawa Tengah','Kab. Banjarnegara',-7.3667,109.7000,'Geo'],
+  [114,'Pos Hujan Semarang','Jawa Tengah','Kota Semarang',-6.9932,110.4203,'Hidr'],
+  [115,'Pos Hujan Solo','Jawa Tengah','Kota Surakarta',-7.5667,110.8167,'Hidr'],
+  [116,'Pos Hujan Cilacap','Jawa Tengah','Kab. Cilacap',-7.7167,109.0167,'Hidr'],
+  [117,'Pos Hujan Purwokerto','Jawa Tengah','Kab. Banyumas',-7.4167,109.2333,'Hidr'],
+  [118,'Pos Hujan Magelang','Jawa Tengah','Kota Magelang',-7.4667,110.2167,'Hidr'],
+  [119,'Pos Hujan Pekalongan','Jawa Tengah','Kota Pekalongan',-6.8833,109.6750,'Hidr'],
+  [120,'Pos Hujan Tegal','Jawa Tengah','Kota Tegal',-6.8667,109.1333,'Hidr'],
+  [121,'Pos Hujan Kudus','Jawa Tengah','Kab. Kudus',-6.8000,110.8500,'Hidr'],
+  [122,'Pos Hujan Wonosobo','Jawa Tengah','Kab. Wonosobo',-7.3667,109.9000,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // DI YOGYAKARTA
+  // ═══════════════════════════════════════════════════════════
+  [123,'Stasiun Meteorologi Adisucipto','DI Yogyakarta','Kab. Sleman',-7.7882,110.4323,'Met'],
+  [124,'Stasiun Klimatologi Mlati','DI Yogyakarta','Kab. Sleman',-7.7500,110.3500,'Klim'],
+  [125,'Stasiun Geofisika Yogyakarta','DI Yogyakarta','Kota Yogyakarta',-7.8367,110.3625,'Geo'],
+  [126,'Pos Hujan Yogyakarta','DI Yogyakarta','Kota Yogyakarta',-7.8014,110.3644,'Hidr'],
+  [127,'Pos Hujan Bantul','DI Yogyakarta','Kab. Bantul',-7.8833,110.3167,'Hidr'],
+  [128,'Pos Hujan Gunung Kidul','DI Yogyakarta','Kab. Gunung Kidul',-7.9667,110.5833,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // JAWA TIMUR
+  // ═══════════════════════════════════════════════════════════
+  [129,'Stasiun Meteorologi Juanda','Jawa Timur','Kab. Sidoarjo',-7.3803,112.7878,'Met'],
+  [130,'Stasiun Klimatologi Karangploso','Jawa Timur','Kab. Malang',-7.8392,112.5989,'Klim'],
+  [131,'Stasiun Meteorologi Abdul Rachman Saleh','Jawa Timur','Kab. Malang',-7.9300,112.7145,'Met'],
+  [132,'Stasiun Meteorologi Banyuwangi','Jawa Timur','Kab. Banyuwangi',-8.3122,114.3380,'Met'],
+  [133,'Stasiun Meteorologi Noto Hadinegoro','Jawa Timur','Kab. Jember',-8.2398,113.6955,'Met'],
+  [134,'Stasiun Geofisika Pasuruan','Jawa Timur','Kab. Pasuruan',-7.6500,112.9167,'Geo'],
+  [135,'Pos Hujan Surabaya','Jawa Timur','Kota Surabaya',-7.2492,112.7508,'Hidr'],
+  [136,'Pos Hujan Malang','Jawa Timur','Kota Malang',-7.9769,112.6308,'Hidr'],
+  [137,'Pos Hujan Kediri','Jawa Timur','Kota Kediri',-7.8167,112.0167,'Hidr'],
+  [138,'Pos Hujan Blitar','Jawa Timur','Kota Blitar',-8.0833,112.1667,'Hidr'],
+  [139,'Pos Hujan Jember','Jawa Timur','Kab. Jember',-8.1667,113.7000,'Hidr'],
+  [140,'Pos Hujan Banyuwangi','Jawa Timur','Kab. Banyuwangi',-8.2500,114.3667,'Hidr'],
+  [141,'Pos Hujan Madiun','Jawa Timur','Kota Madiun',-7.6333,111.5333,'Hidr'],
+  [142,'Pos Hujan Probolinggo','Jawa Timur','Kota Probolinggo',-7.7500,113.2167,'Hidr'],
+  [143,'Pos Hujan Pacitan','Jawa Timur','Kab. Pacitan',-8.1667,111.1000,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // BALI
+  // ═══════════════════════════════════════════════════════════
+  [144,'Stasiun Meteorologi Ngurah Rai','Bali','Kab. Badung',-8.7481,115.1670,'Met'],
+  [145,'Stasiun Klimatologi Jembrana','Bali','Kab. Jembrana',-8.4167,114.6167,'Klim'],
+  [146,'Pos Hujan Denpasar','Bali','Kota Denpasar',-8.6705,115.2126,'Hidr'],
+  [147,'Pos Hujan Singaraja','Bali','Kab. Buleleng',-8.1167,115.0833,'Hidr'],
+  [148,'Pos Hujan Karangasem','Bali','Kab. Karangasem',-8.4333,115.6167,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // NUSA TENGGARA BARAT
+  // ═══════════════════════════════════════════════════════════
+  [149,'Stasiun Meteorologi Praya','NTB','Kab. Lombok Tengah',-8.7581,116.0944,'Met'],
+  [150,'Stasiun Klimatologi Lombok Barat','NTB','Kab. Lombok Barat',-8.5833,116.0833,'Klim'],
+  [151,'Stasiun Meteorologi Bima','NTB','Kota Bima',-8.5394,118.6876,'Met'],
+  [152,'Pos Hujan Mataram','NTB','Kota Mataram',-8.5833,116.1167,'Hidr'],
+  [153,'Pos Hujan Sumbawa Besar','NTB','Kab. Sumbawa',-8.4833,117.4167,'Hidr'],
+  [154,'Pos Hujan Dompu','NTB','Kab. Dompu',-8.5333,118.4500,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // NUSA TENGGARA TIMUR
+  // ═══════════════════════════════════════════════════════════
+  [155,'Stasiun Meteorologi El Tari','NTT','Kota Kupang',-10.1714,123.6703,'Met'],
+  [156,'Stasiun Klimatologi Kupang','NTT','Kota Kupang',-10.1500,123.6167,'Klim'],
+  [157,'Stasiun Meteorologi Frans Sales Lega','NTT','Kab. Manggarai',-8.5970,120.4826,'Met'],
+  [158,'Stasiun Meteorologi David Constantijn Saudale','NTT','Kab. Rote Ndao',-10.8200,123.0700,'Met'],
+  [159,'Pos Hujan Kupang','NTT','Kota Kupang',-10.1667,123.5833,'Hidr'],
+  [160,'Pos Hujan Maumere','NTT','Kab. Sikka',-8.6167,122.2333,'Hidr'],
+  [161,'Pos Hujan Ende','NTT','Kab. Ende',-8.8500,121.6667,'Hidr'],
+  [162,'Pos Hujan Atambua','NTT','Kab. Belu',-9.1000,124.8833,'Hidr'],
+  [163,'Pos Hujan Labuan Bajo','NTT','Kab. Manggarai Barat',-8.4878,119.8878,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // KALIMANTAN BARAT
+  // ═══════════════════════════════════════════════════════════
+  [164,'Stasiun Meteorologi Supadio','Kalimantan Barat','Kab. Kubu Raya',-0.1511,109.4037,'Met'],
+  [165,'Stasiun Klimatologi Mempawah','Kalimantan Barat','Kab. Mempawah',0.3667,108.9833,'Klim'],
+  [166,'Pos Hujan Pontianak','Kalimantan Barat','Kota Pontianak',-0.0333,109.3167,'Hidr'],
+  [167,'Pos Hujan Ketapang','Kalimantan Barat','Kab. Ketapang',-1.8333,110.0000,'Hidr'],
+  [168,'Pos Hujan Singkawang','Kalimantan Barat','Kota Singkawang',0.9000,108.9833,'Hidr'],
+  [169,'Pos Hujan Sanggau','Kalimantan Barat','Kab. Sanggau',0.1333,110.5833,'Hidr'],
+  [170,'Pos Hujan Sintang','Kalimantan Barat','Kab. Sintang',0.0667,111.5000,'Hidr'],
+  [171,'Pos Hujan Putussibau','Kalimantan Barat','Kab. Kapuas Hulu',0.8333,112.9333,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // KALIMANTAN TENGAH
+  // ═══════════════════════════════════════════════════════════
+  [172,'Stasiun Meteorologi Tjilik Riwut','Kalimantan Tengah','Kota Palangka Raya',-2.2251,113.9432,'Met'],
+  [173,'Stasiun Klimatologi Panarung','Kalimantan Tengah','Kota Palangka Raya',-2.2167,113.9000,'Klim'],
+  [174,'Pos Hujan Palangka Raya','Kalimantan Tengah','Kota Palangka Raya',-2.2092,113.9133,'Hidr'],
+  [175,'Pos Hujan Sampit','Kalimantan Tengah','Kab. Kotawaringin Timur',-2.5333,112.9500,'Hidr'],
+  [176,'Pos Hujan Pangkalan Bun','Kalimantan Tengah','Kab. Kotawaringin Barat',-2.6833,111.6167,'Hidr'],
+  [177,'Pos Hujan Muara Teweh','Kalimantan Tengah','Kab. Barito Utara',-0.9500,114.9000,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // KALIMANTAN SELATAN
+  // ═══════════════════════════════════════════════════════════
+  [178,'Stasiun Meteorologi Syamsudin Noor','Kalimantan Selatan','Kab. Banjarbaru',-3.4421,114.7627,'Met'],
+  [179,'Stasiun Klimatologi Banjarbaru','Kalimantan Selatan','Kota Banjarbaru',-3.4750,114.8333,'Klim'],
+  [180,'Pos Hujan Banjarmasin','Kalimantan Selatan','Kota Banjarmasin',-3.3167,114.5833,'Hidr'],
+  [181,'Pos Hujan Banjarbaru','Kalimantan Selatan','Kota Banjarbaru',-3.4667,114.8333,'Hidr'],
+  [182,'Pos Hujan Kotabaru','Kalimantan Selatan','Kab. Kotabaru',-3.2833,116.2167,'Hidr'],
+  [183,'Pos Hujan Amuntai','Kalimantan Selatan','Kab. Hulu Sungai Utara',-2.4167,115.2500,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // KALIMANTAN TIMUR
+  // ═══════════════════════════════════════════════════════════
+  [184,'Stasiun Meteorologi Sultan Aji Muhammad Sulaiman','Kalimantan Timur','Kota Balikpapan',-1.2683,116.8943,'Met'],
+  [185,'Stasiun Meteorologi Temindung','Kalimantan Timur','Kota Samarinda',-0.4762,117.1561,'Met'],
+  [186,'Stasiun Meteorologi Kalimarau','Kalimantan Timur','Kab. Berau',2.1583,117.4329,'Met'],
+  [187,'Pos Hujan Balikpapan','Kalimantan Timur','Kota Balikpapan',-1.2675,116.8289,'Hidr'],
+  [188,'Pos Hujan Samarinda','Kalimantan Timur','Kota Samarinda',-0.5028,117.1536,'Hidr'],
+  [189,'Pos Hujan Bontang','Kalimantan Timur','Kota Bontang',0.1333,117.5000,'Hidr'],
+  [190,'Pos Hujan Kutai Kartanegara','Kalimantan Timur','Kab. Kutai Kartanegara',-0.5000,117.1667,'Hidr'],
+  [191,'Pos Hujan Penajam','Kalimantan Timur','Kab. Penajam Paser Utara',-1.2667,116.4667,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // KALIMANTAN UTARA
+  // ═══════════════════════════════════════════════════════════
+  [192,'Stasiun Meteorologi Juwata','Kalimantan Utara','Kota Tarakan',3.3267,117.5647,'Met'],
+  [193,'Pos Hujan Tarakan','Kalimantan Utara','Kota Tarakan',3.2833,117.6333,'Hidr'],
+  [194,'Pos Hujan Nunukan','Kalimantan Utara','Kab. Nunukan',4.1333,117.6667,'Hidr'],
+  [195,'Pos Hujan Tanjung Selor','Kalimantan Utara','Kab. Bulungan',2.8667,117.3667,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // SULAWESI UTARA
+  // ═══════════════════════════════════════════════════════════
+  [196,'Stasiun Meteorologi Sam Ratulangi','Sulawesi Utara','Kota Manado',1.5492,124.9265,'Met'],
+  [197,'Stasiun Klimatologi Minahasa Selatan','Sulawesi Utara','Kab. Minahasa Selatan',1.1000,124.5500,'Klim'],
+  [198,'Stasiun Meteorologi Naha','Sulawesi Utara','Kab. Kepulauan Sangihe',3.6867,125.5279,'Met'],
+  [199,'Stasiun Geofisika Manado','Sulawesi Utara','Kota Manado',1.4833,124.9000,'Geo'],
+  [200,'Pos Hujan Manado','Sulawesi Utara','Kota Manado',1.4867,124.8458,'Hidr'],
+  [201,'Pos Hujan Kotamobagu','Sulawesi Utara','Kota Kotamobagu',0.7333,124.3167,'Hidr'],
+  [202,'Pos Hujan Bitung','Sulawesi Utara','Kota Bitung',1.4500,125.1833,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // GORONTALO
+  // ═══════════════════════════════════════════════════════════
+  [203,'Stasiun Meteorologi Jalaludin','Gorontalo','Kab. Gorontalo',0.6361,122.8496,'Met'],
+  [204,'Stasiun Klimatologi Gorontalo','Gorontalo','Kab. Gorontalo',0.5000,123.0500,'Klim'],
+  [205,'Pos Hujan Kota Gorontalo','Gorontalo','Kota Gorontalo',0.5333,123.0583,'Hidr'],
+  [206,'Pos Hujan Marisa','Gorontalo','Kab. Pohuwato',0.4667,121.8667,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // SULAWESI TENGAH
+  // ═══════════════════════════════════════════════════════════
+  [207,'Stasiun Meteorologi Mutiara','Sulawesi Tengah','Kota Palu',-0.7182,119.7314,'Met'],
+  [208,'Stasiun Klimatologi Maros','Sulawesi Tengah','Kab. Poso',-1.5000,120.7500,'Klim'],
+  [209,'Stasiun Meteorologi Kasiguncu','Sulawesi Tengah','Kab. Poso',-1.4168,120.6580,'Met'],
+  [210,'Pos Hujan Palu','Sulawesi Tengah','Kota Palu',-0.8917,119.8706,'Hidr'],
+  [211,'Pos Hujan Luwuk','Sulawesi Tengah','Kab. Banggai',-1.0500,122.7833,'Hidr'],
+  [212,'Pos Hujan Tolitoli','Sulawesi Tengah','Kab. Toli-Toli',1.0333,120.8167,'Hidr'],
+  [213,'Pos Hujan Poso','Sulawesi Tengah','Kab. Poso',-1.3833,120.7500,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // SULAWESI SELATAN
+  // ═══════════════════════════════════════════════════════════
+  [214,'Stasiun Meteorologi Sultan Hasanuddin','Sulawesi Selatan','Kab. Maros',-5.0603,119.5537,'Met'],
+  [215,'Stasiun Klimatologi Maros','Sulawesi Selatan','Kab. Maros',-5.0167,119.5667,'Klim'],
+  [216,'Stasiun Meteorologi Tampa Padang','Sulawesi Selatan','Kab. Mamuju',-2.5836,119.0310,'Met'],
+  [217,'Stasiun Meteorologi Soroako','Sulawesi Selatan','Kab. Luwu Timur',-2.5325,121.3588,'Met'],
+  [218,'Stasiun Meteorologi Andi Jemma','Sulawesi Selatan','Kab. Luwu Utara',2.5598,120.3177,'Met'],
+  [219,'Stasiun Geofisika Makassar','Sulawesi Selatan','Kota Makassar',-5.1167,119.4000,'Geo'],
+  [220,'Pos Hujan Makassar','Sulawesi Selatan','Kota Makassar',-5.1478,119.4328,'Hidr'],
+  [221,'Pos Hujan Parepare','Sulawesi Selatan','Kota Parepare',-4.0167,119.6333,'Hidr'],
+  [222,'Pos Hujan Palopo','Sulawesi Selatan','Kota Palopo',-3.0000,120.2167,'Hidr'],
+  [223,'Pos Hujan Bone','Sulawesi Selatan','Kab. Bone',-4.5167,120.3333,'Hidr'],
+  [224,'Pos Hujan Bulukumba','Sulawesi Selatan','Kab. Bulukumba',-5.5667,120.2000,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // SULAWESI BARAT
+  // ═══════════════════════════════════════════════════════════
+  [225,'Stasiun Meteorologi Tampa Padang (Sul-Bar)','Sulawesi Barat','Kab. Mamuju',-2.5836,119.0310,'Met'],
+  [226,'Pos Hujan Mamuju','Sulawesi Barat','Kab. Mamuju',-2.6667,118.9167,'Hidr'],
+  [227,'Pos Hujan Majene','Sulawesi Barat','Kab. Majene',-3.5500,118.9667,'Hidr'],
+  [228,'Pos Hujan Polewali','Sulawesi Barat','Kab. Polewali Mandar',-3.4167,119.3333,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // SULAWESI TENGGARA
+  // ═══════════════════════════════════════════════════════════
+  [229,'Stasiun Meteorologi Haluoleo','Sulawesi Tenggara','Kab. Konawe Selatan',-4.0814,122.4177,'Met'],
+  [230,'Pos Hujan Kendari','Sulawesi Tenggara','Kota Kendari',-3.9817,122.5131,'Hidr'],
+  [231,'Pos Hujan Bau-Bau','Sulawesi Tenggara','Kota Bau-Bau',-5.4833,122.6167,'Hidr'],
+  [232,'Pos Hujan Kolaka','Sulawesi Tenggara','Kab. Kolaka',-4.0667,121.6000,'Hidr'],
+  [233,'Pos Hujan Raha','Sulawesi Tenggara','Kab. Muna',-4.8500,122.7167,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // MALUKU
+  // ═══════════════════════════════════════════════════════════
+  [234,'Stasiun Meteorologi Pattimura','Maluku','Kab. Maluku Tengah',-3.7097,128.0881,'Met'],
+  [235,'Stasiun Klimatologi Seram Bagian Barat','Maluku','Kab. Seram Bagian Barat',-3.2000,128.2000,'Klim'],
+  [236,'Stasiun Meteorologi Amahai','Maluku','Kab. Maluku Tengah',-3.3478,128.9239,'Met'],
+  [237,'Stasiun Meteorologi Dobo','Maluku','Kab. Kepulauan Aru',-5.7728,134.2128,'Met'],
+  [238,'Stasiun Meteorologi Labuha','Maluku','Kab. Halmahera Selatan',-0.6406,127.4952,'Met'],
+  [239,'Pos Hujan Ambon','Maluku','Kota Ambon',-3.6953,128.1814,'Hidr'],
+  [240,'Pos Hujan Tual','Maluku','Kota Tual',-5.6333,132.7500,'Hidr'],
+  [241,'Pos Hujan Namlea','Maluku','Kab. Buru',-3.2500,127.0833,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // MALUKU UTARA
+  // ═══════════════════════════════════════════════════════════
+  [242,'Stasiun Meteorologi Sultan Babullah','Maluku Utara','Kota Ternate',0.8311,127.3749,'Met'],
+  [243,'Stasiun Meteorologi Gamalama','Maluku Utara','Kota Ternate',0.7833,127.3667,'Met'],
+  [244,'Stasiun Meteorologi Gamarmalamo','Maluku Utara','Kab. Halmahera Utara',1.8360,127.7868,'Met'],
+  [245,'Stasiun Meteorologi Buli','Maluku Utara','Kab. Halmahera Timur',0.9082,128.3763,'Met'],
+  [246,'Pos Hujan Ternate','Maluku Utara','Kota Ternate',0.7833,127.3833,'Hidr'],
+  [247,'Pos Hujan Sofifi','Maluku Utara','Kota Tidore Kepulauan',0.7000,127.5667,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // PAPUA BARAT
+  // ═══════════════════════════════════════════════════════════
+  [248,'Stasiun Meteorologi Rendani','Papua Barat','Kota Manokwari',-0.8940,134.0484,'Met'],
+  [249,'Stasiun Klimatologi Manokwari','Papua Barat','Kab. Manokwari',-0.9167,134.0167,'Klim'],
+  [250,'Stasiun Meteorologi Torea','Papua Barat','Kota Fakfak',-2.9199,132.2670,'Met'],
+  [251,'Pos Hujan Manokwari','Papua Barat','Kab. Manokwari',-0.8617,134.0817,'Hidr'],
+  [252,'Pos Hujan Sorong','Papua Barat','Kota Sorong',-0.8833,131.2500,'Hidr'],
+  [253,'Pos Hujan Fakfak','Papua Barat','Kab. Fakfak',-2.9167,132.3000,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // PAPUA BARAT DAYA
+  // ═══════════════════════════════════════════════════════════
+  [254,'Stasiun Meteorologi Domine Eduard Osok','Papua Barat Daya','Kota Sorong',-0.8939,131.2870,'Met'],
+  [255,'Pos Hujan Raja Ampat','Papua Barat Daya','Kab. Raja Ampat',-0.5833,130.1833,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // PAPUA
+  // ═══════════════════════════════════════════════════════════
+  [256,'Stasiun Meteorologi Sentani','Papua','Kab. Jayapura',-2.5756,140.5162,'Met'],
+  [257,'Stasiun Klimatologi Jayapura','Papua','Kota Jayapura',-2.5333,140.7167,'Klim'],
+  [258,'Stasiun Meteorologi Wamena','Papua','Kab. Jayawijaya',-4.1017,138.9568,'Met'],
+  [259,'Stasiun Meteorologi Nabire','Papua','Kab. Nabire',-3.3681,135.4965,'Met'],
+  [260,'Stasiun Meteorologi Mopah','Papua','Kab. Merauke',-8.5206,140.4178,'Met'],
+  [261,'Pos Hujan Jayapura','Papua','Kota Jayapura',-2.5333,140.7167,'Hidr'],
+  [262,'Pos Hujan Merauke','Papua','Kab. Merauke',-8.4833,140.4000,'Hidr'],
+  [263,'Pos Hujan Biak','Papua','Kab. Biak Numfor',-1.1833,136.1000,'Hidr'],
+  [264,'Pos Hujan Nabire','Papua','Kab. Nabire',-3.3667,135.5000,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // PAPUA SELATAN
+  // ═══════════════════════════════════════════════════════════
+  [265,'Stasiun Meteorologi Kimaam','Papua Selatan','Kab. Merauke',-7.9667,138.8833,'Met'],
+  [266,'Pos Hujan Asmat','Papua Selatan','Kab. Asmat',-5.5667,138.4833,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // PAPUA PEGUNUNGAN
+  // ═══════════════════════════════════════════════════════════
+  [267,'Stasiun Meteorologi Oksibil','Papua Pegunungan','Kab. Pegunungan Bintang',-4.9063,140.6266,'Met'],
+  [268,'Pos Hujan Wamena (Peg)','Papua Pegunungan','Kab. Jayawijaya',-4.0833,138.9667,'Hidr'],
+  // ═══════════════════════════════════════════════════════════
+  // PAPUA TENGAH
+  // ═══════════════════════════════════════════════════════════
+  [269,'Stasiun Meteorologi Timika','Papua Tengah','Kab. Mimika',-4.5277,136.8873,'Met'],
+  [270,'Pos Hujan Timika','Papua Tengah','Kab. Mimika',-4.5333,136.8833,'Hidr'],
+  [271,'Pos Hujan Nabire (Teng)','Papua Tengah','Kab. Nabire',-3.3667,135.5000,'Hidr'],
+];
+
+// ── State ──────────────────────────────────────────
+let bmkgSelected   = null;  // selected station object
+let bmkgFetchedData = null; // [{date, value}]
+let bmkgMapInited  = false;
+let bmkgLeafletMap = null;
+let bmkgMarkers    = {};
+let bmkgSelectedMarker = null;
+
+// ── Init: load Leaflet if not yet loaded ──────────
+// ═══════════════════════════════════════════════════════════════
+// BMKG MODULE — Enhanced with Chart.js, Type Filter, Preset Dates
+// ═══════════════════════════════════════════════════════════════
+
+let bmkgLeafletMap    = null;
+let bmkgMapInited     = false;
+let bmkgSelected      = null;
+let bmkgFetchedData   = null;
+let bmkgMarkers       = {};
+let bmkgChartInst     = null;
+let bmkgMonthlyChart  = null;
+
+function bmkgInit() {
+  // Load Leaflet CSS
+  if (!document.getElementById('leaflet-css')) {
+    const link = document.createElement('link');
+    link.id = 'leaflet-css'; link.rel = 'stylesheet';
+    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+    document.head.appendChild(link);
+  }
+  // Load Chart.js if needed
+  if (typeof Chart === 'undefined') {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+    document.head.appendChild(s);
+  }
+  if (typeof L === 'undefined') {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    script.onload = () => { bmkgBuildUI(); };
+    document.head.appendChild(script);
+  } else {
+    bmkgBuildUI();
+  }
+}
+
+function bmkgBuildUI() {
+  bmkgPopulateProvinces();
+  bmkgFilterStations();
+  setTimeout(() => {
+    bmkgInitMap();
+    bmkgSetDefaultDates();
+  }, 80);
+}
+
+function bmkgPopulateProvinces() {
+  const sel = document.getElementById('bmkg-prov');
+  if (!sel || sel.options.length > 1) return;
+  const provs = [...new Set(BMKG_STATIONS.map(s => s[2]))].sort();
+  provs.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p; opt.textContent = p;
+    sel.appendChild(opt);
+  });
+}
+
+function bmkgOnProvChange() {
+  const prov   = document.getElementById('bmkg-prov').value;
+  const kabSel = document.getElementById('bmkg-kab');
+  kabSel.innerHTML = '<option value="">— Semua Kab/Kota —</option>';
+  if (prov) {
+    const kabs = [...new Set(BMKG_STATIONS.filter(s => s[2] === prov).map(s => s[3]))].sort();
+    kabs.forEach(k => {
+      const opt = document.createElement('option');
+      opt.value = k; opt.textContent = k;
+      kabSel.appendChild(opt);
+    });
+  }
+  bmkgFilterStations();
+}
+
+function bmkgResetFilter() {
+  document.getElementById('bmkg-search').value = '';
+  document.getElementById('bmkg-prov').value   = '';
+  document.getElementById('bmkg-kab').innerHTML = '<option value="">— Semua Kab/Kota —</option>';
+  ['bmkg-type-met','bmkg-type-klim','bmkg-type-geo','bmkg-type-hidr'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = true;
+  });
+  bmkgFilterStations();
+}
+
+function bmkgFilterStations() {
+  const prov   = document.getElementById('bmkg-prov')?.value    || '';
+  const kab    = document.getElementById('bmkg-kab')?.value     || '';
+  const search = (document.getElementById('bmkg-search')?.value || '').toLowerCase();
+  const typeMet  = document.getElementById('bmkg-type-met')?.checked  !== false;
+  const typeKlim = document.getElementById('bmkg-type-klim')?.checked !== false;
+  const typeGeo  = document.getElementById('bmkg-type-geo')?.checked  !== false;
+  const typeHidr = document.getElementById('bmkg-type-hidr')?.checked !== false;
+
+  const typeMap = { Met: typeMet, Klim: typeKlim, Geo: typeGeo, Hidr: typeHidr };
+
+  const filtered = BMKG_STATIONS.filter(s => {
+    if (!typeMap[s[6]]) return false;
+    if (prov   && s[2] !== prov)  return false;
+    if (kab    && s[3] !== kab)   return false;
+    if (search && !s[1].toLowerCase().includes(search) &&
+                  !s[3].toLowerCase().includes(search) &&
+                  !s[2].toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const countEl = document.getElementById('bmkg-count');
+  if (countEl) countEl.textContent = filtered.length + ' stasiun';
+
+  const listEl = document.getElementById('bmkg-station-list');
+  if (!listEl) return;
+
+  if (!filtered.length) {
+    listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">Tidak ada stasiun ditemukan</div>';
+    return;
+  }
+
+  const typeColor = { Met:'var(--blue)', Klim:'var(--green)', Geo:'var(--orange)', Hidr:'var(--teal)' };
+  const typeBg    = { Met:'rgba(127,187,238,0.12)', Klim:'rgba(90,200,140,0.12)', Geo:'rgba(232,160,80,0.12)', Hidr:'rgba(90,200,176,0.12)' };
+
+  listEl.innerHTML = filtered.map(s => {
+    const isActive = bmkgSelected && bmkgSelected[0] === s[0];
+    const tc = typeColor[s[6]] || 'var(--muted)';
+    const tb = typeBg[s[6]]   || 'rgba(255,255,255,0.05)';
+    return `<div class="bmkg-station-item${isActive ? ' bmkg-station-active' : ''}"
+      onclick="bmkgSelectStation(${s[0]})"
+      style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);${isActive?'background:var(--blue-soft)':''}">
+      <div style="font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:2px;line-height:1.4">${s[1]}</div>
+      <div style="font-size:10.5px;color:var(--muted);margin-bottom:4px">${s[3]} · ${s[2]}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:${tb};color:${tc}">${s[6]}</span>
+        <span style="font-size:10px;color:var(--light)">${s[4].toFixed(4)}°, ${s[5].toFixed(4)}°</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Update map markers visibility
+  if (bmkgLeafletMap) {
+    const filteredIds = new Set(filtered.map(s => s[0]));
+    Object.entries(bmkgMarkers).forEach(([id, marker]) => {
+      const inFilter = filteredIds.has(parseInt(id));
+      if (inFilter && !bmkgLeafletMap.hasLayer(marker)) marker.addTo(bmkgLeafletMap);
+      else if (!inFilter && bmkgLeafletMap.hasLayer(marker)) bmkgLeafletMap.removeLayer(marker);
+    });
+    // Fit bounds to filtered
+    if (filtered.length > 0 && filtered.length <= 50) {
+      try {
+        const lats = filtered.map(s => s[4]);
+        const lons = filtered.map(s => s[5]);
+        bmkgLeafletMap.fitBounds([[Math.min(...lats)-0.5, Math.min(...lons)-0.5],
+                                   [Math.max(...lats)+0.5, Math.max(...lons)+0.5]]);
+      } catch(e) {}
+    }
+  }
+}
+
+// ── Leaflet Map Init ──────────────────────────────────────────
+function bmkgInitMap() {
+  if (bmkgMapInited) { setTimeout(() => bmkgLeafletMap?.invalidateSize(), 80); return; }
+  const container = document.getElementById('bmkg-map');
+  if (!container || typeof L === 'undefined') return;
+
+  bmkgLeafletMap = L.map('bmkg-map', { center: [-2.5, 118], zoom: 5 });
+
+  const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap', maxZoom: 18
+  }).addTo(bmkgLeafletMap);
+
+  const sat = L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    { attribution: 'Tiles © Esri', maxZoom: 18 }
+  );
+
+  L.control.layers({'Peta':osm,'Satelit':sat},{},{position:'topright'}).addTo(bmkgLeafletMap);
+  bmkgMapInited = true;
+
+  // Add all station markers
+  const typeColor = { Met:'#7fbbee', Klim:'#8ecb6a', Geo:'#e8a050', Hidr:'#5ac8b0' };
+  BMKG_STATIONS.forEach(s => {
+    const c = typeColor[s[6]] || '#aaa';
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:10px;height:10px;border-radius:50%;background:${c};border:2px solid rgba(255,255,255,0.8);box-shadow:0 0 4px ${c}88;cursor:pointer"></div>`,
+      iconSize: [10,10], iconAnchor: [5,5]
+    });
+    const marker = L.marker([s[4], s[5]], { icon })
+      .on('click', () => bmkgSelectStation(s[0]))
+      .bindTooltip(`<b>${s[1]}</b><br>${s[3]}, ${s[2]}`, { direction:'top', offset:[0,-5] });
+    marker.addTo(bmkgLeafletMap);
+    bmkgMarkers[s[0]] = marker;
+  });
+
+  setTimeout(() => bmkgLeafletMap.invalidateSize(), 200);
+}
+
+// ── Select Station ────────────────────────────────────────────
+function bmkgSelectStation(id) {
+  const s = BMKG_STATIONS.find(x => x[0] === id);
+  if (!s) return;
+  bmkgSelected = s;
+
+  // Update detail panel
+  document.getElementById('bmkg-no-selection').style.display = 'none';
+  document.getElementById('bmkg-selected-info').style.display = 'block';
+  document.getElementById('bmkg-sel-name').textContent = s[1];
+  document.getElementById('bmkg-sel-loc').textContent  = s[3] + ' · ' + s[2];
+  document.getElementById('bmkg-sel-coord').textContent = s[4].toFixed(5) + '°, ' + s[5].toFixed(5) + '°';
+
+  const tc = {Met:'#7fbbee',Klim:'#8ecb6a',Geo:'#e8a050',Hidr:'#5ac8b0'}[s[6]] || 'var(--muted)';
+  const badge = document.getElementById('bmkg-sel-type-badge');
+  badge.textContent = s[6];
+  badge.style.cssText = `font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:${tc}22;color:${tc};border:1px solid ${tc}55`;
+
+  document.getElementById('bmkg-open-link').href =
+    `https://dataonline.bmkg.go.id/home?prov=${encodeURIComponent(s[2])}&sta=${encodeURIComponent(s[1])}`;
+
+  // Fly map to station
+  if (bmkgLeafletMap) bmkgLeafletMap.flyTo([s[4], s[5]], 12, { duration: 0.8 });
+
+  // Highlight marker
+  Object.entries(bmkgMarkers).forEach(([mid, m]) => {
+    const isThis = parseInt(mid) === id;
+    const c2 = {Met:'#7fbbee',Klim:'#8ecb6a',Geo:'#e8a050',Hidr:'#5ac8b0'}[s[6]] || '#aaa';
+    if (isThis) {
+      m.setIcon(L.divIcon({
+        className:'',
+        html:`<div style="width:16px;height:16px;border-radius:50%;background:${c2};border:3px solid #fff;box-shadow:0 0 8px ${c2};cursor:pointer"></div>`,
+        iconSize:[16,16],iconAnchor:[8,8]
+      }));
+    }
+  });
+
+  // Re-render list to show active
+  bmkgFilterStations();
+  // Scroll list to active item
+  const listEl = document.getElementById('bmkg-station-list');
+  const activeEl = listEl?.querySelector('.bmkg-station-active');
+  if (activeEl) activeEl.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ── Default dates ─────────────────────────────────────────────
+function bmkgSetDefaultDates() {
+  const today = new Date();
+  const endD  = new Date(today); endD.setDate(endD.getDate() - 5);
+  const startD = new Date(endD); startD.setFullYear(startD.getFullYear() - 10);
+  const fmt = d => d.toISOString().split('T')[0];
+  const startEl = document.getElementById('bmkg-date-start');
+  const endEl   = document.getElementById('bmkg-date-end');
+  if (startEl) startEl.value = fmt(startD);
+  if (endEl)   endEl.value   = fmt(endD);
+}
+
+function bmkgApplyPreset() {
+  const years = parseInt(document.getElementById('bmkg-preset').value);
+  if (!years) return;
+  const today = new Date();
+  const endD  = new Date(today); endD.setDate(endD.getDate() - 5);
+  const startD = new Date(endD); startD.setFullYear(startD.getFullYear() - years);
+  const fmt = d => d.toISOString().split('T')[0];
+  document.getElementById('bmkg-date-start').value = fmt(startD);
+  document.getElementById('bmkg-date-end').value   = fmt(endD);
+  document.getElementById('bmkg-preset').value = '';
+}
+
+// ── Fetch ERA5 Data ───────────────────────────────────────────
+async function bmkgFetchData() {
+  if (!bmkgSelected) { showToast('⚠ Pilih stasiun terlebih dahulu', 'error'); return; }
+
+  const s         = bmkgSelected;
+  const startDate = document.getElementById('bmkg-date-start').value;
+  const endDate   = document.getElementById('bmkg-date-end').value;
+
+  if (!startDate || !endDate)    { showToast('⚠ Isi rentang tanggal', 'error'); return; }
+  if (startDate >= endDate)      { showToast('⚠ Tanggal mulai harus sebelum tanggal selesai', 'error'); return; }
+
+  const btn    = document.getElementById('bmkg-fetch-btn');
+  const status = document.getElementById('bmkg-fetch-status');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Mengunduh data ERA5...';
+
+  const startYear = new Date(startDate).getFullYear();
+  const endYear   = new Date(endDate).getFullYear();
+  status.innerHTML = `Menghubungi Open-Meteo ERA5 untuk <b>${s[1]}</b> (${s[4].toFixed(3)}°, ${s[5].toFixed(3)}°) · ${startYear}–${endYear}...`;
+
+  try {
+    const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${s[4]}&longitude=${s[5]}&start_date=${startDate}&end_date=${endDate}&daily=precipitation_sum&timezone=Asia%2FJakarta`;
+
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+    const json = await resp.json();
+    if (!json.daily?.time) throw new Error('Format respons tidak valid');
+
+    const times  = json.daily.time;
+    const values = json.daily.precipitation_sum;
+
+    bmkgFetchedData = times.map((t, i) => ({
+      date:  t,
+      value: values[i] != null ? +values[i].toFixed(1) : 0
+    }));
+
+    // Compute stats
+    const positive = bmkgFetchedData.filter(d => d.value > 0).map(d => d.value);
+    const totalDays = bmkgFetchedData.length;
+    const wetDays   = positive.length;
+    const maxCH     = positive.length ? Math.max(...positive).toFixed(1) : 0;
+    const meanWet   = positive.length ? (positive.reduce((a,b)=>a+b,0)/positive.length).toFixed(1) : 0;
+    const totalCH   = positive.reduce((a,b)=>a+b,0).toFixed(0);
+
+    status.textContent = `✅ ${totalDays.toLocaleString('id-ID')} hari data berhasil diunduh`;
+    document.getElementById('bmkg-result-summary').textContent =
+      `${s[1]} · ${startDate} — ${endDate}`;
+
+    // Stats strip
+    const strip = document.getElementById('bmkg-stats-strip');
+    const kpiDef = [
+      { label:'Total Hari Data',   val: totalDays.toLocaleString('id-ID'),     color:'var(--blue)' },
+      { label:'Hari Hujan',        val: wetDays.toLocaleString('id-ID'),        color:'var(--teal)' },
+      { label:'CH Maks (mm)',      val: maxCH,                                  color:'var(--green)'},
+      { label:'Total CH (mm)',     val: (+totalCH).toLocaleString('id-ID'),     color:'var(--orange)'},
+    ];
+    strip.innerHTML = kpiDef.map(k => `
+      <div style="padding:10px 12px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)">
+        <div style="font-size:10px;color:var(--muted);font-weight:600;margin-bottom:4px">${k.label}</div>
+        <div style="font-size:18px;font-weight:700;color:${k.color};font-family:var(--head)">${k.val}</div>
+      </div>`).join('');
+
+    document.getElementById('bmkg-result-area').style.display = 'block';
+    bmkgRenderChart();
+    bmkgRenderTable();
+    bmkgRenderMonthly();
+    bmkgShowTab('chart');
+
+  } catch(e) {
+    status.textContent = '❌ Gagal: ' + e.message;
+    showToast('❌ Gagal mengunduh: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '⚡ Ambil Data ERA5 Open-Meteo';
+  }
+}
+
+// ── Tab switching ─────────────────────────────────────────────
+function bmkgShowTab(tab) {
+  ['chart','table','monthly'].forEach(t => {
+    const panel = document.getElementById('bmkg-panel-' + t);
+    const tabBtn = document.getElementById('bmkg-tab-' + t);
+    if (panel) panel.style.display = (t === tab) ? '' : 'none';
+    if (tabBtn) {
+      tabBtn.style.borderBottomColor = (t === tab) ? 'var(--teal)' : 'transparent';
+      tabBtn.style.color = (t === tab) ? 'var(--teal)' : 'var(--muted)';
+    }
+  });
+  if (tab === 'chart')   bmkgRenderChart();
+  if (tab === 'monthly') bmkgRenderMonthly();
+}
+
+// ── Chart: daily time-series ──────────────────────────────────
+function bmkgRenderChart() {
+  if (!bmkgFetchedData || typeof Chart === 'undefined') return;
+  const canvas = document.getElementById('bmkg-chart-canvas');
+  if (!canvas) return;
+
+  // Aggregate to monthly for large datasets
+  let labels, values;
+  if (bmkgFetchedData.length > 365) {
+    // Monthly aggregation
+    const monthly = {};
+    bmkgFetchedData.forEach(d => {
+      const ym = d.date.slice(0, 7);
+      monthly[ym] = (monthly[ym] || 0) + d.value;
+    });
+    labels = Object.keys(monthly).sort();
+    values = labels.map(k => +monthly[k].toFixed(1));
+  } else {
+    labels = bmkgFetchedData.map(d => d.date);
+    values = bmkgFetchedData.map(d => d.value);
+  }
+
+  if (bmkgChartInst) bmkgChartInst.destroy();
+  bmkgChartInst = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'CH (mm)',
+        data: values,
+        backgroundColor: 'rgba(90,200,176,0.5)',
+        borderColor: 'rgba(90,200,176,0.8)',
+        borderWidth: 1,
+        borderRadius: 2,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.raw} mm`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color:'rgba(255,255,255,0.05)' }, ticks: { color:'#6a8060', font:{size:10}, maxRotation:45, maxTicksLimit:18 } },
+        y: { grid: { color:'rgba(255,255,255,0.05)' }, ticks: { color:'#6a8060', font:{size:10} }, title: { display:true, text:'mm', color:'#6a8060', font:{size:10} } }
+      }
+    }
+  });
+}
+
+// ── Chart: monthly average ────────────────────────────────────
+function bmkgRenderMonthly() {
+  if (!bmkgFetchedData || typeof Chart === 'undefined') return;
+  const canvas = document.getElementById('bmkg-monthly-canvas');
+  if (!canvas) return;
+
+  // Average per month (Jan–Dec) across all years
+  const monthly = Array(12).fill(0).map(() => ({ sum:0, count:0 }));
+  bmkgFetchedData.forEach(d => {
+    const m = parseInt(d.date.slice(5,7)) - 1;
+    if (d.value > 0) { monthly[m].sum += d.value; monthly[m].count++; }
+  });
+  const avg = monthly.map(m => m.count > 0 ? +(m.sum / m.count).toFixed(1) : 0);
+  const monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+  if (bmkgMonthlyChart) bmkgMonthlyChart.destroy();
+  bmkgMonthlyChart = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: monthNames,
+      datasets: [{
+        label: 'Rata-rata CH hari hujan (mm)',
+        data: avg,
+        backgroundColor: avg.map(v => v > 15 ? 'rgba(90,200,140,0.7)' : 'rgba(127,187,238,0.5)'),
+        borderColor: 'rgba(90,200,176,0.8)',
+        borderWidth: 1,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.raw} mm/hari hujan` } }
+      },
+      scales: {
+        x: { grid: { color:'rgba(255,255,255,0.05)' }, ticks: { color:'#6a8060', font:{size:11} } },
+        y: { grid: { color:'rgba(255,255,255,0.05)' }, ticks: { color:'#6a8060', font:{size:10} }, title: { display:true, text:'mm', color:'#6a8060', font:{size:10} } }
+      }
+    }
+  });
+}
+
+// ── Table render ──────────────────────────────────────────────
+function bmkgRenderTable() {
+  if (!bmkgFetchedData) return;
+  const tbody = document.getElementById('bmkg-preview-tbody');
+  if (!tbody) return;
+  const max = Math.max(...bmkgFetchedData.map(d => d.value), 1);
+  tbody.innerHTML = bmkgFetchedData.slice(0, 100).map(d => {
+    const pct = Math.min(100, (d.value / max * 100)).toFixed(0);
+    const clr = d.value > 50 ? 'var(--green)' : d.value > 20 ? 'var(--teal)' : d.value > 0 ? 'var(--blue)' : 'var(--muted)';
+    return `<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:6px 12px;color:var(--text)">${d.date}</td>
+      <td style="padding:6px 12px;text-align:right;font-family:var(--mono);font-weight:600;color:${clr}">${d.value > 0 ? d.value : '—'}</td>
+      <td style="padding:6px 12px">
+        <div style="background:var(--bg2);border-radius:3px;height:6px;width:100%;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${clr};border-radius:3px;transition:width 0.3s"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  if (bmkgFetchedData.length > 100) {
+    tbody.innerHTML += `<tr><td colspan="3" style="padding:10px;text-align:center;color:var(--muted);font-size:11px">Menampilkan 100 dari ${bmkgFetchedData.length.toLocaleString('id-ID')} baris · Unduh CSV untuk data lengkap</td></tr>`;
+  }
+}
+
+// ── Import to Rainfall ────────────────────────────────────────
+function bmkgImportToRainfall() {
+  if (!bmkgFetchedData || !bmkgFetchedData.length || !bmkgSelected) return;
+  const values = bmkgFetchedData.map(d => d.value);
+  const maxCH  = Math.max(...values).toFixed(1);
+  const s      = bmkgSelected;
+
+  // Store for use in rainfall page
+  window._bmkgImportData = { station: s[1], lat: s[4], lng: s[5], data: bmkgFetchedData };
+
+  // Try to fill the rainfall page input
+  const input = document.getElementById('ra-input');
+  if (input) {
+    input.value = bmkgFetchedData.map(d => d.value).join('
+');
+  }
+  const stationInput = document.getElementById('ra-station-name');
+  if (stationInput) stationInput.value = s[1];
+
+  showToast(`📥 Data ${s[1]} (${bmkgFetchedData.length} hari) berhasil diimpor ke Rainfall`, 'success');
+  setTimeout(() => nav('rainfall'), 600);
+}
+
+// ── Export CSV ────────────────────────────────────────────────
+function bmkgDownloadCSV() {
+  if (!bmkgFetchedData?.length || !bmkgSelected) return;
+  const s    = bmkgSelected;
+  const rows = [
+    `# Stasiun: ${s[1]}`,
+    `# Lokasi: ${s[3]}, ${s[2]}`,
+    `# Koordinat: ${s[4]}, ${s[5]}`,
+    `# Tipe: ${s[6]}`,
+    `# Sumber: Open-Meteo ERA5 Archive`,
+    'Tanggal,Curah Hujan (mm)',
+    ...bmkgFetchedData.map(d => `${d.date},${d.value}`)
+  ].join('
+');
+  const blob = new Blob([rows], { type:'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `CH_${s[1].replace(/\s+/g,'-')}_${document.getElementById('bmkg-date-start').value}_${document.getElementById('bmkg-date-end').value}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('⬇ CSV berhasil diunduh', 'success');
+}
+
+// ── Tambahkan CSS stasiun list ────────────────────
+(function() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .bmkg-station-item:hover { background: var(--card2) !important; }
+    .bmkg-station-active     { background: var(--blue-soft) !important; }
+    #bmkg-map .leaflet-control-attribution { font-size: 9px; }
+    @media (max-width: 768px) {
+      #bmkg-grid { grid-template-columns: 1fr !important; }
+    }
+  `;
+  document.head.appendChild(style);
+})();
 </script>
 
 <script>
