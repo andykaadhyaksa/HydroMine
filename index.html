@@ -12,60 +12,113 @@
 <title>HydroMine — Mine Hydrology Tool</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Sora:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════════
    ROOT VARIABLES
 ══════════════════════════════════════════════ */
 :root {
-  --bg:         #eaeff6;
-  --sidebar:    #ffffff;
-  --card:       #ffffff;
-  --blue:       #0f5fc8;
-  --blue2:      #1a7fd4;
-  --blue-grad:  linear-gradient(135deg,#0f5fc8,#1a9ee8);
-  --blue-soft:  #ddeeff;
-  --border:     #c8d8ea;
-  --text:       #0d2140;
-  --muted:      #5a7898;
-  --light:      #a0b8cc;
-  --green:      #1a8c4e;
-  --green2:     #21c068;
-  --orange:     #d4620e;
-  --red:        #c0392b;
-  --yellow:     #d4860a;
-  --shadow:     0 2px 14px rgba(15,95,200,0.10);
-  --shadow-md:  0 6px 24px rgba(15,95,200,0.16);
-  --r:  12px;
-  --rs: 6px;
-  --sans: 'Inter', sans-serif;
-  --display: 'Oswald', sans-serif;
-  --mono: 'JetBrains Mono', monospace;
+  /* ── EtherDashboard inspired palette ─────────────────── */
+  --bg:          #10130f;      /* deep olive-black          */
+  --bg2:         #161a14;      /* slightly lighter           */
+  --sidebar:     #0e1109;      /* sidebar surface            */
+  --card:        rgba(255,255,255,0.052);
+  --card2:       rgba(255,255,255,0.028);
+  --border:      rgba(255,255,255,0.08);
+  --border2:     rgba(160,200,120,0.2);
+  --text:        #e8f0d8;      /* warm cream-green           */
+  --muted:       #6a8060;      /* muted sage                 */
+  --light:       #3a5035;
+
+  /* Accent colours */
+  --blue:        #7fbbee;      /* blue (from EtherDash nav)  */
+  --blue2:       #9fceff;
+  --blue-grad:   linear-gradient(135deg,#5a9de0,#7fbbee);
+  --blue-soft:   rgba(127,187,238,0.12);
+
+  --green:       #8ecb6a;      /* warm olive-green           */
+  --green2:      #a8e080;
+  --orange:      #e8a050;      /* warm amber                 */
+  --red:         #e05c5c;
+  --yellow:      #d4be5a;
+  --teal:        #5ac8b0;
+  --purple:      #9a7fcc;
+
+  /* Gradient mesh colours */
+  --mesh-a: rgba(90,200,140,0.18);   /* top-left teal        */
+  --mesh-b: rgba(90,140,220,0.14);   /* top-right blue       */
+  --mesh-c: rgba(200,160,60,0.10);   /* bottom gold          */
+  --mesh-d: rgba(60,100,60,0.12);    /* bottom-left olive    */
+
+  --shadow:     0 4px 24px rgba(0,0,0,0.45);
+  --shadow-md:  0 8px 40px rgba(0,0,0,0.55);
+  --shadow-3d:  0 20px 60px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.06);
+
+  --r:  14px;
+  --rs: 8px;
+
+  --sans:  'Inter', system-ui, sans-serif;
+  --head:  'Sora', 'Inter', sans-serif;
+  --mono:  'Inter', sans-serif;
+  --display: 'Sora', sans-serif;
 }
 
-/* ══════════════════════════════════════════════
-   DARK MODE VARIABLES
-══════════════════════════════════════════════ */
+/* ── DARK mode — body.dark class toggle ────────────────────── */
 body.dark {
-  --bg:        #0b1420;       /* background utama — gelap navy */
-  --sidebar:   #070d17;       /* sidebar lebih gelap */
-  --card:      #101c2c;       /* card surface */
-  --border:    #1c3050;       /* border halus */
-  --border2:   #2a4870;       /* border aktif */
-  --text:      #ddeeff;       /* teks utama — putih kebiruan */
-  --muted:     #6a96b8;       /* teks sekunder */
-  --light:     #3a5870;       /* teks paling redup */
-  --blue:      #4ea8e8;       /* aksen biru lebih cerah di dark */
-  --blue2:     #60b8f8;
-  --blue-soft: #0c1c30;
-  --green:     #28c070;
-  --green2:    #32d880;
-  --orange:    #f07828;
-  --red:       #e04848;
-  --yellow:    #f0b020;
-  --shadow:    0 2px 16px rgba(0,0,0,0.6);
-  --shadow-md: 0 6px 30px rgba(0,0,0,0.7);
+  --bg:      #10130f;
+  --bg2:     #161a14;
+  --sidebar: #0e1109;
+  --card:    rgba(255,255,255,0.058);
+  --card2:   rgba(255,255,255,0.03);
+  --border:  rgba(255,255,255,0.09);
+  --border2: rgba(160,200,120,0.22);
+  --text:    #e8f0d8;
+  --muted:   #6a8060;
+  --light:   #3a5035;
+  --blue:    #7fbbee;
+  --blue2:   #9fceff;
+  --blue-soft: rgba(127,187,238,0.12);
+  --green:   #8ecb6a;
+  --green2:  #a8e080;
+  --orange:  #e8a050;
+  --red:     #e05c5c;
+  --yellow:  #d4be5a;
+  --shadow:     0 4px 24px rgba(0,0,0,0.5);
+  --shadow-md:  0 8px 40px rgba(0,0,0,0.6);
+  --shadow-3d:  0 20px 60px rgba(0,0,0,0.65), 0 8px 24px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.06);
 }
+
+/* ── LIGHT mode ─────────────────────────────────────────────── */
+body:not(.dark) {
+  --bg:      #f0f5ee;
+  --bg2:     #e6ede2;
+  --sidebar: #ffffff;
+  --card:    rgba(255,255,255,0.85);
+  --card2:   rgba(255,255,255,0.65);
+  --border:  rgba(80,120,60,0.14);
+  --border2: rgba(80,120,60,0.25);
+  --text:    #1a2a14;
+  --muted:   #5a7850;
+  --light:   #8aaa80;
+  --blue:    #3a7abf;
+  --blue2:   #4a90d4;
+  --blue-soft: rgba(58,122,191,0.1);
+  --green:   #3a8a30;
+  --green2:  #4aa040;
+  --orange:  #b86820;
+  --red:     #b03020;
+  --yellow:  #907010;
+  --shadow:     0 4px 18px rgba(0,60,0,0.1);
+  --shadow-md:  0 8px 30px rgba(0,60,0,0.14);
+  --shadow-3d:  0 12px 40px rgba(0,60,0,0.12), 0 4px 16px rgba(0,60,0,0.08), 0 1px 0 rgba(255,255,255,0.95);
+}
+
+/* ── Semantic aliases for old code compatibility ────────────── */
+:root {
+  --blue-grad2: var(--blue-grad);
+  --heading-color: var(--text);
+}
+
 
 /* ══════════════════════════════════════════════
    RESET & BASE
@@ -75,10 +128,44 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--sans);
-  min-height: 100vh;
-  overflow-x: auto;
-  transition: background 0.35s, color 0.35s;
+  height: 100vh;
+  overflow: hidden;          /* body itself fixed — scroll is in .main */
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+  position: relative;
 }
+
+/* ── Animated gradient mesh background ────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 60% at -10% -10%, var(--mesh-a) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 110%  -5%, var(--mesh-b) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 55% at 110% 110%, var(--mesh-c) 0%, transparent 58%),
+    radial-gradient(ellipse 60% 50% at -5%  110%, var(--mesh-d) 0%, transparent 60%),
+    var(--bg);
+  animation: bgDrift 20s ease-in-out infinite alternate;
+}
+@keyframes bgDrift {
+  0%   { opacity:0.85; transform:scale(1) translate(0,0); }
+  50%  { opacity:1;    transform:scale(1.03) translate(6px,-4px); }
+  100% { opacity:0.9;  transform:scale(1.01) translate(-3px,5px); }
+}
+
+/* Noise texture */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-size: 200px 200px; opacity: 0.5;
+}
+
+body > * { position: relative; z-index: 1; }
+
 
 /* smooth dark transitions */
 .sidebar, .card, .stat-card, .toggle-card, .input-section,
@@ -163,131 +250,126 @@ body.dark .toggle-sw::after { right: auto; left: 3px; background: #e8f1fa; }
 /* ══════════════════════════════════════════════
    SIDEBAR — expanded (220px) with text labels
 ══════════════════════════════════════════════ */
-.sidebar {
-  width: 220px;
-  background: var(--sidebar);
-  border-right: 3px solid var(--blue);
-  display: flex;
-  flex-direction: column;
-  padding: 20px 0 20px;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 20;
-  box-shadow: 4px 0 20px rgba(15,95,200,0.10);
-  overflow-y: auto;
+/* ── TOPBAR replaces sidebar ────────────────────────────────── */
+.sidebar { display: none !important; }
+
+/* Topbar */
+.hm-topbar {
+  position: sticky; top: 0; z-index: 200; flex-shrink: 0;
+  background: rgba(8,11,7,0.88);
+  backdrop-filter: blur(28px) saturate(1.4);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 4px 32px rgba(0,0,0,0.4);
 }
 
-.sb-logo-wrap {
-  padding: 24px 18px 22px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 12px;
+.hm-tb-inner {
+  display: flex; align-items: center;
+  height: 58px; padding: 0 28px; gap: 0;
 }
 
-.sb-logo {
-  display: none;
+/* Brand */
+.hm-tb-brand {
+  display: flex; align-items: center; gap: 11px;
+  flex-shrink: 0; margin-right: 32px; cursor: default;
 }
+.hm-tb-logo {
+  width: 30px; height: 30px; object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(90,200,140,0.5));
+}
+.hm-tb-name {
+  font-family: var(--head);
+  font-size: 17px; font-weight: 800; line-height: 1;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #8ecb6a, #5ac8b0, #7fbbee);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hm-tb-sub {
+  font-size: 9px; color: var(--muted); letter-spacing: 0.1px; margin-top: 2px; line-height: 1;
+}
+.hm-tb-sep { width: 1px; height: 22px; background: rgba(255,255,255,0.08); margin: 0 8px; flex-shrink: 0; }
 
-.sb-app-name {
-  font-family: 'Bebas Neue', 'Oswald', sans-serif;
-  font-size: 28px;
-  font-weight: 400;
-  letter-spacing: 2px;
-  line-height: 1;
-  color: var(--text);
+/* Nav links */
+.hm-tb-nav { display: flex; align-items: stretch; height: 100%; flex: 1; overflow-x: auto; scrollbar-width: none; }
+.hm-tb-nav::-webkit-scrollbar { display: none; }
+.hm-tb-sec {
+  display: flex; align-items: center;
+  padding: 0 6px 0 12px;
+  font-size: 8px; font-weight: 700; color: rgba(106,128,96,0.7);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  white-space: nowrap; flex-shrink: 0;
+  border-right: 1px solid rgba(255,255,255,0.06); margin-right: 4px;
 }
-.sb-app-name .wm-hydro { color: var(--text); }
-.sb-app-name .wm-mine  { color: var(--blue); }
-.sb-app-name .wm-dot   { display: none; }
-.sb-app-name small {
-  display: block;
-  font-family: 'Inter', sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--muted);
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  margin-top: 5px;
-}
-
-.sb-section {
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding: 14px 18px 5px;
-}
+.hm-tb-sec:first-child { padding-left: 4px; }
 
 .nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 18px;
-  margin: 1px 8px;
-  border-radius: var(--rs);
-  cursor: pointer;
-  transition: all 0.15s;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: var(--muted);
-  position: relative;
+  display: inline-flex; align-items: center; gap: 0;
+  padding: 0 15px; height: 100%;
+  font-family: var(--sans); font-size: 13px; font-weight: 500;
+  color: rgba(180,210,160,0.55);
+  border-bottom: 2px solid transparent; border-left: none;
+  cursor: pointer; background: transparent;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  white-space: nowrap; flex-shrink: 0;
+  letter-spacing: -0.1px; position: relative;
+  border-radius: 0; margin: 0; transform: none !important;
+  box-shadow: none !important;
 }
-
-.nav-item:hover { background: var(--blue-soft); color: var(--blue); }
-
+.nav-item:hover { color: var(--green2); background: rgba(90,200,140,0.05); }
 .nav-item.active {
-  background: var(--blue-grad);
-  color: white;
-  box-shadow: 0 4px 16px rgba(15,95,200,0.35);
-  transform: translateX(2px);
+  color: #c8eea8; font-weight: 600;
+  border-bottom-color: var(--green);
+  background: rgba(142,203,106,0.08);
 }
-
-.nav-icon { font-size: 17px; flex-shrink: 0; width: 22px; text-align: center; }
+.nav-icon { display: none; }
 
 .nav-badge {
-  margin-left: auto;
-  font-size: 10px;
-  font-weight: 700;
-  background: rgba(255,255,255,0.25);
-  padding: 1px 6px;
-  border-radius: 10px;
+  margin-left: 6px; font-size: 8.5px; font-weight: 700;
+  background: rgba(127,187,238,0.15); color: var(--blue);
+  border: 1px solid rgba(127,187,238,0.25);
+  padding: 1px 6px; border-radius: 10px;
 }
+.nav-item.active .nav-badge { background: rgba(127,187,238,0.2); }
 
-.nav-item:not(.active) .nav-badge {
-  background: var(--blue-soft);
-  color: var(--blue);
+/* Right actions */
+.hm-tb-actions {
+  display: flex; align-items: center; gap: 5px;
+  margin-left: auto; flex-shrink: 0;
 }
+.hm-tb-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+  background: transparent; border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 9px; color: rgba(180,210,160,0.45);
+  cursor: pointer; transition: all 0.15s;
+}
+.hm-tb-btn:hover {
+  background: rgba(90,200,140,0.08);
+  border-color: rgba(90,200,140,0.25);
+  color: var(--green);
+}
+.hm-tb-btn-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 13px; border-radius: 9px;
+  background: rgba(90,200,140,0.1); border: 1px solid rgba(90,200,140,0.2);
+  color: var(--green); font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.hm-tb-btn-label:hover { background: rgba(90,200,140,0.16); border-color: rgba(90,200,140,0.35); }
+.hm-tb-theme {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: 9px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(180,210,160,0.5); font-size: 11px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.hm-tb-theme:hover { background: rgba(255,255,255,0.09); color: var(--text); }
 
-.sb-bottom {
-  margin-top: auto;
-  padding: 12px 16px 0;
-  border-top: 1px solid var(--border);
-}
-.author-tag {
-  font-family: var(--mono);
-  font-size: 9.5px;
-  color: var(--light);
-  line-height: 1.5;
-}
-.author-tag strong { color: var(--muted); }
-
-/* ══════════════════════════════════════════════
-   MAIN CONTENT
-══════════════════════════════════════════════ */
-.main {
-  margin-left: 220px;
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-  padding: 24px 28px 48px;
-  border-top: 4px solid var(--blue);
-  overflow-x: hidden;
-}
 
 .page { display: none; min-width: 0; max-width: 100%; }
+.page.active { animation: hmPageIn 0.3s cubic-bezier(0.16,1,0.3,1); }
+@keyframes hmPageIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 .page.active { display: block; }
 
 /* Watermark */
@@ -311,7 +393,7 @@ body.dark .toggle-sw::after { right: auto; left: 3px; background: #e8f1fa; }
   justify-content: space-between;
   margin-bottom: 20px;
 }
-.page-title { font-family: 'Oswald', 'Bebas Neue', sans-serif; font-size: 26px; font-weight: 600; color: var(--text); letter-spacing: 1px; text-transform: uppercase; }
+.page-title { font-family: 'Inter', 'Sora', sans-serif; font-size: 26px; font-weight: 600; color: var(--text); letter-spacing: 1px; text-transform: uppercase; }
 .page-subtitle { font-size: 12px; font-weight: 500; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.8px; }
 
 /* ══════════════════════════════════════════════
@@ -328,7 +410,7 @@ body.dark .toggle-sw::after { right: auto; left: 3px; background: #e8f1fa; }
 .card:hover { box-shadow: var(--shadow-md); border-top-color: var(--blue); }
 
 .section-title {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px; font-weight: 600; color: var(--text);
   margin-bottom: 14px;
   display: flex; align-items: center; gap: 8px;
@@ -365,7 +447,7 @@ body.dark .toggle-sw::after { right: auto; left: 3px; background: #e8f1fa; }
 .stat-bar { width: 5px; height: 44px; border-radius: 3px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 .stat-body { flex: 1; min-width: 0; }
 .stat-val {
-  font-family: 'Oswald', var(--mono); font-size: 24px; font-weight: 700;
+  font-family: 'Inter', var(--mono); font-size: 24px; font-weight: 700;
   color: var(--text); line-height: 1;
   display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap;
 }
@@ -405,7 +487,7 @@ body.dark .toggle-sw::after { right: auto; left: 3px; background: #e8f1fa; }
   box-shadow: 0 4px 14px rgba(26,127,212,0.2);
 }
 .bp-lbl { font-size: 10px; font-weight: 700; opacity: 0.85; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.8px; }
-.bp-val { font-family: 'Oswald', var(--mono); font-size: 22px; font-weight: 600; line-height: 1; }
+.bp-val { font-family: 'Inter', var(--mono); font-size: 22px; font-weight: 600; line-height: 1; }
 .bp-unit { font-size: 10px; opacity: 0.7; margin-top: 2px; }
 .mini-bars { display: flex; align-items: flex-end; gap: 3px; height: 28px; opacity: 0.5; }
 .mini-bar { width: 5px; background: rgba(255,255,255,0.8); border-radius: 2px; }
@@ -516,7 +598,7 @@ button {
 ══════════════════════════════════════════════ */
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
 th {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 11px; font-weight: 600; color: var(--text);
   text-transform: uppercase; letter-spacing: 0.8px;
   padding: 9px 10px; text-align: left;
@@ -564,7 +646,7 @@ tr:hover td { background: #ecf3fc; }
   font-size: 120px; opacity: 0.06; font-family: serif;
   line-height: 1;
 }
-.formula-title { font-family: 'Oswald', sans-serif; font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+.formula-title { font-family: 'Inter', sans-serif; font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
 .formula-eq {
   font-family: var(--mono); font-size: 22px; font-weight: 600;
   letter-spacing: 1px; margin-bottom: 10px;
@@ -745,7 +827,7 @@ body.dark .cr-wtp-sel { background: #0b1825; color: var(--text); border-color: v
   display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;
 }
 .report-section-hd {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 15px; font-weight: 600; color: var(--text);
   border-left: 5px solid var(--blue);
   padding: 8px 14px; margin: 20px 0 12px;
@@ -972,7 +1054,7 @@ body.dark .flow-tbl th { background: #0e2240; }
   .sb-logo-wrap { justify-content: center; padding: 0 0 16px; }
   .nav-item { justify-content: center; padding: 10px; }
   .nav-icon { width: auto; }
-  .main { margin-left: 64px; }
+  .main { margin-left: 0; flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
   .catchment-row, .cr-header { grid-template-columns: 28px 1fr 1fr 1fr 80px 80px 80px 34px; }
 }
 
@@ -1096,7 +1178,7 @@ body.dark .flow-tbl th { background: #0e2240; }
   text-align: center;
 }
 .hm-wm-title {
-  font-family: 'Bebas Neue', 'Oswald', sans-serif;
+  font-family: 'Sora', 'Inter', sans-serif;
   font-size: 42px;
   letter-spacing: 6px;
   background: linear-gradient(135deg, #4da8f5, #0f5fc8, #1a9ee8);
@@ -1106,7 +1188,7 @@ body.dark .flow-tbl th { background: #0e2240; }
   animation: titleReveal 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s both;
 }
 .hm-wm-sub {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Inter', monospace;
   font-size: 11px;
   letter-spacing: 3.5px;
   color: rgba(78,168,232,0.6);
@@ -1136,7 +1218,7 @@ body.dark .flow-tbl th { background: #0e2240; }
   box-shadow: 0 0 10px rgba(15,95,200,0.8);
 }
 .hm-status {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Inter', monospace;
   font-size: 10px;
   color: rgba(78,168,232,0.5);
   letter-spacing: 1.5px;
@@ -1218,6 +1300,74 @@ body > nav, body > main { position: relative; z-index: 1; }
 }
 
 </style>
+<style>
+/* ══ CRITICAL LAYOUT — scroll + topbar ══════════════════════ */
+body {
+  height: 100vh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+.hm-topbar { flex-shrink: 0 !important; z-index: 200 !important; }
+.sidebar { display: none !important; }
+.main {
+  flex: 1 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  margin-left: 0 !important;
+}
+.page { padding: 28px 32px 80px; }
+.page.active {
+  display: block !important;
+  animation: hmPageIn 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes hmPageIn {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+/* Gradient mesh BG */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 60% at -10% -10%, rgba(90,200,140,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 110%  -5%, rgba(90,140,220,0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 55% at 110% 110%, rgba(200,160,60,0.10) 0%, transparent 58%),
+    radial-gradient(ellipse 60% 50% at -5%  110%, rgba(60,100,60,0.12)  0%, transparent 60%),
+    var(--bg);
+  animation: bgDrift 20s ease-in-out infinite alternate;
+}
+@keyframes bgDrift {
+  0%   { opacity:.85; transform:scale(1) translate(0,0); }
+  50%  { opacity:1;   transform:scale(1.03) translate(6px,-4px); }
+  100% { opacity:.9;  transform:scale(1.01) translate(-3px,5px); }
+}
+body > * { position: relative; z-index: 1; }
+.hm-topbar { position: sticky; top: 0; }
+</style>
+<script>
+// Initialize dark mode state
+(function(){
+  var saved = localStorage.getItem('hm-dark');
+  var isDarkInit = saved !== null ? saved === 'true' : true;
+  if (isDarkInit) document.body.classList.add('dark');
+  // Sync topbar button once DOM ready
+  document.addEventListener('DOMContentLoaded', function(){
+    var icon  = document.getElementById('theme-icon');
+    var label = document.getElementById('theme-label');
+    if (icon)  icon.textContent  = isDarkInit ? '🌙' : '☀';
+    if (label) label.textContent = isDarkInit ? 'Dark' : 'Light';
+    // Patch toggleDarkMode to save pref
+    var origToggle = window.toggleDarkMode;
+    window.toggleDarkMode = function(){
+      origToggle && origToggle();
+      var dark = document.body.classList.contains('dark');
+      localStorage.setItem('hm-dark', dark);
+    };
+  });
+})();
+</script>
 </head>
 <body>
 
@@ -1246,79 +1396,68 @@ body > nav, body > main { position: relative; z-index: 1; }
 <canvas id="hm-canvas"></canvas>
 
 <!-- ══════════ SIDEBAR ══════════ -->
-<nav class="sidebar">
-  <div class="sb-logo-wrap" style="padding:16px 14px 12px;border-bottom:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:10px">
-      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWE2ZGQ2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBiM2E4YSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZHJvcCIgeDE9IjIwJSIgeTE9IjAlIiB4Mj0iODAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM3ZWM4ZjgiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGY3MmUwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJnbG93IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzRkYjZmOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxYTVlYzgiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8ZmlsdGVyIGlkPSJzb2Z0Qmx1ciI+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjEuMiIgcmVzdWx0PSJibHVyIi8+CiAgICAgIDxmZUNvbXBvc2l0ZSBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJibHVyIiBvcGVyYXRvcj0ib3ZlciIvPgogICAgPC9maWx0ZXI+CiAgPC9kZWZzPgoKICA8IS0tIEhleGFnb24gYmFja2dyb3VuZCAtLT4KICA8cG9seWdvbiBwb2ludHM9IjYwLDQgMTA4LDMxIDEwOCw4OSA2MCwxMTYgMTIsODkgMTIsMzEiCiAgICBmaWxsPSJ1cmwoI2JnKSIgc3Ryb2tlPSIjNGRhOGY1IiBzdHJva2Utd2lkdGg9IjIuNSIvPgoKICA8IS0tIElubmVyIGhleCBnbG93IHJpbmcgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSI2MCwxNCA5OCwzNiA5OCw4NCA2MCwxMDYgMjIsODQgMjIsMzYiCiAgICBmaWxsPSJub25lIiBzdHJva2U9InJnYmEoNzcsMTY4LDI0NSwwLjI1KSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KCiAgPCEtLSBXYXRlciBkcm9wIGJvZHkgLS0+CiAgPHBhdGggZD0iTTYwLDI0IEM2MCwyNCA4NSw1NiA4NSw3NCBDODUsODguNCA3My44LDk4IDYwLDk4IEM0Ni4yLDk4IDM1LDg4LjQgMzUsNzQgQzM1LDU2IDYwLDI0IDYwLDI0WiIKICAgIGZpbGw9InVybCgjZHJvcCkiLz4KCiAgPCEtLSBEcm9wIGlubmVyIGhpZ2hsaWdodCAobGVmdCBjdXJ2ZSkgLS0+CiAgPHBhdGggZD0iTTUwLDUwIEM0Nyw1NiA0NSw2NCA0NSw3MiIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuNTUpIiBzdHJva2Utd2lkdGg9IjMiCiAgICBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KCiAgPCEtLSBEcm9wIHRvcCBzcGVjdWxhciAtLT4KICA8ZWxsaXBzZSBjeD0iNTMiIGN5PSI0MiIgcng9IjQiIHJ5PSI2IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIHRyYW5zZm9ybT0icm90YXRlKC0yMCw1Myw0MikiLz4KCiAgPCEtLSBCb3R0b20gYmFyIGFjY2VudCAtLT4KICA8cmVjdCB4PSIyOCIgeT0iMTA0IiB3aWR0aD0iNjQiIGhlaWdodD0iMyIgcng9IjEuNSIgZmlsbD0iIzRkYThmNSIgb3BhY2l0eT0iMC42Ii8+CiAgPHJlY3QgeD0iMzgiIHk9IjEwOSIgd2lkdGg9IjQ0IiBoZWlnaHQ9IjIiIHJ4PSIxIiBmaWxsPSIjMWE3ZmQ0IiBvcGFjaXR5PSIwLjM1Ii8+Cjwvc3ZnPg==" alt="HydroMine" style="width:42px;height:42px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 3px 10px rgba(15,95,200,0.5))">
-      <div class="sb-app-name" style="display:flex;flex-direction:column;gap:0">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;line-height:1;color:var(--text)"><span style="color:var(--blue)">Hydro</span><span>Mine</span></div>
-        <small style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase">Mine Hydrology Tool</small>
+<header class="hm-topbar">
+  <div class="hm-tb-inner">
+
+    <!-- Brand -->
+    <div class="hm-tb-brand">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWE2ZGQ2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBiM2E4YSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZHJvcCIgeDE9IjIwJSIgeTE9IjAlIiB4Mj0iODAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM3ZWM4ZjgiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGY3MmUwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJnbG93IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzRkYjZmOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxYTVlYzgiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8ZmlsdGVyIGlkPSJzb2Z0Qmx1ciI+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjEuMiIgcmVzdWx0PSJibHVyIi8+CiAgICAgIDxmZUNvbXBvc2l0ZSBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJibHVyIiBvcGVyYXRvcj0ib3ZlciIvPgogICAgPC9maWx0ZXI+CiAgPC9kZWZzPgoKICA8IS0tIEhleGFnb24gYmFja2dyb3VuZCAtLT4KICA8cG9seWdvbiBwb2ludHM9IjYwLDQgMTA4LDMxIDEwOCw4OSA2MCwxMTYgMTIsODkgMTIsMzEiCiAgICBmaWxsPSJ1cmwoI2JnKSIgc3Ryb2tlPSIjNGRhOGY1IiBzdHJva2Utd2lkdGg9IjIuNSIvPgoKICA8IS0tIElubmVyIGhleCBnbG93IHJpbmcgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSI2MCwxNCA5OCwzNiA5OCw4NCA2MCwxMDYgMjIsODQgMjIsMzYiCiAgICBmaWxsPSJub25lIiBzdHJva2U9InJnYmEoNzcsMTY4LDI0NSwwLjI1KSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KCiAgPCEtLSBXYXRlciBkcm9wIGJvZHkgLS0+CiAgPHBhdGggZD0iTTYwLDI0IEM2MCwyNCA4NSw1NiA4NSw3NCBDODUsODguNCA3My44LDk4IDYwLDk4IEM0Ni4yLDk4IDM1LDg4LjQgMzUsNzQgQzM1LDU2IDYwLDI0IDYwLDI0WiIKICAgIGZpbGw9InVybCgjZHJvcCkiLz4KCiAgPCEtLSBEcm9wIGlubmVyIGhpZ2hsaWdodCAobGVmdCBjdXJ2ZSkgLS0+CiAgPHBhdGggZD0iTTUwLDUwIEM0Nyw1NiA0NSw2NCA0NSw3MiIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuNTUpIiBzdHJva2Utd2lkdGg9IjMiCiAgICBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KCiAgPCEtLSBEcm9wIHRvcCBzcGVjdWxhciAtLT4KICA8ZWxsaXBzZSBjeD0iNTMiIGN5PSI0MiIgcng9IjQiIHJ5PSI2IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIHRyYW5zZm9ybT0icm90YXRlKC0yMCw1Myw0MikiLz4KCiAgPCEtLSBCb3R0b20gYmFyIGFjY2VudCAtLT4KICA8cmVjdCB4PSIyOCIgeT0iMTA0IiB3aWR0aD0iNjQiIGhlaWdodD0iMyIgcng9IjEuNSIgZmlsbD0iIzRkYThmNSIgb3BhY2l0eT0iMC42Ii8+CiAgPHJlY3QgeD0iMzgiIHk9IjEwOSIgd2lkdGg9IjQ0IiBoZWlnaHQ9IjIiIHJ4PSIxIiBmaWxsPSIjMWE3ZmQ0IiBvcGFjaXR5PSIwLjM1Ii8+Cjwvc3ZnPg==" alt="HydroMine" class="hm-tb-logo">
+      <div>
+        <div class="hm-tb-name">HydroMine</div>
+        <div class="hm-tb-sub">Mine Hydrology Tool</div>
       </div>
     </div>
-  </div>
 
-  <div class="sb-section">Analisis</div>
+    <div class="hm-tb-sep"></div>
 
-  <div class="nav-item active" onclick="nav('rainfall')" id="nav-rainfall">
-    <span class="nav-icon">🌧️</span>
-    <span>Rainfall Analysis</span>
-  </div>
+    <!-- Navigation -->
+    <nav class="hm-tb-nav">
+      <span class="hm-tb-sec">Beranda</span>
+      <div class="nav-item active" onclick="nav('home')" id="nav-home">Beranda</div>
 
-  <div class="nav-item" onclick="nav('runoff')" id="nav-runoff">
-    <span class="nav-icon">🌊</span>
-    <span>Runoff Contact Water</span>
-  </div>
+      <span class="hm-tb-sec">Analisis</span>
+      <div class="nav-item" onclick="nav('rainfall')" id="nav-rainfall">Rainfall</div>
+      <div class="nav-item" onclick="nav('runoff')" id="nav-runoff">Runoff</div>
+      <div class="nav-item" onclick="nav('evaporation')" id="nav-evaporation">Evaporasi</div>
+      <div class="nav-item" onclick="nav('groundwater')" id="nav-groundwater">Groundwater</div>
 
-  <div class="nav-item" onclick="nav('evaporation')" id="nav-evaporation">
-    <span class="nav-icon">☀️</span>
-    <span>Evaporation Analysis</span>
-  </div>
+      <span class="hm-tb-sec">Kolam</span>
+      <div class="nav-item" onclick="nav('sedpond')" id="nav-sedpond">Sediment Pond</div>
+      <div class="nav-item" onclick="nav('retpond')" id="nav-retpond">Retention Pond</div>
 
-  <div class="nav-item" onclick="nav('groundwater')" id="nav-groundwater">
-    <span class="nav-icon">🟫</span>
-    <span>Groundwater</span>
-  </div>
+      <span class="hm-tb-sec">Output</span>
+      <div class="nav-item" onclick="nav('flow')" id="nav-flow">Flow Diagram</div>
+      <div class="nav-item" onclick="nav('rekap')" id="nav-rekap">Rekap Akhir</div>
+      <div class="nav-item" onclick="nav('laporan')" id="nav-laporan">
+        Output Laporan
+        <span class="nav-badge">EXPORT</span>
+      </div>
+    </nav>
 
-  <div class="sb-section">Output</div>
+    <!-- Actions -->
+    <div class="hm-tb-actions">
+      <div id="save-status" style="font-size:10px;color:var(--green);display:none;white-space:nowrap;padding:0 8px"></div>
 
-  <div class="nav-item" onclick="nav('flow')" id="nav-flow">
-    <span class="nav-icon">🔀</span>
-    <span>Flow Diagram</span>
-  </div>
+      <button class="hm-tb-btn-label" onclick="saveProject()" title="Simpan Proyek">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Simpan
+      </button>
 
-  <div class="nav-item" onclick="nav('rekap')" id="nav-rekap" style="border-left:3px solid transparent">
-    <span class="nav-icon">📋</span>
-    <span>Rekap Akhir</span>
-  </div>
+      <button class="hm-tb-btn" onclick="document.getElementById('load-file-input').click()" title="Buka Proyek">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      </button>
+      <input type="file" id="load-file-input" accept=".hydromine,.json" style="display:none" onchange="loadProjectFile(this)">
 
-  <div class="nav-item" onclick="nav('laporan')" id="nav-laporan" style="border-left:3px solid transparent">
-    <span class="nav-icon">📄</span>
-    <span>Output Laporan</span>
-    <span class="nav-badge" style="background:linear-gradient(135deg,#0f5fc8,#1a7fd4);color:white;font-size:9px">EXPORT</span>
-  </div>
+      <div class="hm-tb-sep"></div>
 
-
-  <div class="sb-section">Data</div>
-
-  <div class="nav-item" onclick="saveProject()" id="nav-save">
-    <span class="nav-icon">💾</span>
-    <span>Simpan Proyek</span>
-  </div>
-
-  <div class="nav-item" onclick="document.getElementById('load-file-input').click()" id="nav-load">
-    <span class="nav-icon">📂</span>
-    <span>Buka Proyek</span>
-  </div>
-  <input type="file" id="load-file-input" accept=".hydromine,.json" style="display:none" onchange="loadProjectFile(this)">
-
-  <div class="sb-bottom">
-    <div id="save-status" style="font-size:10px;color:var(--green);margin-bottom:6px;display:none;font-family:var(--mono)"></div>
-    <div class="author-tag">
-      <strong>© Andyka Adhyaksa Sumarno</strong><br>
-      HydroMine v1.0
+      <button class="hm-tb-theme" onclick="toggleDarkMode()" id="theme-toggle-btn">
+        <span id="theme-icon">☀</span>
+        <span id="theme-label">Light</span>
+      </button>
     </div>
+
   </div>
-</nav>
+</header>
 
 <!-- Watermark -->
 <div class="watermark">Andyka Adhyaksa Sumarno</div>
@@ -1330,9 +1469,263 @@ body > nav, body > main { position: relative; z-index: 1; }
 <main class="main">
 
 <!-- ╔══════════════════════════════════════╗
+     ║   PAGE: BERANDA — HOME              ║
+     ╚══════════════════════════════════════╝ -->
+<div class="page active" id="page-home">
+
+  <!-- ══ HERO ═══════════════════════════════════════════════ -->
+  <div class="hm-home-hero">
+    <div class="hm-home-hero-left">
+
+      <div class="hm-home-badge">
+        <span class="hm-home-badge-dot"></span>
+        Mine Hydrology · Analisis Berbasis Regulasi Indonesia
+      </div>
+
+      <h1 class="hm-home-title">
+        HydroMine<br>
+        <span class="hm-home-gradient">Mine Hydrology Tool</span>
+      </h1>
+
+      <p class="hm-home-desc">
+        Platform web terintegrasi untuk analisis hidrologi tambang — menghitung runoff contact water, evaporasi, groundwater, dan kebutuhan kolam pengolahan secara otomatis dari data curah hujan hingga output laporan siap cetak.
+      </p>
+
+      <div class="hm-home-taglist">
+        <span class="hm-home-tag">🌧️ Rainfall Analysis</span>
+        <span class="hm-home-tag">🌊 Runoff</span>
+        <span class="hm-home-tag">☀️ Evaporasi</span>
+        <span class="hm-home-tag">🏔️ Groundwater</span>
+        <span class="hm-home-tag">🏗️ Sediment Pond</span>
+        <span class="hm-home-tag">💧 Retention Pond</span>
+      </div>
+
+      <div class="hm-home-cta">
+        <button class="hm-home-btn-primary" onclick="nav('rainfall')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+          Mulai Analisis
+        </button>
+        <button class="hm-home-btn-ghost" onclick="nav('rekap')">
+          Lihat Rekap Akhir →
+        </button>
+      </div>
+
+    </div>
+    <div class="hm-home-hero-right">
+      <div class="hm-home-diagram">
+        <svg viewBox="0 0 400 300" width="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gW2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#5ac8b0" stop-opacity="0.9"/>
+              <stop offset="100%" stop-color="#7fbbee" stop-opacity="0.7"/>
+            </linearGradient>
+            <linearGradient id="gM2" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#4a6040" stop-opacity="0.8"/>
+              <stop offset="100%" stop-color="#2a3820" stop-opacity="0.5"/>
+            </linearGradient>
+            <linearGradient id="gC2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.1)"/>
+              <stop offset="100%" stop-color="rgba(255,255,255,0.03)"/>
+            </linearGradient>
+            <filter id="gB2"><feGaussianBlur stdDeviation="2.5"/></filter>
+          </defs>
+          <g opacity="0.07" stroke="#8ecb6a" stroke-width="0.5">
+            <line x1="0" y1="60" x2="400" y2="60"/><line x1="0" y1="120" x2="400" y2="120"/>
+            <line x1="0" y1="180" x2="400" y2="180"/><line x1="0" y1="240" x2="400" y2="240"/>
+            <line x1="80" y1="0" x2="80" y2="300"/><line x1="160" y1="0" x2="160" y2="300"/>
+            <line x1="240" y1="0" x2="240" y2="300"/><line x1="320" y1="0" x2="320" y2="300"/>
+          </g>
+          <!-- Mountain -->
+          <path d="M0,210 L70,110 L130,165 L190,70 L250,145 L310,85 L370,135 L400,100 L400,300 L0,300Z" fill="url(#gM2)" opacity="0.45"/>
+          <!-- River -->
+          <path d="M0,228 Q80,208 160,222 Q240,238 320,218 Q360,208 400,222" stroke="url(#gW2)" stroke-width="16" fill="none" opacity="0.18" stroke-linecap="round"/>
+          <path d="M0,228 Q80,208 160,222 Q240,238 320,218 Q360,208 400,222" stroke="url(#gW2)" stroke-width="3" fill="none" opacity="0.9" stroke-linecap="round" filter="url(#gB2)">
+            <animate attributeName="stroke-dasharray" values="0,900;350,550;0,900" dur="3.5s" repeatCount="indefinite"/>
+            <animate attributeName="stroke-dashoffset" from="900" to="0" dur="3.5s" repeatCount="indefinite"/>
+          </path>
+          <!-- Rain -->
+          <g opacity="0.55">
+            <circle cx="55" cy="25" r="2" fill="#7fbbee"><animate attributeName="cy" values="15;225" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.8;0" dur="2s" repeatCount="indefinite"/></circle>
+            <circle cx="145" cy="8" r="1.5" fill="#7fbbee"><animate attributeName="cy" values="0;218" dur="2.4s" begin="0.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.7;0" dur="2.4s" begin="0.5s" repeatCount="indefinite"/></circle>
+            <circle cx="225" cy="20" r="2" fill="#7fbbee"><animate attributeName="cy" values="10;228" dur="1.8s" begin="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.8;0" dur="1.8s" begin="1s" repeatCount="indefinite"/></circle>
+            <circle cx="305" cy="12" r="1.5" fill="#7fbbee"><animate attributeName="cy" values="5;216" dur="2.2s" begin="0.3s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.7;0" dur="2.2s" begin="0.3s" repeatCount="indefinite"/></circle>
+            <circle cx="365" cy="30" r="2" fill="#7fbbee"><animate attributeName="cy" values="20;220" dur="2.6s" begin="0.8s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.8;0" dur="2.6s" begin="0.8s" repeatCount="indefinite"/></circle>
+          </g>
+          <!-- CA points -->
+          <g><circle cx="105" cy="218" r="8" fill="rgba(90,200,140,0.2)" stroke="#5ac8b0" stroke-width="1.5"><animate attributeName="r" values="8;12;8" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="105" cy="218" r="3.5" fill="#5ac8b0"/><text x="105" y="203" text-anchor="middle" fill="#5ac8b0" font-family="Inter,sans-serif" font-size="8" font-weight="600">CA-1</text></g>
+          <g><circle cx="240" cy="226" r="8" fill="rgba(90,200,140,0.2)" stroke="#5ac8b0" stroke-width="1.5"><animate attributeName="r" values="8;12;8" dur="2.5s" begin="0.9s" repeatCount="indefinite"/></circle><circle cx="240" cy="226" r="3.5" fill="#5ac8b0"/><text x="240" y="211" text-anchor="middle" fill="#5ac8b0" font-family="Inter,sans-serif" font-size="8" font-weight="600">CA-2</text></g>
+          <!-- Cards -->
+          <g><rect x="8" y="12" width="106" height="46" rx="9" fill="url(#gC2)" stroke="rgba(90,200,140,0.25)" stroke-width="1"/><text x="20" y="29" fill="rgba(142,203,106,0.6)" font-family="Inter,sans-serif" font-size="8" font-weight="500">Q Limpasan</text><text x="20" y="48" fill="#8ecb6a" font-family="Inter,sans-serif" font-size="17" font-weight="700">24.8 <tspan font-size="9" fill="rgba(142,203,106,0.55)">m³/hr</tspan></text></g>
+          <g><rect x="286" y="12" width="106" height="46" rx="9" fill="url(#gC2)" stroke="rgba(127,187,238,0.25)" stroke-width="1"/><text x="298" y="29" fill="rgba(127,187,238,0.6)" font-family="Inter,sans-serif" font-size="8" font-weight="500">Evaporasi</text><text x="298" y="48" fill="#7fbbee" font-family="Inter,sans-serif" font-size="17" font-weight="700">0.082 <tspan font-size="9" fill="rgba(127,187,238,0.55)">m³/m²</tspan></text></g>
+          <g><rect x="8" y="246" width="106" height="46" rx="9" fill="url(#gC2)" stroke="rgba(232,160,80,0.25)" stroke-width="1"/><text x="20" y="263" fill="rgba(232,160,80,0.6)" font-family="Inter,sans-serif" font-size="8" font-weight="500">Sed. Pond</text><text x="20" y="282" fill="#e8a050" font-family="Inter,sans-serif" font-size="17" font-weight="700">186 <tspan font-size="9" fill="rgba(232,160,80,0.55)">m³</tspan></text></g>
+          <g><rect x="286" y="246" width="106" height="46" rx="9" fill="url(#gC2)" stroke="rgba(154,127,204,0.25)" stroke-width="1"/><text x="298" y="263" fill="rgba(154,127,204,0.6)" font-family="Inter,sans-serif" font-size="8" font-weight="500">Debit Akhir</text><text x="298" y="282" fill="#9a7fcc" font-family="Inter,sans-serif" font-size="17" font-weight="700">31.2 <tspan font-size="9" fill="rgba(154,127,204,0.55)">m³/hr</tspan></text></g>
+          <!-- WTP -->
+          <g><rect x="159" y="152" width="82" height="50" rx="10" fill="rgba(90,200,140,0.08)" stroke="#5ac8b0" stroke-width="1.5"/><text x="200" y="171" text-anchor="middle" fill="#5ac8b0" font-family="Inter,sans-serif" font-size="8.5" font-weight="700">KOLAM</text><text x="200" y="184" text-anchor="middle" fill="#5ac8b0" font-family="Inter,sans-serif" font-size="8">PENGOLAHAN</text><text x="200" y="196" text-anchor="middle" fill="rgba(90,200,140,0.55)" font-family="Inter,sans-serif" font-size="7">WTP Unit 1</text></g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STATS ════════════════════════════════════════════════ -->
+  <div class="hm-home-stats">
+    <div class="hm-home-stat"><div class="hm-home-stat-num" id="hm-stat-1">0</div><div class="hm-home-stat-lbl">Modul Analisis</div></div>
+    <div class="hm-home-stat-sep"></div>
+    <div class="hm-home-stat"><div class="hm-home-stat-num" id="hm-stat-2">0</div><div class="hm-home-stat-lbl">Jenis Kolam</div></div>
+    <div class="hm-home-stat-sep"></div>
+    <div class="hm-home-stat"><div class="hm-home-stat-num" id="hm-stat-3">0+</div><div class="hm-home-stat-lbl">Catchment Area</div></div>
+    <div class="hm-home-stat-sep"></div>
+    <div class="hm-home-stat"><div class="hm-home-stat-num">100%</div><div class="hm-home-stat-lbl">Berbasis Regulasi</div></div>
+  </div>
+
+  <!-- ══ FITUR UTAMA ══════════════════════════════════════════ -->
+  <div class="hm-home-sec-lbl">Modul Analisis Terintegrasi</div>
+  <div class="hm-home-grid">
+
+    <div class="hm-home-feat hm-feat-accent" onclick="nav('rainfall')">
+      <div class="hm-feat-icon-wrap">🌧️</div>
+      <div class="hm-feat-name">Rainfall Analysis</div>
+      <div class="hm-feat-desc">Analisis statistik data curah hujan harian multi-tahun. Mendukung 5 metode distribusi: Normal, Log-Normal, Gumbel, Log-Pearson III, dan Weibull. Uji kesesuaian Chi-Square dan Smirnov-Kolmogorov. Output CH rancangan untuk kala ulang 2–100 tahun.</div>
+      <div class="hm-feat-tag">5 distribusi · Uji statistik · CH rancangan</div>
+      <div class="hm-feat-go">→</div>
+    </div>
+
+    <div class="hm-home-feat" onclick="nav('runoff')">
+      <div class="hm-feat-icon-wrap">🌊</div>
+      <div class="hm-feat-name">Runoff Contact Water</div>
+      <div class="hm-feat-desc">Hitung debit limpasan air kontak tambang per catchment area menggunakan metode Rational Q = C·i·A. Definisikan koefisien limpasan, luas, dan alokasi ke unit pengolahan. Integrasi otomatis dengan evaporasi dan groundwater.</div>
+      <div class="hm-feat-tag">Q = C × i × A · Neraca air otomatis</div>
+      <div class="hm-feat-go">→</div>
+    </div>
+
+    <div class="hm-home-feat" onclick="nav('evaporation')">
+      <div class="hm-feat-icon-wrap">☀️</div>
+      <div class="hm-feat-name">Evaporation Analysis</div>
+      <div class="hm-feat-desc">Hitung laju evaporasi aktual menggunakan metode Irving Langmuir berdasarkan suhu udara dan kelembaban relatif. Nilai evaporasi dikurangi otomatis dari debit limpasan tiap catchment area yang aktif.</div>
+      <div class="hm-feat-tag">Irving Langmuir · Reduksi otomatis</div>
+      <div class="hm-feat-go">→</div>
+    </div>
+
+    <div class="hm-home-feat" onclick="nav('groundwater')">
+      <div class="hm-feat-icon-wrap">🏔️</div>
+      <div class="hm-feat-name">Groundwater Inflow</div>
+      <div class="hm-feat-desc">Masukkan kontribusi aliran air tanah per catchment area tambang. Data groundwater ditambahkan ke Q neto limpasan untuk menghasilkan debit total akhir yang mengalir ke sistem pengolahan air.</div>
+      <div class="hm-feat-tag">Q_akhir = Q_neto + Q_GW</div>
+      <div class="hm-feat-go">→</div>
+    </div>
+
+    <div class="hm-home-feat" onclick="nav('sedpond')">
+      <div class="hm-feat-icon-wrap">🏗️</div>
+      <div class="hm-feat-name">Sediment Pond Design</div>
+      <div class="hm-feat-desc">Desain kolam pengendap lumpur berdasarkan debit neto per unit pengolahan. Hitung volume minimum, dimensi kolam, dan waktu retensi. Terapkan safety factor sesuai standar desain kolam tambang.</div>
+      <div class="hm-feat-tag">Volume · Dimensi · Safety factor</div>
+      <div class="hm-feat-go">→</div>
+    </div>
+
+    <div class="hm-home-feat" onclick="nav('retpond')">
+      <div class="hm-feat-icon-wrap">💧</div>
+      <div class="hm-feat-name">Retention Pond Design</div>
+      <div class="hm-feat-desc">Desain kolam retensi untuk unit yang membutuhkan waktu detensi lebih lama (pH, TSS tinggi). Hitung volume berdasarkan waktu hujan rancangan, debit puncak, dan faktor retensi yang dapat dikustomisasi.</div>
+      <div class="hm-feat-tag">Waktu detensi · Volume retensi</div>
+      <div class="hm-feat-go">→</div>
+    </div>
+
+  </div>
+
+  <!-- ══ OUTPUT ════════════════════════════════════════════════ -->
+  <div class="hm-home-sec-lbl" style="margin-top:36px">Output & Pelaporan</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:0">
+
+    <div class="hm-home-feat" onclick="nav('flow')" style="cursor:pointer">
+      <div class="hm-feat-icon-wrap">🔀</div>
+      <div class="hm-feat-name">Flow Diagram</div>
+      <div class="hm-feat-desc">Diagram alir visual neraca air tambang: dari curah hujan → limpasan → evaporasi → groundwater → unit pengolahan → kolam. Semua nilai ter-update otomatis saat data berubah.</div>
+      <div class="hm-feat-tag">Neraca air visual</div>
+    </div>
+
+    <div class="hm-home-feat" onclick="nav('rekap')" style="cursor:pointer">
+      <div class="hm-feat-icon-wrap">📋</div>
+      <div class="hm-feat-name">Rekap Akhir</div>
+      <div class="hm-feat-desc">Ringkasan seluruh hasil analisis dalam satu tampilan: debit per catchment, total per unit pengolahan, dimensi kolam, dan catatan teknis otomatis.</div>
+      <div class="hm-feat-tag">Summary · Catatan teknis</div>
+    </div>
+
+    <div class="hm-home-feat" onclick="nav('laporan')" style="cursor:pointer">
+      <div class="hm-feat-icon-wrap">📄</div>
+      <div class="hm-feat-name">Output Laporan</div>
+      <div class="hm-feat-desc">Generate laporan Excel (.xlsx) berwarna multi-sheet dan laporan Word (.docx) terstruktur siap cetak. Simpan dan buka kembali proyek dalam format .hydromine.</div>
+      <div class="hm-feat-tag hm-feat-export">Export Excel · Word · .hydromine</div>
+    </div>
+
+  </div>
+
+  <!-- ══ ALUR KERJA ════════════════════════════════════════════ -->
+  <div class="hm-home-sec-lbl" style="margin-top:36px">Alur Kerja Analisis</div>
+  <div class="hm-home-steps">
+    <div class="hm-home-step">
+      <div class="hm-step-num">01</div>
+      <div class="hm-step-title">Data Curah Hujan</div>
+      <div class="hm-step-desc">Input data hujan tahunan, pilih distribusi statistik dan kala ulang. Sistem menghitung CH rancangan (i) secara otomatis.</div>
+    </div>
+    <div class="hm-step-line"></div>
+    <div class="hm-home-step">
+      <div class="hm-step-num">02</div>
+      <div class="hm-step-title">Setup Catchment</div>
+      <div class="hm-step-desc">Definisikan catchment area: koefisien limpasan C, luas A (ha), aktifkan evaporasi dan groundwater per CA.</div>
+    </div>
+    <div class="hm-step-line"></div>
+    <div class="hm-home-step">
+      <div class="hm-step-num">03</div>
+      <div class="hm-step-title">Neraca Air Otomatis</div>
+      <div class="hm-step-desc">Q = C·i·A dikurangi evaporasi, ditambah groundwater. Debit akhir per unit pengolahan (WTP) dihitung real-time.</div>
+    </div>
+    <div class="hm-step-line"></div>
+    <div class="hm-home-step">
+      <div class="hm-step-num">04</div>
+      <div class="hm-step-title">Desain Kolam & Export</div>
+      <div class="hm-step-desc">Dimensi sediment pond dan retention pond ter-hitung otomatis. Export laporan Excel + Word dalam satu klik.</div>
+    </div>
+  </div>
+
+  <!-- ══ CARA PAKAI ════════════════════════════════════════════ -->
+  <div class="hm-home-sec-lbl" style="margin-top:36px">Tips Penggunaan</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0">
+    <div class="hm-home-feat" style="cursor:default">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">💾 Menyimpan Pekerjaan</div>
+      <div style="font-size:12.5px;color:var(--muted);line-height:1.7">Klik <strong style="color:var(--green)">Simpan</strong> di topbar untuk menyimpan seluruh data ke file <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;font-size:11px">.hydromine</code>. Buka kembali dengan tombol 📂 Buka Proyek. Data juga tersimpan otomatis di browser (localStorage).</div>
+    </div>
+    <div class="hm-home-feat" style="cursor:default">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">📊 Export Laporan</div>
+      <div style="font-size:12.5px;color:var(--muted);line-height:1.7">Buka menu <strong style="color:var(--green)">Output Laporan</strong> untuk export Excel (.xlsx) multi-sheet berwarna dan Word (.docx) terstruktur. Klik <strong style="color:var(--green)">Perbarui Rekap</strong> dulu agar data terkini ter-include di laporan.</div>
+    </div>
+    <div class="hm-home-feat" style="cursor:default">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">🔀 Flow Diagram</div>
+      <div style="font-size:12.5px;color:var(--muted);line-height:1.7">Flow Diagram menampilkan neraca air secara visual. Pastikan semua catchment area sudah dikonfigurasi di Runoff sebelum melihat diagram alir untuk hasil yang akurat.</div>
+    </div>
+    <div class="hm-home-feat" style="cursor:default">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">🌙 Dark / Light Mode</div>
+      <div style="font-size:12.5px;color:var(--muted);line-height:1.7">Gunakan tombol <strong style="color:var(--green)">☀ Light / 🌙 Dark</strong> di kanan topbar untuk beralih tema. Preferensi tersimpan otomatis. Tersedia juga toggle di halaman Rekap Akhir.</div>
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ════════════════════════════════════════════════ -->
+  <div class="hm-home-footer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-family:var(--head);font-size:16px;font-weight:800;background:linear-gradient(135deg,#8ecb6a,#5ac8b0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">HydroMine</span>
+      <span style="font-size:10px;color:var(--muted);padding:2px 8px;border:1px solid rgba(255,255,255,0.1);border-radius:10px">v2.0</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.7">
+      Platform analisis hidrologi tambang berbasis web · Tidak memerlukan instalasi<br>
+      <span style="color:rgba(106,128,96,0.6)">© 2024 Andyka Adhyaksa Sumarno · Seluruh perhitungan bersifat referensial</span>
+    </div>
+  </div>
+
+</div><!-- /page-home -->
+
+
+<!-- ╔══════════════════════════════════════╗
      ║   PAGE 1 — RAINFALL ANALYSIS        ║
      ╚══════════════════════════════════════╝ -->
-<div class="page active" id="page-rainfall">
+<div class="page" id="page-rainfall">
 
   <div class="page-header">
     <div>
@@ -2583,7 +2976,7 @@ body > nav, body > main { position: relative; z-index: 1; }
   margin-bottom: 6px;
 }
 #page-rekap .rekap-hero-val {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 32px; font-weight: 700; line-height: 1;
   color: #ffffff;
 }
@@ -2640,7 +3033,7 @@ body > nav, body > main { position: relative; z-index: 1; }
   letter-spacing: 0.8px; color: var(--muted); margin-bottom: 4px;
 }
 #page-rekap .rekap-kpi-val {
-  font-family: 'Oswald', var(--mono);
+  font-family: 'Inter', var(--mono);
   font-size: 22px; font-weight: 700; color: var(--text);
   line-height: 1; display: flex; align-items: baseline; gap: 4px;
 }
@@ -2657,7 +3050,7 @@ body > nav, body > main { position: relative; z-index: 1; }
   margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
 }
 #page-rekap .rekap-view-title {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px; font-weight: 600; color: var(--text);
   text-transform: uppercase; letter-spacing: 0.8px;
   display: flex; align-items: center; gap: 8px;
@@ -2694,7 +3087,7 @@ body > nav, body > main { position: relative; z-index: 1; }
   background: var(--card);
 }
 #page-rekap .rekap-table-title {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px; font-weight: 600; color: var(--text);
   text-transform: uppercase; letter-spacing: 0.8px;
   display: flex; align-items: center; gap: 8px;
@@ -2800,7 +3193,7 @@ body.dark #page-rekap .rekap-tbl tbody tr:hover td { background: rgba(78,168,232
   padding: 16px 20px 12px;
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; gap: 8px;
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.8px;
   color: var(--text);
@@ -3111,7 +3504,7 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
   <div class="rekap-pond-card">
     <div class="rekap-pond-header">
       <div class="dot" style="background:#9b59b6"></div>
-      <span style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:0.8px">
+      <span style="font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:0.8px">
         Rekap Dimensi Kolam Pengolahan — Sediment &amp; Retention Pond
       </span>
     </div>
@@ -3342,6 +3735,15 @@ function toggleDarkMode() {
     lbl.textContent       = '☀️ Light Mode';
   }
 
+  // Update topbar theme button
+  const themeIcon  = document.getElementById('theme-icon');
+  const themeLabel = document.getElementById('theme-label');
+  if (themeIcon)  themeIcon.textContent  = isDark ? '🌙' : '☀';
+  if (themeLabel) themeLabel.textContent = isDark ? 'Dark' : 'Light';
+
+  // Update body background mesh vars
+  document.body.style.background = '';
+
   // Redraw charts so their backgrounds match
   setTimeout(() => {
     if (raChartInst) { raUpdateChart(); }
@@ -3361,6 +3763,7 @@ function nav(page) {
   if (page === 'groundwater') gwRefresh();
   if (page === 'sedpond') calcSedPond();
   if (page === 'retpond') calcRetPond();
+  if (page === 'home')   initHMHome();
   if (page === 'rekap')  buildRekap();
   if (page === 'laporan') buildLaporan();
 }
@@ -3886,7 +4289,7 @@ function raUpdateChart() {
           align: 'end',
           labels: {
             color: isDark ? '#a0c8e8' : '#1e3a5f',
-            font: { family: 'JetBrains Mono', size: 10, weight: '500' },
+            font: { family: 'Inter', size: 10, weight: '500' },
             boxWidth: 12, boxHeight: 12,
             padding: 16, usePointStyle: true, pointStyleWidth: 14,
           }
@@ -3899,8 +4302,8 @@ function raUpdateChart() {
           bodyColor: isDark ? '#c0d8f0' : '#ddeeff',
           padding: 10,
           cornerRadius: 8,
-          titleFont: { family: 'JetBrains Mono', size: 10, weight: '700' },
-          bodyFont:  { family: 'JetBrains Mono', size: 11 },
+          titleFont: { family: 'Inter', size: 10, weight: '700' },
+          bodyFont:  { family: 'Inter', size: 11 },
           callbacks: {
             label: c => ` ${c.dataset.label}: ${c.parsed.y.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})} mm`
           }
@@ -3912,7 +4315,7 @@ function raUpdateChart() {
           border: { display: false },
           ticks: {
             color: tickColor,
-            font: { family: 'JetBrains Mono', size: type==='yearly'||type==='annual_max' ? 10 : 8.5 },
+            font: { family: 'Inter', size: type==='yearly'||type==='annual_max' ? 10 : 8.5 },
             maxTicksLimit: isLarge ? 16 : (nYears > 15 ? 20 : nYears > 5 ? 30 : labels.length),
             maxRotation: nYears > 5 ? 45 : 0,
             minRotation: 0,
@@ -3934,7 +4337,7 @@ function raUpdateChart() {
           })(),
           ticks: {
             color: tickColor,
-            font: { family: 'JetBrains Mono', size: 9 },
+            font: { family: 'Inter', size: 9 },
             count: 7,
             padding: 8,
             callback: v => v % 1 === 0
@@ -3945,7 +4348,7 @@ function raUpdateChart() {
             display: true,
             text: type==='monthly_avg' ? 'CH Rerata (mm/hari)' : 'Curah Hujan (mm)',
             color: tickColor,
-            font: { family: 'JetBrains Mono', size: 10, weight: '600' },
+            font: { family: 'Inter', size: 10, weight: '600' },
             padding: { bottom: 6 },
           }
         }
@@ -3980,9 +4383,9 @@ function chartOpts(yLabel) {
       }
     },
     scales: {
-      x: { grid:{color:gridColor}, ticks:{color:tickColor,font:{family:'JetBrains Mono',size:9},maxTicksLimit:18,maxRotation:45} },
+      x: { grid:{color:gridColor}, ticks:{color:tickColor,font:{family:'Inter',size:9},maxTicksLimit:18,maxRotation:45} },
       y: { grid:{color:gridColor}, beginAtZero:true,
-        ticks:{color:tickColor,font:{family:'JetBrains Mono',size:9},callback:v=>v.toLocaleString('id-ID',{maximumFractionDigits:0})},
+        ticks:{color:tickColor,font:{family:'Inter',size:9},callback:v=>v.toLocaleString('id-ID',{maximumFractionDigits:0})},
         title:{display:true,text:yLabel,color:tickColor,font:{size:11}} }
     }
   };
@@ -4024,15 +4427,15 @@ function raRenderExtraCharts() {
           borderColor:isDk?'#2a4870':'rgba(26,127,212,0.25)',borderWidth:1,
           cornerRadius:8,padding:10,
           titleColor:'#7dd3fc',bodyColor:isDk?'#c0d8f0':'#ddeeff',
-          titleFont:{family:'JetBrains Mono',size:10,weight:'700'},
-          bodyFont:{family:'JetBrains Mono',size:11},
+          titleFont:{family:'Inter',size:10,weight:'700'},
+          bodyFont:{family:'Inter',size:11},
           callbacks:{label:c=>` ${c.parsed.y.toLocaleString('id-ID',{minimumFractionDigits:2})} mm/hari`}
         }},
         scales:{
           x:{grid:{color:gc,lineWidth:0.5},border:{display:false},
-            ticks:{color:tc,font:{family:'JetBrains Mono',size:10},padding:4}},
+            ticks:{color:tc,font:{family:'Inter',size:10},padding:4}},
           y:{grid:{color:gc,lineWidth:0.5},border:{display:false,dash:[3,3]},beginAtZero:true,
-            ticks:{color:tc,font:{family:'JetBrains Mono',size:9},padding:8,count:6},
+            ticks:{color:tc,font:{family:'Inter',size:9},padding:8,count:6},
             title:{display:true,text:'mm/hari',color:tc,font:{size:10,weight:'600'},padding:{bottom:6}}}
         }
       }
@@ -4058,7 +4461,7 @@ function raRenderExtraCharts() {
         plugins:{
           legend:{position:'right',labels:{
             color:isDk?'#a0c8e8':'#1e3a5f',
-            font:{family:'JetBrains Mono',size:10},
+            font:{family:'Inter',size:10},
             padding:12,boxWidth:11,boxHeight:11,usePointStyle:true
           }},
           tooltip:{
@@ -4066,7 +4469,7 @@ function raRenderExtraCharts() {
             borderColor:isDk?'#2a4870':'rgba(26,127,212,0.25)',borderWidth:1,
             cornerRadius:8,padding:10,
             titleColor:'#7dd3fc',bodyColor:isDk?'#c0d8f0':'#ddeeff',
-            titleFont:{family:'JetBrains Mono',size:10,weight:'700'},
+            titleFont:{family:'Inter',size:10,weight:'700'},
             callbacks:{label:c=>{const t=raClassCounts.reduce((s,x)=>s+x.cnt,0);return ` ${c.label}: ${c.parsed.toLocaleString('id-ID')} hari (${(c.parsed/t*100).toFixed(1)}%)`;}}
           }
         }
@@ -4096,15 +4499,15 @@ function raRenderExtraCharts() {
           borderColor:isDk?'#2a4870':'rgba(26,127,212,0.25)',borderWidth:1,
           cornerRadius:8,padding:10,
           titleColor:'#7dd3fc',bodyColor:isDk?'#c0d8f0':'#ddeeff',
-          titleFont:{family:'JetBrains Mono',size:10,weight:'700'},
-          bodyFont:{family:'JetBrains Mono',size:11},
+          titleFont:{family:'Inter',size:10,weight:'700'},
+          bodyFont:{family:'Inter',size:11},
           callbacks:{label:c=>` ${c.parsed.y.toLocaleString('id-ID',{minimumFractionDigits:1})} mm`}
         }},
         scales:{
           x:{grid:{display:false},border:{display:false},
-            ticks:{color:tc,font:{family:'JetBrains Mono',size:10,weight:'600'},padding:6}},
+            ticks:{color:tc,font:{family:'Inter',size:10,weight:'600'},padding:6}},
           y:{grid:{color:gc,lineWidth:0.5},border:{display:false,dash:[3,3]},beginAtZero:true,
-            ticks:{color:tc,font:{family:'JetBrains Mono',size:9},padding:8,count:6},
+            ticks:{color:tc,font:{family:'Inter',size:9},padding:8,count:6},
             title:{display:true,text:'mm',color:tc,font:{size:10,weight:'600'}}}
         }
       }
@@ -4139,7 +4542,7 @@ function raRenderExtraCharts() {
         plugins:{
           legend:{display:true,position:'top',align:'end',labels:{
             color:isDk?'#a0c8e8':'#1e3a5f',
-            font:{family:'JetBrains Mono',size:10,weight:'500'},
+            font:{family:'Inter',size:10,weight:'500'},
             boxWidth:12,boxHeight:12,padding:16,usePointStyle:true
           }},
           tooltip:{
@@ -4147,16 +4550,16 @@ function raRenderExtraCharts() {
             borderColor:isDk?'#2a4870':'rgba(26,127,212,0.25)',borderWidth:1,
             cornerRadius:8,padding:10,
             titleColor:'#7dd3fc',bodyColor:isDk?'#c0d8f0':'#ddeeff',
-            titleFont:{family:'JetBrains Mono',size:10,weight:'700'},
-            bodyFont:{family:'JetBrains Mono',size:11},
+            titleFont:{family:'Inter',size:10,weight:'700'},
+            bodyFont:{family:'Inter',size:11},
             callbacks:{label:c=>` ${c.dataset.label.split('(')[0].trim()}: ${c.parsed.y.toLocaleString('id-ID',{minimumFractionDigits:1})} mm`}
           }
         },
         scales:{
           x:{grid:{color:gc,lineWidth:0.5},border:{display:false},
-            ticks:{color:tc,font:{family:'JetBrains Mono',size:9},maxTicksLimit:20,maxRotation:45,padding:4}},
+            ticks:{color:tc,font:{family:'Inter',size:9},maxTicksLimit:20,maxRotation:45,padding:4}},
           y:{grid:{color:gc,lineWidth:0.5},border:{display:false,dash:[3,3]},beginAtZero:false,
-            ticks:{color:tc,font:{family:'JetBrains Mono',size:9},padding:8,count:6},
+            ticks:{color:tc,font:{family:'Inter',size:9},padding:8,count:6},
             title:{display:true,text:'mm',color:tc,font:{size:10,weight:'600'},padding:{bottom:6}}}
         }
       }
@@ -4597,8 +5000,8 @@ function roUpdateBarChart(names, vals) {
       responsive: true, maintainAspectRatio: false, animation: { duration: 250 },
       plugins: { legend:{display:false}, tooltip:{ backgroundColor: isDark?'#0e1621':'#1e3a5f', titleColor:'#7dd3fc', bodyColor: isDark?'#d8e8f4':'#e2e8f0', callbacks:{ label: c=>` ${c.parsed.y.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})} m³/hari` } } },
       scales: {
-        x: { grid:{color:gc}, ticks:{color:tc,font:{family:'JetBrains Mono',size:9},maxRotation:30} },
-        y: { grid:{color:gc}, beginAtZero:true, ticks:{color:tc,font:{family:'JetBrains Mono',size:9},callback:v=>v.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})}, title:{display:true,text:'m³/hari',color:tc,font:{size:11}} }
+        x: { grid:{color:gc}, ticks:{color:tc,font:{family:'Inter',size:9},maxRotation:30} },
+        y: { grid:{color:gc}, beginAtZero:true, ticks:{color:tc,font:{family:'Inter',size:9},callback:v=>v.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})}, title:{display:true,text:'m³/hari',color:tc,font:{size:11}} }
       }
     }
   });
@@ -4635,7 +5038,7 @@ function roUpdateWTPChart(ch, grandTotal) {
     options: {
       responsive: true, maintainAspectRatio: false, animation: { duration: 250 },
       plugins: {
-        legend: { position:'right', labels:{ color: isDark?'#d8e8f4':'#1e3a5f', font:{family:'JetBrains Mono',size:10}, padding:12 } },
+        legend: { position:'right', labels:{ color: isDark?'#d8e8f4':'#1e3a5f', font:{family:'Inter',size:10}, padding:12 } },
         tooltip: { backgroundColor: isDark?'#0e1621':'#1e3a5f', titleColor:'#7dd3fc', bodyColor: isDark?'#d8e8f4':'#e2e8f0',
           callbacks: { label: c => ` ${c.label}: ${c.parsed.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})} m³/hari (${grandTotal>0?(c.parsed/grandTotal*100).toFixed(1):0}%)` } }
       }
@@ -6782,7 +7185,7 @@ function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
 
   // Enthalpy labels — every 10 kJ/kg along left edge (inside plot)
   ctx.save();
-  ctx.font = `bold 8px 'JetBrains Mono',monospace`;
+  ctx.font = `bold 8px 'Inter',monospace`;
   ctx.fillStyle = ENT_LBL;
   ctx.textAlign = 'right';
   for (let hVal = -10; hVal <= 130; hVal += 10) {
@@ -6795,7 +7198,7 @@ function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
   ctx.save();
   ctx.translate(ml - 46, mt + ch / 2);
   ctx.rotate(-Math.PI / 2);
-  ctx.font = `9px 'JetBrains Mono',monospace`;
+  ctx.font = `9px 'Inter',monospace`;
   ctx.fillStyle = ENT_LBL;
   ctx.textAlign = 'center';
   ctx.fillText('Enthalpy kJ/kg(d.a.)', 0, 0);
@@ -6804,7 +7207,7 @@ function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
 
   // Top enthalpy scale
   ctx.save();
-  ctx.font = `bold 8px 'JetBrains Mono',monospace`;
+  ctx.font = `bold 8px 'Inter',monospace`;
   ctx.fillStyle = ENT_LBL;
   ctx.textAlign = 'center';
   for (let hVal = 80; hVal <= 125; hVal += 5) {
@@ -6836,7 +7239,7 @@ function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
       const xSatG = xSat * 1000;
       if (xSatG >= 0.5 && xSatG <= Wmax - 0.5) {
         ctx.setLineDash([]);
-        ctx.font = `7.5px 'JetBrains Mono',monospace`;
+        ctx.font = `7.5px 'Inter',monospace`;
         ctx.fillStyle = WB_LBL;
         ctx.textAlign = 'center';
         ctx.fillText(Twb + '°', tx(Twb) - 3, ty(xSatG) - 5);
@@ -6881,7 +7284,7 @@ function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
       const ang  = Math.atan2(ty(xgL2) - ty(xgL), tx(lT + 1.5) - tx(lT));
       ctx.translate(tx(lT), ty(xgL));
       ctx.rotate(ang);
-      ctx.font = `bold ${is100 ? 10 : 9}px 'JetBrains Mono',monospace`;
+      ctx.font = `bold ${is100 ? 10 : 9}px 'Inter',monospace`;
       ctx.fillStyle = is100 ? RH100_C : RH_C;
       ctx.textAlign = 'center';
       ctx.fillText(rh + '%', 0, -4);
@@ -6904,7 +7307,7 @@ function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
     ctx.lineWidth = isMajor ? 1.2 : 0.7;
     ctx.moveTo(tx(T), H - mb); ctx.lineTo(tx(T), H - mb + tickLen); ctx.stroke();
     if (isMajor) {
-      ctx.font = `${T % 10 === 0 ? 'bold ' : ''}9.5px 'JetBrains Mono',monospace`;
+      ctx.font = `${T % 10 === 0 ? 'bold ' : ''}9.5px 'Inter',monospace`;
       ctx.fillStyle = LBL_C; ctx.textAlign = 'center';
       ctx.fillText(T, tx(T), H - mb + 16);
     }
@@ -6921,7 +7324,7 @@ function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
     ctx.moveTo(ml + cw, ty(w)); ctx.lineTo(ml + cw + tickLen, ty(w)); ctx.stroke();
     // Label every 2 g/kg only
     if (w % 2 === 0) {
-      ctx.font = `${w % 10 === 0 ? 'bold ' : ''}9px 'JetBrains Mono',monospace`;
+      ctx.font = `${w % 10 === 0 ? 'bold ' : ''}9px 'Inter',monospace`;
       ctx.fillStyle = LBL_C; ctx.textAlign = 'left';
       ctx.fillText(w, ml + cw + 9, ty(w) + 3.5);
     }
@@ -6929,7 +7332,7 @@ function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
 
   // ── AXIS TITLES ───────────────────────────────────────────
   // X-axis title — bottom, centered
-  ctx.font = `600 10.5px 'JetBrains Mono',monospace`;
+  ctx.font = `600 10.5px 'Inter',monospace`;
   ctx.fillStyle = LBL_C; ctx.textAlign = 'center';
   ctx.fillText(`Dry Bulb Temperature  (°C)   |   Pressure = ${Math.round(Patm)} Pa`, ml + cw / 2, H - 8);
 
@@ -6937,13 +7340,13 @@ function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
   ctx.save();
   ctx.translate(W - 12, mt + ch / 2);
   ctx.rotate(-Math.PI / 2);
-  ctx.font = `600 10px 'JetBrains Mono',monospace`;
+  ctx.font = `600 10px 'Inter',monospace`;
   ctx.fillStyle = LBL_C; ctx.textAlign = 'center';
   ctx.fillText('Humidity Ratio,  g / kg (d.a.)', 0, 0);
   ctx.restore();
 
   // Chart title — top-left, clean
-  ctx.font = `bold 11px 'JetBrains Mono',monospace`;
+  ctx.font = `bold 11px 'Inter',monospace`;
   ctx.fillStyle = '#1a3a5c';
   ctx.textAlign = 'left';
   ctx.fillText('PSYCHROMETRIC CHART — SI', ml, mt - 10);
@@ -7000,7 +7403,7 @@ function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
     ctx.textAlign = 'left';
     lines.forEach((l, i) => {
       ctx.fillStyle = i === 0 ? color : '#2a4060';
-      ctx.font = i === 0 ? `bold 9px 'JetBrains Mono',monospace` : `8.5px 'JetBrains Mono',monospace`;
+      ctx.font = i === 0 ? `bold 9px 'Inter',monospace` : `8.5px 'Inter',monospace`;
       ctx.fillText(l, bx + 10, by + 15 + i * 14);
     });
   }
@@ -8387,6 +8790,183 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() { loop(); }, 2000);
 })();
 </script>
+
+
+<style>
+/* ─── HOME PAGE ────────────────────────────────────────────── */
+.hm-home-hero {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+  align-items: center; padding: 36px 0 32px; margin-bottom: 36px;
+}
+.hm-home-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 14px; margin-bottom: 20px;
+  background: rgba(90,200,140,0.1); border: 1px solid rgba(90,200,140,0.2);
+  border-radius: 20px; font-size: 10.5px; font-weight: 500; color: var(--green);
+}
+.hm-home-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  animation: hmBadgePulse 2s ease-in-out infinite;
+}
+@keyframes hmBadgePulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:0.5} }
+.hm-home-title {
+  font-family: var(--head); font-size: 44px; font-weight: 900;
+  line-height: 1.1; letter-spacing: -1px; color: var(--text); margin-bottom: 18px;
+}
+.hm-home-gradient {
+  background: linear-gradient(135deg, #8ecb6a 0%, #5ac8b0 50%, #7fbbee 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  background-size: 200% 100%; animation: hmGrad 5s ease infinite alternate;
+}
+@keyframes hmGrad { 0%{background-position:0%} 100%{background-position:100%} }
+.hm-home-desc {
+  font-size: 14px; color: var(--muted); line-height: 1.75; max-width: 440px; margin-bottom: 28px;
+}
+.hm-home-cta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.hm-home-btn-primary {
+  display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;
+  background: linear-gradient(135deg, #8ecb6a, #5ac8b0); color: #0a1a06;
+  border: none; border-radius: 12px; font-size: 13.5px; font-weight: 700;
+  cursor: pointer; box-shadow: 0 6px 24px rgba(90,200,140,0.35);
+  transition: all 0.2s;
+}
+.hm-home-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(90,200,140,0.45); }
+.hm-home-btn-ghost {
+  display: inline-flex; align-items: center; gap: 6px; padding: 11px 22px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px; color: var(--muted); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+}
+.hm-home-btn-ghost:hover { background: rgba(255,255,255,0.09); border-color: rgba(90,200,140,0.3); color: var(--green); }
+.hm-home-diagram {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(142,203,106,0.12);
+  border-radius: 18px; padding: 10px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05);
+  transition: transform 0.3s;
+}
+.hm-home-diagram:hover { transform: perspective(1000px) rotateY(-3deg) rotateX(2deg); }
+
+/* Stats strip */
+.hm-home-stats {
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 26px 32px; margin-bottom: 36px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px; backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.04);
+}
+.hm-home-stat { text-align: center; flex: 1; }
+.hm-home-stat-num {
+  font-family: var(--head); font-size: 38px; font-weight: 900; line-height: 1;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #8ecb6a, #5ac8b0);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hm-home-stat-lbl { font-size: 11px; color: var(--muted); margin-top: 6px; font-weight: 500; }
+.hm-home-stat-sep { width: 1px; height: 40px; background: rgba(255,255,255,0.07); flex-shrink: 0; margin: 0 12px; }
+
+/* Section label */
+.hm-home-sec-lbl {
+  font-size: 11px; font-weight: 700; color: var(--green); text-transform: uppercase;
+  letter-spacing: 1.5px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hm-home-sec-lbl::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(142,203,106,0.3),transparent); }
+
+/* Feature grid */
+.hm-home-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 0;
+}
+.hm-home-feat {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 22px 22px 20px;
+  cursor: pointer; position: relative; overflow: hidden;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 6px 28px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.05);
+  transition: all 0.25s cubic-bezier(0.23,1,0.32,1);
+  transform: translateZ(0);
+}
+.hm-home-feat::before {
+  content: ''; position: absolute; top:0; left:10%; right:10%; height:1px;
+  background: linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent);
+}
+.hm-home-feat:hover {
+  transform: perspective(800px) translateY(-6px) rotateX(1.5deg);
+  border-color: rgba(142,203,106,0.2);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(142,203,106,0.1);
+}
+.hm-feat-accent { border-color: rgba(90,200,140,0.18); background: linear-gradient(135deg,rgba(90,200,140,0.07),rgba(127,187,238,0.04)); }
+.hm-feat-icon-wrap { font-size: 24px; margin-bottom: 12px; }
+.hm-feat-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 8px; letter-spacing: -0.2px; }
+.hm-feat-desc { font-size: 12.5px; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+.hm-feat-tag {
+  display: inline-block; font-size: 10.5px; font-weight: 600; color: var(--green);
+  background: rgba(90,200,140,0.1); border: 1px solid rgba(90,200,140,0.2);
+  border-radius: 6px; padding: 3px 9px;
+}
+.hm-feat-go {
+  position: absolute; right:20px; bottom:20px;
+  font-size: 18px; color: var(--green); opacity:0; transform:translateX(-4px);
+  transition: all 0.2s;
+}
+.hm-home-feat:hover .hm-feat-go { opacity:1; transform:translateX(0); }
+
+/* Steps */
+.hm-home-steps { display:flex; align-items:flex-start; gap:0; }
+.hm-home-step { flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 16px; }
+.hm-step-num {
+  width:48px; height:48px; border-radius:14px;
+  background: linear-gradient(135deg,rgba(90,200,140,0.15),rgba(127,187,238,0.08));
+  border: 1px solid rgba(90,200,140,0.2);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--head); font-size:18px; font-weight:900; color:var(--green);
+  margin-bottom:14px; box-shadow: 0 4px 16px rgba(90,200,140,0.12);
+}
+.hm-step-title { font-size:13.5px; font-weight:700; color:var(--text); margin-bottom:8px; letter-spacing:-0.2px; }
+.hm-step-desc  { font-size:12px; color:var(--muted); line-height:1.65; }
+.hm-step-line  { width:48px; flex-shrink:0; height:1px; background:linear-gradient(90deg,rgba(90,200,140,0.4),rgba(127,187,238,0.3)); margin-top:24px; align-self:flex-start; position:relative; }
+.hm-step-line::after { content:''; position:absolute; right:-4px; top:-3px; width:6px; height:6px; border-radius:50%; background:var(--green); }
+
+/* Footer */
+.hm-home-footer {
+  margin-top:44px; padding:24px 0 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display:flex; align-items:center; gap:24px; flex-wrap:wrap;
+}
+</style>
+
+<script>
+function initHMHome() {
+  var targets = [
+    {id:'hm-stat-1', target:6, suffix:''},
+    {id:'hm-stat-2', target:2, suffix:''},
+    {id:'hm-stat-3', target:50, suffix:'+'}
+  ];
+  targets.forEach(function(t) {
+    var el = document.getElementById(t.id);
+    if (!el) return;
+    var cur = 0;
+    var step = Math.max(1, Math.floor(t.target/30));
+    var timer = setInterval(function(){
+      cur = Math.min(cur+step, t.target);
+      el.textContent = cur + t.suffix;
+      if(cur >= t.target) clearInterval(timer);
+    }, 45);
+  });
+}
+setTimeout(initHMHome, 900);
+</script>
+
+
+<style>
+.hm-home-taglist { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:22px; }
+.hm-home-tag {
+  font-size:11px; font-weight:500; color:var(--green);
+  background:rgba(90,200,140,0.1); border:1px solid rgba(90,200,140,0.2);
+  border-radius:20px; padding:4px 12px;
+}
+.hm-feat-export { color:var(--blue) !important; background:rgba(127,187,238,0.1) !important; border-color:rgba(127,187,238,0.2) !important; }
+</style>
 
 </body>
 </html>
