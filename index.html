@@ -7308,7 +7308,7 @@ async function _buildDocxXml(D, JSZip) {
     'Terdapat '+(gw.count||0)+' catchment aktif dengan total debit air tanah sebesar '+(gw.total||'0')+' m³/hari.',
     {after:120,line:320}
   );
-  if(parseFloat(gw.total||0) < 1){
+  if(parseID(gw.total||'0') < 1){
     xml+=callout('ℹ️','Data Groundwater',
       'Tidak ada kontribusi air tanah aktif yang diinput pada saat laporan ini dibuat. '+
       'Jika tersedia data dewatering lapangan, input pada menu Groundwater untuk menyertakannya dalam neraca air.',
@@ -7335,7 +7335,7 @@ async function _buildDocxXml(D, JSZip) {
     });
     brows.push(tr2(
       tc('TOTAL GROUNDWATER AKTIF',{w:c4[0]+c4[1],bold:true,bg:'15803d',color:'FFFFFF',sz:20,center:true})+
-      tc((parseFloat(gw.total||0)).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c4[2],right:true,bold:true,bg:'15803d',color:'FFFFFF',sz:21})+
+      tc((parseID(gw.total||'0')).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c4[2],right:true,bold:true,bg:'15803d',color:'FFFFFF',sz:21})+
       tc('',{w:c4[3],bg:'15803d'})
     ));
     xml+=tbl2(c4,brows);
@@ -7397,7 +7397,7 @@ async function _buildDocxXml(D, JSZip) {
       tc(parseFloat(bal.totalEva||0).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c6[2],right:true,bold:true,bg:'b45309',color:'FFFFFF',sz:20})+
       tc(parseFloat(bal.totalNeto||0).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c6[3],right:true,bold:true,bg:'374151',color:'FFFFFF',sz:20})+
       tc(parseFloat(akhir.totalGW||0).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c6[4],right:true,bold:true,bg:'15803d',color:'FFFFFF',sz:20})+
-      tc(parseFloat(akhir.total||0).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c6[5],right:true,bold:true,bg:'7c3aed',color:'FFFFFF',sz:22})
+      tc(parseID(akhir.total||'0').toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c6[5],right:true,bold:true,bg:'7c3aed',color:'FFFFFF',sz:22})
     ));
     xml+=tbl2(c6,brows);
   }
@@ -7416,7 +7416,7 @@ async function _buildDocxXml(D, JSZip) {
     ['Air Tanah (Groundwater)',
      (gw.count||0)+' catchment aktif, total kontribusi = '+(gw.total||'0')+' m³/hari. Perlu verifikasi berkala dengan data dewatering lapangan.'],
     ['Debit Akhir ke WTP',
-     'Q Akhir = '+akhir.total+' m³/hari. Kapasitas rancangan WTP disarankan: '+akhir.total+' m³/hari × SF 1,2 = '+(parseFloat(akhir.total||0)*1.2).toLocaleString('id-ID',{maximumFractionDigits:2})+' m³/hari (safety factor 1,2).'],
+     'Q Akhir = '+akhir.total+' m³/hari. Kapasitas rancangan WTP disarankan: '+akhir.total+' m³/hari × SF 1,2 = '+(parseID(akhir.total||'0')*1.2).toLocaleString('id-ID',{maximumFractionDigits:2})+' m³/hari (safety factor 1,2).'],
     ['Rekomendasi Pemantauan',
      'Lakukan kalibrasi koefisien limpasan (C) minimal setahun sekali. Update data groundwater setelah setiap pumping test. Perbarui data curah hujan secara berkala untuk meningkatkan akurasi analisis frekuensi.'],
   ];
@@ -7437,9 +7437,9 @@ async function _buildDocxXml(D, JSZip) {
     '📋','Rumus Kapasitas Rancangan WTP',
     'Q Rancangan = Q Akhir × Safety Factor\n'+
     'Q Akhir = '+akhir.total+' m³/hari  |  SF = 1,2 (rekomendasi)  →  Q Rancangan ≈ '+
-    (parseFloat(akhir.total||0)*1.2).toLocaleString('id-ID',{maximumFractionDigits:1})+' m³/hari\n'+
-    'Setara ≈ '+(parseFloat(akhir.total||0)*1.2/24).toLocaleString('id-ID',{maximumFractionDigits:2})+' m³/jam  atau  ≈ '+
-    (parseFloat(akhir.total||0)*1.2/86400*1000).toLocaleString('id-ID',{maximumFractionDigits:2})+' liter/detik',
+    (parseID(akhir.total||'0')*1.2).toLocaleString('id-ID',{maximumFractionDigits:1})+' m³/hari\n'+
+    'Setara ≈ '+(parseID(akhir.total||'0')*1.2/24).toLocaleString('id-ID',{maximumFractionDigits:2})+' m³/jam  atau  ≈ '+
+    (parseID(akhir.total||'0')*1.2/86400*1000).toLocaleString('id-ID',{maximumFractionDigits:2})+' liter/detik',
     'f0fdf4','15803d'
   );
   xml+=sp2()+sp3();
@@ -8517,7 +8517,7 @@ let gwData = {};
 function gwGetTotal() {
   return Object.values(gwData)
     .filter(d => d.active)
-    .reduce((s, d) => s + (parseFloat(d.q) || 0), 0);
+    .reduce((s, d) => s + (parseID(d.q) || 0), 0);
 }
 
 function gwRefresh() {
@@ -8545,7 +8545,7 @@ function gwRefresh() {
 
   tbody.innerHTML = roRows.map(r => {
     const d = gwData[r.id];
-    const qAktif = d.active ? (parseFloat(d.q) || 0) : 0;
+    const qAktif = d.active ? (parseID(d.q) || 0) : 0;
     return `
     <tr style="border-bottom:1px solid var(--border);${d.active ? 'background:rgba(39,174,96,0.04)' : ''}">
       <td style="padding:10px 14px;font-weight:600;font-size:13px;color:var(--text)">
@@ -8560,8 +8560,8 @@ function gwRefresh() {
         </label>
       </td>
       <td style="padding:10px 14px;text-align:right">
-        <input type="number" id="gw-q-${r.id}"
-          value="${d.q}" min="0" step="0.01"
+        <input type="text" inputmode="decimal" id="gw-q-${r.id}"
+          value="${d.q}" 
           placeholder="${d.active ? '0' : '—'}"
           ${d.active ? '' : 'disabled'}
           oninput="gwChange(${r.id},'q',this.value)"
@@ -8986,7 +8986,7 @@ function buildRekap() {
   const f4r = v => (v == null || isNaN(v)) ? '—' : (+v.toFixed(4)).toLocaleString('id-ID', {minimumFractionDigits:4, maximumFractionDigits:4});
 
   // ── Ambil CH maks ──
-  const ch = parseFloat(String(document.getElementById('ro-ch')?.value || '0').replace(',', '.')) || 0;
+  const ch = parseID(document.getElementById('ro-ch')?.value) || 0;
 
   // ── Ambil laju evaporasi aktual ──
   const aktual = evaCurrAktual() || 0;
