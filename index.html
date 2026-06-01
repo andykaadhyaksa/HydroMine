@@ -2488,7 +2488,7 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
           </div>
           <div style="margin-top:5px;font-size:10.5px;color:var(--muted)">Hari hujan = CH &gt; 0,5 mm</div>
         </div>
-        <textarea id="ra-input" rows="10" placeholder="01/01/1990&#9;0&#10;02/01/1990&#9;5.2&#10;03/01/1990&#9;22.8&#10;..." style="font-size:12px;font-family:var(--mono)"></textarea>
+        <textarea id="ra-input" rows="10" placeholder="01/01/1990&#9;0&#10;02/01/1990&#9;5,2&#10;03/01/1990&#9;22,8&#10;..." style="font-size:12px;font-family:var(--mono)"></textarea>
         <div class="btn-row" style="margin-top:8px">
           <button class="btn-primary" onclick="raAnalyze()">⚡ Analisis</button>
           <button class="btn-secondary" onclick="raSample()">📥 Contoh</button>
@@ -2525,6 +2525,17 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
             <option value="mixed">Bar+Max</option>
           </select>
           <span id="ra-chart-info" style="font-size:10px;color:var(--muted);font-family:var(--mono)"></span>
+          <button id="ra-chart-dl-btn" onclick="raDownloadChart()" title="Unduh grafik sebagai gambar PNG"
+            style="display:none;align-items:center;gap:5px;padding:4px 10px;font-size:11.5px;font-weight:600;
+                   font-family:var(--sans);border:none;border-radius:6px;cursor:pointer;
+                   background:var(--blue-grad);color:#fff;box-shadow:0 2px 8px rgba(26,127,212,0.28);
+                   transition:opacity 0.15s,transform 0.12s;white-space:nowrap">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+              <path d="M8 1v9M8 10l-3-3M8 10l3-3" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 13h12" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+            Unduh PNG
+          </button>
         </div>
       </div>
       <!-- Chart container — tinggi proporsional, mengisi sisa ruang -->
@@ -2730,7 +2741,7 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
         <button class="btn-secondary" onclick="roUseFromRA()" style="font-size:11px;padding:6px 12px;width:100%;justify-content:center;margin-bottom:10px">🔗 Dari Rainfall Analysis</button>
         <div class="form-group" style="margin-bottom:4px">
           <label class="form-label">CH Maksimum <span>(mm/hari)</span></label>
-          <input type="text" id="ro-ch" inputmode="decimal" placeholder="contoh: 85.4" onchange="roRecalcAll()" oninput="roRecalcAll()">
+          <input type="text" id="ro-ch" inputmode="decimal" placeholder="contoh: 85,4" onchange="roRecalcAll()" oninput="roRecalcAll()">
         </div>
         <div class="form-hint" id="ro-ch-hint" style="margin-top:4px;font-size:11px"></div>
       </div>
@@ -2952,11 +2963,11 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label" style="font-size:9.5px">🌡️ Temperatur <span>(°C)</span></label>
-            <input type="text" inputmode="decimal" id="eva-temp" value="25.35" oninput="evaCalc()" style="font-size:12px;padding:6px 9px">
+            <input type="text" inputmode="decimal" id="eva-temp" value="25,35" oninput="evaCalc()" style="font-size:12px;padding:6px 9px">
           </div>
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label" style="font-size:9.5px">💧 Kelembaban <span>(%)</span></label>
-            <input type="text" inputmode="decimal" id="eva-rh" value="89.81" oninput="evaCalc()" style="font-size:12px;padding:6px 9px">
+            <input type="text" inputmode="decimal" id="eva-rh" value="89,81" oninput="evaCalc()" style="font-size:12px;padding:6px 9px">
           </div>
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label" style="font-size:9.5px">🏔️ Tek. Atmosfir <span>(Pa)</span></label>
@@ -2964,7 +2975,7 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
           </div>
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label" style="font-size:9.5px">📐 Faktor Aktual <span>(÷)</span></label>
-            <input type="text" inputmode="decimal" id="eva-factor" value="1000000" oninput="evaCalc()" style="font-size:12px;padding:6px 9px">
+            <input type="text" inputmode="decimal" id="eva-factor" value="1.000.000" oninput="evaCalc()" style="font-size:12px;padding:6px 9px">
           </div>
         </div>
         <div style="margin-top:8px;font-size:10px;color:var(--muted);background:var(--blue-soft);border-radius:5px;padding:5px 9px;line-height:1.5;border-left:3px solid var(--blue)">
@@ -3274,7 +3285,7 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
       <div class="section-title"><div class="dot" style="background:#1a7fd4"></div>Safety Factor Volume</div>
       <div class="form-group">
         <label class="form-label">SF Volume (&times; Q neto)</label>
-        <input type="text" id="sp-sf" value="1.5" inputmode="decimal" placeholder="1.0 – 3.0" oninput="calcSedPond()" style="font-family:var(--mono)">
+        <input type="text" id="sp-sf" value="1,5" inputmode="decimal" placeholder="1,0 – 3,0" oninput="calcSedPond()" style="font-family:var(--mono)">
         <div class="form-hint" style="margin-top:4px">Faktor keamanan volume kolam (umumnya 1.5)</div>
       </div>
     </div>
@@ -3282,7 +3293,7 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
       <div class="section-title"><div class="dot" style="background:#27ae60"></div>Kedalaman Efektif</div>
       <div class="form-group">
         <label class="form-label">Kedalaman Rencana (m)</label>
-        <input type="text" id="sp-depth" value="2.0" inputmode="decimal" placeholder="1.0 – 5.0" oninput="calcSedPond()" style="font-family:var(--mono)">
+        <input type="text" id="sp-depth" value="2,0" inputmode="decimal" placeholder="1,0 – 5,0" oninput="calcSedPond()" style="font-family:var(--mono)">
         <div class="form-hint" style="margin-top:4px">Untuk estimasi luas permukaan kolam</div>
       </div>
     </div>
@@ -3388,7 +3399,7 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
             <input type="radio" name="rp-sf-radio" value="manual" onchange="rpSetSF('manual')"> Manual
           </label>
         </div>
-        <input type="text" id="rp-sf-val" value="1.5" inputmode="decimal" placeholder="masukkan nilai SF" oninput="calcRetPond()" style="font-family:var(--mono)" readonly>
+        <input type="text" id="rp-sf-val" value="1,5" inputmode="decimal" placeholder="masukkan nilai SF" oninput="calcRetPond()" style="font-family:var(--mono)" readonly>
       </div>
     </div>
     <div class="card">
@@ -3403,7 +3414,7 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
       <div class="section-title"><div class="dot" style="background:#e67e22"></div>Kedalaman Retention Pond</div>
       <div class="form-group">
         <label class="form-label">Kedalaman Rencana (m)</label>
-        <input type="text" id="rp-depth" value="3.0" inputmode="decimal" placeholder="1.0 – 6.0" oninput="calcRetPond()" style="font-family:var(--mono)">
+        <input type="text" id="rp-depth" value="3,0" inputmode="decimal" placeholder="1,0 – 6,0" oninput="calcRetPond()" style="font-family:var(--mono)">
         <div class="form-hint" style="margin-top:4px">Untuk estimasi luas permukaan kolam</div>
       </div>
     </div>
@@ -4439,6 +4450,45 @@ const f2  = v => v == null ? '—' : (+v.toFixed(2)).toLocaleString('id-ID',{min
 const f1  = v => v == null ? '—' : (+v.toFixed(1)).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1});
 const f0n = v => v == null ? '—' : Math.round(v).toLocaleString('id-ID');
 const fd  = d => d.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+
+/* ═══════════════════════════════════════════════════════════
+   FORMAT ANGKA INDONESIA — Utility Functions
+   - parseID(str): Parse string format Indonesia → float
+     Contoh: "1.500,25" → 1500.25, "25.000" → 25000
+   - fmtID(v, dec): Format float → string Indonesia
+     Contoh: 1500.25 → "1.500,25"
+   ═══════════════════════════════════════════════════════════ */
+function parseID(str) {
+  if (str === null || str === undefined) return NaN;
+  const s = String(str).trim();
+  if (s === '' || s === '—') return NaN;
+  // Format Indonesia: titik=ribuan, koma=desimal
+  // Hapus titik ribuan, ganti koma desimal → titik
+  const normalized = s.replace(/\./g, '').replace(',', '.');
+  return parseFloat(normalized);
+}
+
+function fmtID(v, dec) {
+  if (v == null || isNaN(v)) return '—';
+  dec = (dec !== undefined && dec !== null) ? dec : 2;
+  return v.toLocaleString('id-ID', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+
+// Validasi input field — hanya terima format Indonesia
+function validateIDInput(el) {
+  const val = el.value.trim();
+  if (!val) return;
+  // Cek apakah ada titik desimal gaya internasional (bukan ribuan)
+  // Pattern tidak valid: angka dengan titik desimal tanpa koma (misal 1500.25)
+  // Pattern valid: 1500, 1.500, 1500,25, 1.500,25
+  const hasIntlDecimal = /\d\.\d/.test(val) && !val.includes(',');
+  if (hasIntlDecimal) {
+    // Auto-konversi: ganti titik desimal → koma (kemungkinan user salah format)
+    el.value = val.replace('.', ',');
+  }
+}
+
+
 const fmb = () => [55,80,40,70,60,90,50].map(h => `<div class="mini-bar" style="height:${h}%"></div>`).join('');
 
 /* ═══════════════════════════════════
@@ -4797,7 +4847,7 @@ function raUpdateChart() {
         tension: 0,
       }
     ];
-    infoText = `${years.length} tahun · Rerata: ${mean.toFixed(0)} mm/tahun`;
+    infoText = `${years.length} tahun · Rerata: ${Math.round(mean).toLocaleString('id-ID')} mm/tahun`;
 
   } else if (type === 'annual_max') {
     // CH maksimum per tahun — penting untuk analisis frekuensi banjir
@@ -4824,7 +4874,7 @@ function raUpdateChart() {
         type: style === 'bar' ? 'bar' : 'line',
       },
       {
-        label: `Rerata Maks: ${mean.toFixed(1)} mm`,
+        label: `Rerata Maks: ${mean.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})} mm`,
         data: years.map(() => +mean.toFixed(2)),
         borderColor: '#e74c3c',
         borderWidth: 1.5,
@@ -4835,7 +4885,7 @@ function raUpdateChart() {
         tension: 0,
       }
     ];
-    infoText = `CH Maks ${nYears} tahun · Tertinggi: ${Math.max(...vals).toFixed(1)} mm`;
+    infoText = `CH Maks ${nYears} tahun · Tertinggi: ${Math.max(...vals).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})} mm`;
   }
 
   if (infoEl) infoEl.textContent = infoText;
@@ -4849,6 +4899,10 @@ function raUpdateChart() {
   const isLarge = labels.length > 500;
   const gridColor = isDark ? 'rgba(20,40,70,0.9)' : 'rgba(200,218,240,0.55)';
   const tickColor = isDark ? '#4a7a9a' : '#6080a0';
+
+  // Tampilkan tombol download setelah chart berhasil dirender
+  const dlBtn = document.getElementById('ra-chart-dl-btn');
+  if (dlBtn) dlBtn.style.display = 'inline-flex';
 
   raChartInst = new Chart(canvas.getContext('2d'), {
     type: datasets[0]?.type || (style === 'line' ? 'line' : 'bar'),
@@ -4932,6 +4986,53 @@ function raUpdateChart() {
       }
     }
   });
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   raDownloadChart — Unduh Grafik Time Series sebagai PNG
+   Menggambar ulang di canvas off-screen dengan background putih
+   agar file PNG tidak transparan
+───────────────────────────────────────────────────────────── */
+function raDownloadChart() {
+  const srcCanvas = document.getElementById('ra-chart');
+  if (!srcCanvas || !raChartInst) {
+    showToast('⚠ Grafik belum tersedia. Muat data terlebih dahulu.', 'error');
+    return;
+  }
+
+  // Buat canvas off-screen dengan ukuran sama (atau 2× untuk retina)
+  const scale  = 2;
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width  = srcCanvas.width  * scale;
+  offCanvas.height = srcCanvas.height * scale;
+  const ctx = offCanvas.getContext('2d');
+
+  // Isi background sesuai tema (putih untuk light, gelap untuk dark)
+  ctx.fillStyle = isDark ? '#0d1b2a' : '#ffffff';
+  ctx.fillRect(0, 0, offCanvas.width, offCanvas.height);
+
+  // Skala lalu salin canvas asli
+  ctx.scale(scale, scale);
+  ctx.drawImage(srcCanvas, 0, 0);
+
+  // Buat nama file dari jenis & gaya chart yang aktif
+  const typeEl  = document.getElementById('ra-chart-type');
+  const styleEl = document.getElementById('ra-chart-style');
+  const typeLabel = typeEl  ? typeEl.options[typeEl.selectedIndex].text.replace(/\s+/g,'_')   : 'Chart';
+  const styleLabel = styleEl? styleEl.options[styleEl.selectedIndex].text.replace(/\s+/g,'_') : '';
+  const ts = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const filename = `HydroMine_Rainfall_${typeLabel}_${styleLabel}_${ts}.png`;
+
+  // Trigger download
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = offCanvas.toDataURL('image/png');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  showToast('✅ Grafik berhasil diunduh — ' + filename, 'ok');
 }
 
 
@@ -5168,6 +5269,8 @@ function raClear() {
   ['sc-total','sc-avg','sc-max','sc-wetdays'].forEach(id => { document.getElementById(id).innerHTML = '—'; });
   raData = []; raStats = raStatsW = raCHMax = null; raClassCounts = [];
   if (raChartInst) { raChartInst.destroy(); raChartInst = null; }
+  const dlBtnC = document.getElementById('ra-chart-dl-btn');
+  if (dlBtnC) dlBtnC.style.display = 'none';
 }
 
 /* ═══════════════════════════════════
@@ -5341,7 +5444,7 @@ function roBuildRow(id) {
     <input type="text"
       id="cr-c-${id}"
       inputmode="decimal"
-      placeholder="0.00–1.00"
+      placeholder="0,00–1,00"
       value="${row.c}"
       oninput="roSetField(${id},'c',this.value)"
       autocomplete="off">
@@ -5379,8 +5482,8 @@ function roUpdateQCell(id) {
   const cell = document.getElementById(`cr-q-${id}`);
   if (!row || !cell) return;
   const ch = parseFloat(getCH()) || 0;
-  const c  = parseFloat(row.c)   || 0;
-  const a  = parseFloat(row.a)   || 0;
+  const c  = parseID(row.c)   || 0;
+  const a  = parseID(row.a)   || 0;
   const q  = c * ch * a * 10;
   cell.textContent = (ch > 0 && c > 0 && a > 0) ? f2(q) : '—';
   cell.style.color = (ch > 0 && c > 0 && a > 0) ? 'var(--green)' : 'var(--muted)';
@@ -5419,8 +5522,8 @@ function roRecalcAll() {
 
   roRows.forEach(r => {
     roUpdateQCell(r.id); // refresh Q cell
-    const c = parseFloat(r.c) || 0;
-    const a = parseFloat(r.a) || 0;
+    const c = parseID(r.c) || 0;
+    const a = parseID(r.a) || 0;
     const q = c * ch * a * 10;
     totalQ += q; totalA += a;
     nameArr.push(r.name || `Area ${r.id}`);
@@ -5484,8 +5587,8 @@ function roRenderWTPSummary(ch, grandTotal) {
   groups['none'] = { name: '(Tidak Dikelompokkan)', rows: [], totalQ: 0, totalA: 0 };
 
   roRows.forEach(r => {
-    const c = parseFloat(r.c) || 0;
-    const a = parseFloat(r.a) || 0;
+    const c = parseID(r.c) || 0;
+    const a = parseID(r.a) || 0;
     const q = c * ch * a * 10;
     const key = getKey(r);
     const target = (key && groups[key]) ? key : 'none';
@@ -5534,10 +5637,10 @@ function roRenderWTPSummary(ch, grandTotal) {
 
     // Detail rows for each catchment in this group
     const detailRows = g.rows.map((r, ri) => {
-      const c = parseFloat(r.c) || 0;
-      const a = parseFloat(r.a) || 0;
+      const c = parseID(r.c) || 0;
+      const a = parseID(r.a) || 0;
       const q = c * ch * a * 10;
-      const qPct = g.totalQ > 0 ? (q / g.totalQ * 100).toFixed(1) : '0.0';
+      const qPct = g.totalQ > 0 ? (q / g.totalQ * 100).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1}) : '0,0';
       return `<tr style="background:${ri%2===1?col+'08':'transparent'}">
         <td style="padding-left:28px;color:var(--muted);font-size:11px">${ri+1}</td>
         <td style="font-size:12px;font-weight:500">${r.name || '(tanpa nama)'}</td>
@@ -5554,7 +5657,7 @@ function roRenderWTPSummary(ch, grandTotal) {
   const totalRow = `<tr style="background:var(--blue-soft);border-top:2px solid var(--border)">
     <td colspan="2" style="font-weight:800;font-size:13px">TOTAL KESELURUHAN</td>
     <td class="td-num" style="font-weight:700">${roRows.length} catchment</td>
-    <td class="td-num" style="font-weight:700">${f2(roRows.reduce((s,r)=>s+(parseFloat(r.a)||0),0))} ha</td>
+    <td class="td-num" style="font-weight:700">${f2(roRows.reduce((s,r)=>s+(parseID(r.a)||0),0))} ha</td>
     <td class="td-num" style="color:var(--blue);font-size:14px;font-weight:800">${f2(grandTotal)}</td>
     <td class="td-num" style="font-weight:700">100%</td>
   </tr>`;
@@ -5594,7 +5697,7 @@ function roUpdateWTPChart(ch, grandTotal) {
 
   wtpList.forEach(w => {
     const totalQ = roRows.filter(r => r.wtpId === w.id).reduce((s, r) => {
-      return s + (parseFloat(r.c)||0) * ch * (parseFloat(r.a)||0) * 10;
+      return s + (parseID(r.c)||0) * ch * (parseID(r.a)||0) * 10;
     }, 0);
     if (totalQ > 0) {
       labels.push(w.name); vals.push(totalQ);
@@ -5603,7 +5706,7 @@ function roUpdateWTPChart(ch, grandTotal) {
   });
 
   const unassignedQ = roRows.filter(r => !r.wtpId || !wtpList.find(w=>w.id===r.wtpId)).reduce((s,r)=>{
-    return s + (parseFloat(r.c)||0)*ch*(parseFloat(r.a)||0)*10;
+    return s + (parseID(r.c)||0)*ch*(parseID(r.a)||0)*10;
   }, 0);
   if (unassignedQ > 0) { labels.push('Tidak Dialokasikan'); vals.push(unassignedQ); colors.push('#bdc3c7'); }
 
@@ -5626,7 +5729,8 @@ function roUpdateWTPChart(ch, grandTotal) {
 // ── Helpers ──────────────────────────────────
 
 function getCH() {
-  return document.getElementById('ro-ch').value.replace(',','.');
+  // Kembalikan string yang sudah di-normalize untuk parseFloat compatibility
+  return String(document.getElementById('ro-ch').value || '').replace(/\./g, '').replace(',', '.');
 }
 
 function roUseFromRA() {
@@ -5688,7 +5792,7 @@ function buildFlow() {
   const ch      = parseFloat(getCH()) || 0;
   const aktual  = evaCurrAktual() || 0;
 
-  const validRows = roRows.filter(r => parseFloat(r.a) > 0);
+  const validRows = roRows.filter(r => parseID(r.a) > 0);
   const hasData   = validRows.length > 0 && ch > 0;
 
   if (!hasData) {
@@ -5701,8 +5805,8 @@ function buildFlow() {
 
   // ── Per-catchment calculations ──────────────────
   const catchData = validRows.map((r, i) => {
-    const c       = parseFloat(r.c) || 0;
-    const aHa     = parseFloat(r.a) || 0;
+    const c       = parseID(r.c) || 0;
+    const aHa     = parseID(r.a) || 0;
     const aM2     = aHa * 10000;
     const qLimpas = c * ch * aHa * 10;
     const evaVol  = (r.evaActive !== false) ? aktual * aM2 : 0;
@@ -6379,19 +6483,19 @@ async function exportExcel() {
   addSS('Rainfall',raRows2.filter(Boolean),[6,18,20,20,14]);
 
   // ═══ SHEET 3: RUNOFF ══════════════════════════════════════
-  const roTotal=roRows.reduce((s,r)=>s+(parseFloat(r.c)||0)*(parseFloat(r.a)||0)*ch*10,0);
+  const roTotal=roRows.reduce((s,r)=>s+(parseID(r.c)||0)*(parseID(r.a)||0)*ch*10,0);
   const ro3=[[H1('RUNOFF CONTACT WATER',C.DARK_BG),EM(C.TEAL_HDR),EM(C.TEAL_HDR),EM(C.TEAL_HDR),EM(C.TEAL_HDR),EM(C.TEAL_HDR),EM(C.TEAL_HDR),EM(C.TEAL_HDR)],
     [LB('CH Maks'),{v:ch,s:cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,bold:true,sz:11,border:true})},LB('mm/hari'),{v:'Q = C × CH × A × 10',s:cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,sz:10,italic:true,border:true})},EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT)],
     null,
     [H3('No',C.TEAL_SOFT),H3('Nama Catchment',C.TEAL_SOFT),H3('C',C.TEAL_SOFT),H3('A (ha)',C.TEAL_SOFT),H3('WTP',C.TEAL_SOFT),H3('Grup',C.TEAL_SOFT),H3('Q (m³/hari)',C.TEAL_SOFT),H3('% Total',C.TEAL_SOFT)],
     ...roRows.map((r,i)=>{
-      const c=parseFloat(r.c)||0,a=parseFloat(r.a)||0,q=c*ch*a*10,pct=roTotal>0?+(q/roTotal*100).toFixed(2):0;
+      const c=parseID(r.c)||0,a=parseID(r.a)||0,q=c*ch*a*10,pct=roTotal>0?+(q/roTotal*100).toFixed(2):0;
       const wtp=r.wtpId?(wtpList.find(w=>w.id===r.wtpId)?.name||'—'):'—';
       const grp=r.groupId?(roGroupList.find(g=>g.id===r.groupId)?.label||'—'):'—';
       const bg=i%2===0?C.WHITE:C.GRAY_SOFT;
       return [{v:i+1,s:cs({bg,sz:10,halign:'center',border:true})},{v:r.name||'',s:cs({bg,sz:10,border:true})},{v:c,s:cs({bg,fc:C.GRAY_LBL,sz:10,halign:'right',border:true})},{v:a,s:cs({bg,sz:10,halign:'right',border:true})},{v:wtp,s:cs({bg,fc:C.TEAL_HDR,sz:10,border:true})},{v:grp,s:cs({bg,fc:C.GRAY_LBL,sz:10,border:true})},{v:+q.toFixed(4),s:cs({bg:q>0?C.TEAL_SOFT:bg,fc:C.TEAL_HDR,bold:q>0,sz:10,halign:'right',border:true})},{v:pct,s:cs({bg,fc:C.GRAY_LBL,sz:10,halign:'right',border:true})}];
     }),
-    [TL('TOTAL',C.TEAL_SOFT,C.TEAL_HDR),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),TT(+roRows.reduce((s,r)=>s+(parseFloat(r.a)||0),0).toFixed(4),C.TEAL_SOFT,C.TEAL_HDR),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),TT(+roTotal.toFixed(4),C.TEAL_SOFT,C.TEAL_HDR),TT('100%',C.TEAL_SOFT,C.TEAL_HDR)],
+    [TL('TOTAL',C.TEAL_SOFT,C.TEAL_HDR),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),TT(+roRows.reduce((s,r)=>s+(parseID(r.a)||0),0).toFixed(4),C.TEAL_SOFT,C.TEAL_HDR),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),TT(+roTotal.toFixed(4),C.TEAL_SOFT,C.TEAL_HDR),TT('100%',C.TEAL_SOFT,C.TEAL_HDR)],
   ];
   addSS('Runoff',ro3.filter(Boolean),[6,28,10,12,22,18,22,10]);
 
@@ -6400,7 +6504,7 @@ async function exportExcel() {
   wtpList.forEach(w=>{wG[w.id]={name:w.name,cnt:0,tA:0,tQ:0,tE:0,tN:0};});
   wG['none']={name:'(Tdk Dialokasikan)',cnt:0,tA:0,tQ:0,tE:0,tN:0};
   roRows.forEach(r=>{
-    const c=parseFloat(r.c)||0,a=parseFloat(r.a)||0,q=c*ch*a*10,e=aktual*a*10000,n=Math.max(0,q-e);
+    const c=parseID(r.c)||0,a=parseID(r.a)||0,q=c*ch*a*10,e=aktual*a*10000,n=Math.max(0,q-e);
     const k=r.wtpId&&wG[r.wtpId]?r.wtpId:'none';
     wG[k].cnt++;wG[k].tA+=a;wG[k].tQ+=q;wG[k].tE+=e;wG[k].tN+=n;
   });
@@ -6416,10 +6520,10 @@ async function exportExcel() {
   addSS('WTP Summary',wtp4.filter(Boolean),[28,10,16,22,22,22]);
 
   // ═══ SHEET 5: EVAPORATION ════════════════════════════════
-  const Tc=parseFloat(document.getElementById('eva-temp')?.value||'25.35')||25.35;
-  const RH=parseFloat(document.getElementById('eva-rh')?.value||'89.81')||89.81;
-  const Patm=parseFloat(document.getElementById('eva-press')?.value||'101325')||101325;
-  const factor=parseFloat(document.getElementById('eva-factor')?.value||'1000000')||1e6;
+  const Tc=parseID(document.getElementById('eva-temp')?.value)||25.35;
+  const RH=parseID(document.getElementById('eva-rh')?.value)||89.81;
+  const Patm=parseID(document.getElementById('eva-press')?.value)||101325;
+  const factor=parseID(document.getElementById('eva-factor')?.value)||1e6;
   const logP=8.07131-1730.63/(233.426+Tc),pTorr=Math.pow(10,logP),pvA=pTorr*133.322;
   const x100v=typeof humRatio==='function'?humRatio(Tc,100,Patm):0;
   const xAktv=typeof humRatio==='function'?humRatio(Tc,RH,Patm):0;
@@ -6454,9 +6558,9 @@ async function exportExcel() {
 
   // ═══ SHEET 6: SEDIMENT POND ══════════════════════════════
   const {groups:spG}=_getWTPData();
-  const sfSP=parseFloat(document.getElementById('sp-sf')?.value||'1.5')||1.5;
-  const spDep=parseFloat(document.getElementById('sp-depth')?.value||'2.0')||2.0;
-  const spHrt=parseFloat(document.getElementById('sp-hrt')?.value||'1')||1;
+  const sfSP=parseID(document.getElementById('sp-sf')?.value)||1.5;
+  const spDep=parseID(document.getElementById('sp-depth')?.value)||2.0;
+  const spHrt=parseID(document.getElementById('sp-hrt')?.value)||1;
   const sp6=[[H1('SEDIMENT POND',C.DARK_BG),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR)],
     [LB('SF'),{v:sfSP,s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,bold:true,sz:11,border:true})},LB('Kedalaman'),{v:spDep,s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,bold:true,sz:11,border:true})},LB('m · HRT'),{v:spHrt,s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,bold:true,sz:11,border:true})},LB('hari')],
     [{v:'V_min = Q_neto × SF',s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,sz:10,italic:true,border:true})},EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT)],
@@ -6471,9 +6575,9 @@ async function exportExcel() {
   addSS('Sediment Pond',sp6.filter(Boolean),[28,20,20,20,10,22,20]);
 
   // ═══ SHEET 7: RETENTION POND ════════════════════════════
-  const sfRet=parseFloat(document.getElementById('rp-sf-val')?.value||'1.5')||1.5;
-  const rpFac=parseFloat(document.getElementById('rp-factor')?.value||'84')||84;
-  const rpDep=parseFloat(document.getElementById('rp-depth')?.value||'3.0')||3.0;
+  const sfRet=parseID(document.getElementById('rp-sf-val')?.value)||1.5;
+  const rpFac=parseID(document.getElementById('rp-factor')?.value)||84;
+  const rpDep=parseID(document.getElementById('rp-depth')?.value)||3.0;
   const rpG=spG.filter(g=>spNeedRetPond[g.id]);
   const rp7=[[H1('RETENTION POND',C.DARK_BG),EM(C.GREEN_HDR),EM(C.GREEN_HDR),EM(C.GREEN_HDR),EM(C.GREEN_HDR),EM(C.GREEN_HDR),EM(C.GREEN_HDR)],
     [LB('SF Ret'),{v:sfRet,s:cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:11,border:true})},LB('Faktor'),{v:rpFac,s:cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:11,border:true})},LB('Kedalaman'),{v:rpDep,s:cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:11,border:true})},LB('m')],
@@ -6501,10 +6605,10 @@ async function exportExcel() {
 
 function getEvaData() {
   // Ambil state evaporasi dari input fields
-  const Tc = parseFloat(document.getElementById('eva-temp')?.value);
-  const RH = parseFloat(document.getElementById('eva-rh')?.value);
+  const Tc = parseID(document.getElementById('eva-temp')?.value);
+  const RH = parseID(document.getElementById('eva-rh')?.value);
   if (!Tc || !RH) return null;
-  const Patm = parseFloat(document.getElementById('eva-patm')?.value) || 101325;
+  const Patm = parseID(document.getElementById('eva-patm')?.value) || 101325;
   const Pv   = pSat_Antoine?.(Tc);
   const x100 = humRatio?.(Tc, 100, Patm) * 1000;
   const xAkt = humRatio?.(Tc, RH,  Patm) * 1000;
@@ -6530,13 +6634,13 @@ async function generateWordReport() {
     const ym={};
     raData.forEach(d=>{const yr=d.date.getFullYear(),mo=d.date.getMonth();if(!ym[yr])ym[yr]=new Array(12).fill(0);if(d.value>ym[yr][mo])ym[yr][mo]=d.value;});
     const years=Object.keys(ym).map(Number).sort((a,b)=>a-b);
-    const validRO=roRows.filter(r=>parseFloat(r.a)>0);
+    const validRO=roRows.filter(r=>parseID(r.a)>0);
     let totalQ=0,totalEva=0;
     const catchRows=validRO.map(r=>{
-      const c=parseFloat(r.c)||0,a=parseFloat(r.a)||0,q=c*ch*a*10,eva=(r.evaActive!==false)?aktual*a*10000:0;
+      const c=parseID(r.c)||0,a=parseID(r.a)||0,q=c*ch*a*10,eva=(r.evaActive!==false)?aktual*a*10000:0;
       totalQ+=q;totalEva+=eva;
       const wtpName=r.wtpId?(wtpList.find(w=>w.id===r.wtpId)||{name:'Tidak Dialokasikan'}).name:'Tidak Dialokasikan';
-      const gw=gwData[r.id]?.active?(parseFloat(gwData[r.id]?.q)||0):0;
+      const gw=gwData[r.id]?.active?(parseID(gwData[r.id]?.q)||0):0;
       return {name:r.name||'Area '+r.id,c:String(c),a:String(a),q:String(q),eva:String(eva),
               neto:String(Math.max(0,q-eva)),wtpName,evaActive:r.evaActive!==false,
               gw:String(gw),akhir:String(Math.max(0,q-eva)+gw),gwNote:gwData[r.id]?.note||''};
@@ -6548,23 +6652,23 @@ async function generateWordReport() {
     catchRows.forEach(r=>{
       if(!wtpGrpRaw[r.wtpName]) wtpGrpRaw[r.wtpName]={rows:[],totalA:0,totalQ:0,totalEva:0,totalNeto:0,totalGW:0,totalAkhir:0};
       wtpGrpRaw[r.wtpName].rows.push(r);
-      wtpGrpRaw[r.wtpName].totalA   +=parseFloat(r.a)||0;
-      wtpGrpRaw[r.wtpName].totalQ   +=parseFloat(r.q)||0;
-      wtpGrpRaw[r.wtpName].totalEva +=parseFloat(r.eva)||0;
-      wtpGrpRaw[r.wtpName].totalNeto+=parseFloat(r.neto)||0;
-      wtpGrpRaw[r.wtpName].totalGW  +=parseFloat(r.gw)||0;
-      wtpGrpRaw[r.wtpName].totalAkhir+=parseFloat(r.akhir)||0;
+      wtpGrpRaw[r.wtpName].totalA   +=parseID(r.a)||0;
+      wtpGrpRaw[r.wtpName].totalQ   +=parseID(r.q)||0;
+      wtpGrpRaw[r.wtpName].totalEva +=parseID(r.eva)||0;
+      wtpGrpRaw[r.wtpName].totalNeto+=parseID(r.neto)||0;
+      wtpGrpRaw[r.wtpName].totalGW  +=parseID(r.gw)||0;
+      wtpGrpRaw[r.wtpName].totalAkhir+=parseID(r.akhir)||0;
     });
-    const Tc_=parseFloat(String(document.getElementById('eva-temp').value).replace(',','.'))||25.35;
-    const RH_=parseFloat(String(document.getElementById('eva-rh').value).replace(',','.'))||89.81;
-    const Pt_=parseFloat(String(document.getElementById('eva-press').value).replace(',','.'))||101325;
-    const fac_=parseFloat(String(document.getElementById('eva-factor').value).replace(',','.'))||1000000;
+    const Tc_=parseID(document.getElementById('eva-temp')?.value)||25.35;
+    const RH_=parseID(document.getElementById('eva-rh')?.value)||89.81;
+    const Pt_=parseID(document.getElementById('eva-press')?.value)||101325;
+    const fac_=parseID(document.getElementById('eva-factor')?.value)||1000000;
     const x1_=humRatio(Tc_,100,Pt_),xA_=humRatio(Tc_,RH_,Pt_);
     const Pv_=ppFromX(x1_,Pt_),Pp_=ppFromX(xA_,Pt_);
     const fl_=langmuirFlux(Pv_,Pp_,Tc_+273.15),m3_=fl_*86400/1000;
 
     const nY=raData.length?Math.max(1,last_.getFullYear()-first.getFullYear()+1):1;
-    const gwRows=catchRows.filter(r=>parseFloat(r.gw)>0);
+    const gwRows=catchRows.filter(r=>parseID(r.gw)>0);
 
     const D={
       date:new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}),
@@ -6905,13 +7009,13 @@ async function _buildDocxXml(D, JSZip) {
       row.forEach((v,i)=>{if(v>mxM[i])mxM[i]=v;});
       var mx=Math.max(...row), bg=ri%2?'f8fafc':null;
       var cells=tc(yr,{w:cw14[0],bg:bg||'eff6ff',center:true,sz:16,color:'1e40af',bold:true});
-      for(var ci=0;ci<12;ci++) cells+=tc(row[ci]>0?row[ci].toFixed(1):'0',{w:cw14[ci+1],bg,center:true,sz:14,color:row[ci]===mx?'dc2626':'374151',bold:row[ci]===mx});
-      cells+=tc(mx.toFixed(1),{w:cw14[13],bg:'fef3c7',bold:true,center:true,sz:15,color:'92400e'});
+      for(var ci=0;ci<12;ci++) cells+=tc(row[ci]>0?row[ci].toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1}):'0',{w:cw14[ci+1],bg,center:true,sz:14,color:row[ci]===mx?'dc2626':'374151',bold:row[ci]===mx});
+      cells+=tc(mx.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1}),{w:cw14[13],bg:'fef3c7',bold:true,center:true,sz:15,color:'92400e'});
       drs.push(tr2(cells));
     });
     var mc=tc('Max',{w:cw14[0],bold:true,center:true,bg:'dc2626',color:'FFFFFF',sz:17});
-    for(var i=0;i<12;i++) mc+=tc(mxM[i].toFixed(1),{w:cw14[i+1],bold:true,center:true,bg:'fef3c7',color:'92400e',sz:14});
-    mc+=tc(Math.max(...mxM).toFixed(1),{w:cw14[13],bold:true,center:true,bg:'dc2626',color:'FFFFFF',sz:17});
+    for(var i=0;i<12;i++) mc+=tc(mxM[i].toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1}),{w:cw14[i+1],bold:true,center:true,bg:'fef3c7',color:'92400e',sz:14});
+    mc+=tc(Math.max(...mxM).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1}),{w:cw14[13],bold:true,center:true,bg:'dc2626',color:'FFFFFF',sz:17});
     drs.push(tr2(mc));
     xml+=tbl2(cw14,drs);
   }
@@ -6931,7 +7035,7 @@ async function _buildDocxXml(D, JSZip) {
       tr2(hc('Parameter Statistik',c2[0])+hn('Nilai (mm/hari)',c2[1]),true),
       ...[ ['Jumlah Data Terpakai (N) — Mode: '+(ra.calcModeLabel||'—'), ra.n],
            ['Total Baris Data Masukan', (ra.totalRows||ra.n)],
-           ['Data Nilai Nol (= 0 mm)', (ra.zeroCount||0).toLocaleString('id-ID')+' hari  ('+((ra.zeroCount||0)/(ra.totalRows||1)*100).toFixed(1)+'%)'],
+           ['Data Nilai Nol (= 0 mm)', (ra.zeroCount||0).toLocaleString('id-ID')+' hari  ('+((ra.zeroCount||0)/(ra.totalRows||1)*100).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})+'%)'],
            ['Baris Tidak Valid / Dilewati', (ra.blankCount||0).toLocaleString('id-ID')+' baris'],
            ['Hari Hujan (> 0,5 mm)', (ra.wetDays||'—')+' hari  ('+(ra.pctWet||'—')+'%)'],
            ['Minimum (P0)', ra.min], ['Persentil 10 (P10)',ra.p10],['Persentil 25 (P25)',ra.p25],
@@ -7022,14 +7126,14 @@ async function _buildDocxXml(D, JSZip) {
      ████  BAB 2 — LIMPASAN CONTACT WATER
   ══════════════════════════════════════════════════════════ */
   xml+=h1('BAB 2','LIMPASAN CONTACT WATER TAMBANG');
-  const totA=rows2.reduce((s,r)=>s+parseFloat(r.a||0),0);
+  const totA=rows2.reduce((s,r)=>s+parseID(r.a||'0'),0);
   const wg=cat.wtpGroups||{};
   xml+=bp(
     'Limpasan contact water adalah aliran permukaan yang bersentuhan langsung dengan material tambang (overburden, batubara, ore) '+
     'sehingga berpotensi mengandung kontaminan dan memerlukan penanganan khusus sebelum dibuang ke lingkungan. '+
     'Perhitungan menggunakan Metode Rasional: Q = C × CH × A × 10 (m³/hari), di mana '+
     'C adalah koefisien limpasan permukaan, CH adalah curah hujan rancangan ('+( cat.ch||'—')+' mm/hari), dan A adalah luas catchment (Ha). '+
-    'Terdapat '+rows2.length+' daerah tangkapan air (catchment area) dengan total luas '+totA.toFixed(2)+' Ha.',
+    'Terdapat '+rows2.length+' daerah tangkapan air (catchment area) dengan total luas '+totA.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})+' Ha.',
     {after:120,line:320}
   );
   xml+=callout(
@@ -7058,15 +7162,15 @@ async function _buildDocxXml(D, JSZip) {
         brows.push(tr2(
           tc(idx===0?wtp:'',{w:c5[0],bg:idx===0?'eff6ff':'f8fafc',bold:idx===0,color:'1e40af',sz:18})+
           tc(r.name||'—',{w:c5[1],bg,sz:18})+
-          tc((parseFloat(r.a||0)).toFixed(2),{w:c5[2],right:true,bg,sz:18})+
-          tc((parseFloat(r.c||0)).toFixed(2),{w:c5[3],right:true,bg,sz:18})+
-          tc((parseFloat(r.q||0)).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c5[4],right:true,bg,sz:18,bold:true,color:'2563eb'})+
-          tc((parseFloat(r.neto||0)).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c5[5],right:true,bg,sz:18,bold:true,color:'15803d'})
+          tc((parseID(r.a||'0')).toFixed(2),{w:c5[2],right:true,bg,sz:18})+
+          tc((parseID(r.c||'0')).toFixed(2),{w:c5[3],right:true,bg,sz:18})+
+          tc((parseID(r.q||'0')).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c5[4],right:true,bg,sz:18,bold:true,color:'2563eb'})+
+          tc((parseID(r.neto||'0')).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c5[5],right:true,bg,sz:18,bold:true,color:'15803d'})
         ));ri++;
       });
       brows.push(tr2(
         tc('Sub-total: '+wtp,{w:c5[0]+c5[1],bold:true,bg:'dbeafe',color:'1e40af',sz:18})+
-        tc((g.totalA||0).toFixed(2),{w:c5[2],right:true,bold:true,bg:'dbeafe',color:'1e40af',sz:18})+
+        tc((g.totalA||0).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c5[2],right:true,bold:true,bg:'dbeafe',color:'1e40af',sz:18})+
         tc('',{w:c5[3],bg:'dbeafe'})+
         tc((g.totalQ||0).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c5[4],right:true,bold:true,bg:'dbeafe',color:'1e40af',sz:18})+
         tc((g.totalNeto||0).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c5[5],right:true,bold:true,bg:'dcfce7',color:'15803d',sz:18})
@@ -7074,7 +7178,7 @@ async function _buildDocxXml(D, JSZip) {
     });
     brows.push(tr2(
       tc('GRAND TOTAL',{w:c5[0]+c5[1],bold:true,center:true,bg:'0f2744',color:'FFFFFF',sz:20})+
-      tc(totA.toFixed(2),{w:c5[2],right:true,bold:true,bg:'0f2744',color:'FFFFFF',sz:20})+
+      tc(totA.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c5[2],right:true,bold:true,bg:'0f2744',color:'FFFFFF',sz:20})+
       tc('',{w:c5[3],bg:'0f2744'})+
       tc(parseFloat(bal.totalQ||0).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c5[4],right:true,bold:true,bg:'1d4ed8',color:'FFFFFF',sz:21})+
       tc(parseFloat(bal.totalNeto||0).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c5[5],right:true,bold:true,bg:'15803d',color:'FFFFFF',sz:21})
@@ -7174,11 +7278,11 @@ async function _buildDocxXml(D, JSZip) {
     const brows=[tr2(hc('Catchment Area',c3[0],'d97706')+hn('Luas (Ha)',c3[1],'d97706')+hn('Laju (m³/m²/hr)',c3[2],'d97706')+hn('Volume Eva (m³/hr)',c3[3],'d97706'),true)];
     let tEA=0,tEV=0;
     rows2.forEach((r,i)=>{
-      const a=parseFloat(r.a||0),e=parseFloat(r.eva||0);tEA+=a;tEV+=e;
+      const a=parseID(r.a||'0'),e=parseID(r.eva||'0');tEA+=a;tEV+=e;
       const bg=i%2?null:'fffbeb';
       brows.push(tr2(
         tc(r.name||'—',{w:c3[0],bg,sz:19})+
-        tc(a.toFixed(2),{w:c3[1],right:true,bg,sz:19})+
+        tc(a.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}),{w:c3[1],right:true,bg,sz:19})+
         tc(r.evaActive===false?'Nonaktif':fSmart(parseFloat(eva.aktual)||0),{w:c3[2],right:true,bg,sz:19,color:r.evaActive===false?'94a3b8':'374151'})+
         tc(r.evaActive===false?'— (Tidak Aktif)':e.toLocaleString('id-ID',{minimumFractionDigits:4,maximumFractionDigits:4}),{w:c3[3],right:true,bg,sz:19,color:r.evaActive===false?'94a3b8':'b45309',bold:r.evaActive!==false})
       ));
@@ -7220,12 +7324,12 @@ async function _buildDocxXml(D, JSZip) {
     const brows=[tr2(hc('Catchment',c4[0],'15803d')+hc('Status',c4[1],'15803d')+hn('Q GW (m³/hr)',c4[2],'15803d')+hl('Keterangan',c4[3],'15803d'),true)];
     let ri=0;
     gwAllRows.forEach((r,i)=>{
-      const isAktif=parseFloat(r.gw||0)>0;
+      const isAktif=parseID(r.gw||'0')>0;
       const bg=ri%2?null:'f8fafc';
       brows.push(tr2(
         tc(r.name||'—',{w:c4[0],bg,sz:19})+
         tc(isAktif?'✓ Aktif':'Non-aktif',{w:c4[1],center:true,bg:isAktif?'dcfce7':'f1f5f9',sz:18,bold:isAktif,color:isAktif?'15803d':'94a3b8'})+
-        tc(isAktif?(parseFloat(r.gw||0)).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}):'—',{w:c4[2],right:true,bg,sz:19,bold:isAktif,color:isAktif?'15803d':'94a3b8'})+
+        tc(isAktif?(parseID(r.gw||'0')).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}):'—',{w:c4[2],right:true,bg,sz:19,bold:isAktif,color:isAktif?'15803d':'94a3b8'})+
         tc(r.gwNote||'—',{w:c4[3],bg,sz:18,it:true,color:'64748b'})
       ));ri++;
     });
@@ -7306,9 +7410,9 @@ async function _buildDocxXml(D, JSZip) {
     ['Curah Hujan Rancangan',
      'CH harian maksimum '+ra.max+' mm/hari digunakan sebagai skenario worst-case. Periode data '+( ra.period||'—')+' ('+ra.nY+' tahun), '+ra.n+' hari observasi, rata-rata '+ra.mean+' mm/hari, CV = '+ra.cv+'%.'],
     ['Limpasan Contact Water',
-     'Total '+rows2.length+' catchment, luas total '+totA.toFixed(2)+' Ha, Q limpasan = '+bal.totalQ+' m³/hari menggunakan Metode Rasional dengan CH '+( cat.ch||'—')+' mm/hari.'],
+     'Total '+rows2.length+" catchment, luas total "+totA.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})+' Ha, Q limpasan = '+bal.totalQ+' m³/hari menggunakan Metode Rasional dengan CH '+( cat.ch||'—')+' mm/hari.'],
     ['Evaporasi (Metode Langmuir)',
-     'Laju aktual = '+eva.aktual+' m³/m²/hari pada T = '+eva.Tc+'°C dan RH = '+eva.RH+'%. Volume total evaporasi = '+bal.totalEva+' m³/hari ('+parseFloat(bal.pctEva||0).toFixed(1)+'% dari limpasan).'],
+     'Laju aktual = '+eva.aktual+' m³/m²/hari pada T = '+eva.Tc+'°C dan RH = '+eva.RH+'%. Volume total evaporasi = '+bal.totalEva+' m³/hari ('+parseID(bal.pctEva||'0').toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})+'% dari limpasan).'],
     ['Air Tanah (Groundwater)',
      (gw.count||0)+' catchment aktif, total kontribusi = '+(gw.total||'0')+' m³/hari. Perlu verifikasi berkala dengan data dewatering lapangan.'],
     ['Debit Akhir ke WTP',
@@ -7523,10 +7627,10 @@ function fRow(label, val, unit, note, highlight) {
 // ── MAIN CALCULATION ─────────────────────────────
 function evaCalc() {
   // ── Parse inputs ──
-  const Tc     = parseFloat(String(document.getElementById('eva-temp').value).replace(',','.'))   || 25.35;
-  const RH     = parseFloat(String(document.getElementById('eva-rh').value).replace(',','.'))    || 89.81;
-  const Patm   = parseFloat(String(document.getElementById('eva-press').value).replace(',','.')) || 101325;
-  const factor = parseFloat(String(document.getElementById('eva-factor').value).replace(',','.'))|| 1000000;
+  const Tc     = parseID(document.getElementById('eva-temp')?.value)   || 25.35;
+  const RH     = parseID(document.getElementById('eva-rh')?.value)    || 89.81;
+  const Patm   = parseID(document.getElementById('eva-press')?.value) || 101325;
+  const factor = parseID(document.getElementById('eva-factor')?.value)|| 1000000;
   const TK     = Tc + 273.15;
 
   // ── STEP 1: Antoine ──
@@ -7721,7 +7825,7 @@ function evaCatchmentTable(aktualM3perM2perHari) {
   const literEl  = document.getElementById('eva-total-liter');
 
   const validRows = (typeof roRows !== 'undefined' ? roRows : [])
-    .filter(r => parseFloat(r.a) > 0);
+    .filter(r => parseID(r.a) > 0);
 
   if (!validRows.length) {
     emptyEl.style.display = 'block';
@@ -7750,7 +7854,7 @@ function evaCatchmentTable(aktualM3perM2perHari) {
 
   let grandTotal = 0;
   const rowData = validRows.map((r, i) => {
-    const aHa    = parseFloat(r.a) || 0;
+    const aHa    = parseID(r.a) || 0;
     const aM2    = aHa * 10000;
     const active = r.evaActive !== false; // default true
     const vol    = active ? aktualM3perM2perHari * aM2 : 0;
@@ -8301,15 +8405,15 @@ function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
   const baktX = dotX > ml + cw / 2 ? dotX - BW - 16 : dotX + 14;
   drawBubble(dotX + 10, b100y, '#f39c12', [
     'Titik Jenuh  (RH = 100%)',
-    `x₁₀₀ = ${x100_gkg.toFixed(3)} g/kg`,
-    `Pv_sat = ${Pv.toFixed(1)} Pa`,
-    `T = ${Tc.toFixed(2)} °C`,
+    `x₁₀₀ = ${x100_gkg.toLocaleString('id-ID',{minimumFractionDigits:3,maximumFractionDigits:3})} g/kg`,
+    `Pv_sat = ${Pv.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})} Pa`,
+    `T = ${Tc.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})} °C`,
   ]);
   drawBubble(baktX, dotYakt - BH / 2, '#e74c3c', [
-    `State Aktual  RH = ${RH.toFixed(2)}%`,
-    `x_akt = ${xAkt_gkg.toFixed(3)} g/kg`,
-    `Pp = ${Pp.toFixed(1)} Pa`,
-    `T = ${Tc.toFixed(2)} °C`,
+    `State Aktual  RH = ${RH.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})}%`,
+    `x_akt = ${xAkt_gkg.toLocaleString('id-ID',{minimumFractionDigits:3,maximumFractionDigits:3})} g/kg`,
+    `Pp = ${Pp.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})} Pa`,
+    `T = ${Tc.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})} °C`,
   ]);
 }
 
@@ -8352,10 +8456,10 @@ let evaInitDone = false;
 
 // Returns the current aktual (m³/m²/hari) from current input values without re-rendering charts
 function evaCurrAktual() {
-  const Tc     = parseFloat(String(document.getElementById('eva-temp').value).replace(',','.'))   || 25.35;
-  const RH     = parseFloat(String(document.getElementById('eva-rh').value).replace(',','.'))    || 89.81;
-  const Patm   = parseFloat(String(document.getElementById('eva-press').value).replace(',','.')) || 101325;
-  const factor = parseFloat(String(document.getElementById('eva-factor').value).replace(',','.'))|| 1000000;
+  const Tc     = parseID(document.getElementById('eva-temp')?.value)   || 25.35;
+  const RH     = parseID(document.getElementById('eva-rh')?.value)    || 89.81;
+  const Patm   = parseID(document.getElementById('eva-press')?.value) || 101325;
+  const factor = parseID(document.getElementById('eva-factor')?.value)|| 1000000;
   if (!Tc || !RH || !Patm) return null;
   const TK   = Tc + 273.15;
   const x100 = humRatio(Tc, 100, Patm);
@@ -8662,8 +8766,8 @@ function _getWTPData() {
   });
   wtpData['none'] = { id: 'none', name: '(Tidak Dialokasikan)', rows: [], totalQ: 0, totalEva: 0, totalNeto: 0 };
   roRows.forEach(r => {
-    const c   = parseFloat(r.c) || 0;
-    const aHa = parseFloat(r.a) || 0;
+    const c   = parseID(r.c) || 0;
+    const aHa = parseID(r.a) || 0;
     const aM2 = aHa * 10000;
     const q   = c * ch * aHa * 10;
     const eva = (r.evaActive !== false) ? aktual * aM2 : 0;
@@ -8691,9 +8795,9 @@ function calcSedPond() {
   }
   emptyEl.style.display = 'none'; contentEl.style.display = 'block';
 
-  const sf    = parseFloat(String(document.getElementById('sp-sf')?.value    || '1.5').replace(',','.'))  || 1.5;
-  const depth = parseFloat(String(document.getElementById('sp-depth')?.value || '2.0').replace(',','.')) || 2.0;
-  const hrt   = parseFloat(String(document.getElementById('sp-hrt')?.value   || '1').replace(',','.'))   || 1;
+  const sf    = parseID(document.getElementById('sp-sf')?.value)  || 1.5;
+  const depth = parseID(document.getElementById('sp-depth')?.value) || 2.0;
+  const hrt   = parseID(document.getElementById('sp-hrt')?.value)   || 1;
 
   const grandQ    = groups.reduce((s,g) => s+g.totalQ,    0);
   const grandEva  = groups.reduce((s,g) => s+g.totalEva,  0);
@@ -8778,7 +8882,12 @@ function rpSetSF(val) {
   const inp = document.getElementById('rp-sf-val');
   if (!inp) return;
   if (val === 'manual') { inp.removeAttribute('readonly'); inp.focus(); }
-  else { inp.setAttribute('readonly',''); inp.value = val; calcRetPond(); }
+  else {
+    inp.setAttribute('readonly','');
+    // Tampilkan dalam format Indonesia (ganti titik desimal → koma)
+    inp.value = String(val).replace('.', ',');
+    calcRetPond();
+  }
 }
 
 function calcRetPond() {
@@ -8792,10 +8901,10 @@ function calcRetPond() {
   }
   emptyEl.style.display = 'none'; contentEl.style.display = 'block';
 
-  const sfSP  = parseFloat(String(document.getElementById('sp-sf')?.value    || '1.5').replace(',','.')) || 1.5;
-  const sfRet = parseFloat(String(document.getElementById('rp-sf-val')?.value|| '1.5').replace(',','.')) || 1.5;
-  const fac   = parseFloat(String(document.getElementById('rp-factor')?.value|| '84').replace(',','.'))  || 84;
-  const depth = parseFloat(String(document.getElementById('rp-depth')?.value  || '3.0').replace(',','.'))|| 3.0;
+  const sfSP  = parseID(document.getElementById('sp-sf')?.value) || 1.5;
+  const sfRet = parseID(document.getElementById('rp-sf-val')?.value) || 1.5;
+  const fac   = parseID(document.getElementById('rp-factor')?.value)  || 84;
+  const depth = parseID(document.getElementById('rp-depth')?.value)|| 3.0;
 
   const rpGroups = groups.filter(g => spNeedRetPond[g.id]);
 
@@ -8883,16 +8992,16 @@ function buildRekap() {
   const aktual = evaCurrAktual() || 0;
 
   // ── Build per-catchment data ──
-  const validRO = roRows.filter(r => parseFloat(r.a) > 0);
+  const validRO = roRows.filter(r => parseID(r.a) > 0);
   let totalQ = 0, totalEva = 0, totalArea = 0;
 
   const catchRows = validRO.map(r => {
-    const c   = parseFloat(r.c)  || 0;
-    const a   = parseFloat(r.a)  || 0;
+    const c   = parseID(r.c)  || 0;
+    const a   = parseID(r.a)  || 0;
     const q   = c * ch * a * 10;
     const eva = (r.evaActive !== false) ? aktual * a * 10000 : 0;
     const neto = Math.max(0, q - eva);
-    const gw  = (gwData[r.id]?.active) ? (parseFloat(gwData[r.id]?.q) || 0) : 0;
+    const gw  = (gwData[r.id]?.active) ? (parseID(gwData[r.id]?.q) || 0) : 0;
     const akhir = neto + gw;
     const wtpName = r.wtpId
       ? (wtpList.find(w => w.id === r.wtpId) || { name: 'Tidak Dialokasikan' }).name
@@ -9061,8 +9170,8 @@ function buildRekap() {
   }
 
   // ── Parameter Analisis ──
-  const Tc  = parseFloat(String(document.getElementById('eva-temp')?.value || '25.35').replace(',','.')) || 25.35;
-  const RH  = parseFloat(String(document.getElementById('eva-rh')?.value || '89.81').replace(',','.'))   || 89.81;
+  const Tc  = parseID(document.getElementById('eva-temp')?.value) || 25.35;
+  const RH  = parseID(document.getElementById('eva-rh')?.value)   || 89.81;
   const ch_hint = document.getElementById('ro-ch-hint')?.textContent || '';
   const chMax_ra = raCHMax ? f2r(raCHMax) + ' mm' : '—';
   const paramRows = [
@@ -9086,12 +9195,12 @@ function buildRekap() {
   const pondEmpty   = document.getElementById('rekap-pond-empty');
   const pondContent = document.getElementById('rekap-pond-content');
   try {
-    const spSF  = parseFloat(String(document.getElementById('sp-sf')?.value || '1.5').replace(',','.')) || 1.5;
+    const spSF  = parseID(document.getElementById('sp-sf')?.value) || 1.5;
     const { groups } = _getWTPData ? _getWTPData() : { groups:[] };
     if (groups && groups.length > 0) {
       pondEmpty.style.display = 'none'; pondContent.style.display = 'block';
-      const sfRet = parseFloat(String(document.getElementById('rp-sf-val')?.value || '1.5').replace(',','.')) || 1.5;
-      const fac   = parseFloat(String(document.getElementById('rp-factor')?.value || '84').replace(',','.'))  || 84;
+      const sfRet = parseID(document.getElementById('rp-sf-val')?.value) || 1.5;
+      const fac   = parseID(document.getElementById('rp-factor')?.value)  || 84;
       let tNeto=0, tVSP=0, tVRP=0, tTot=0;
       document.getElementById('rekap-pond-tbody').innerHTML = groups.map(g => {
         const vSP  = g.totalNeto * spSF;
@@ -9207,18 +9316,18 @@ function buildLaporan() {
   const f4 = v => (v==null||isNaN(v)) ? '—' : (+v.toFixed(4)).toLocaleString('id-ID',{minimumFractionDigits:4,maximumFractionDigits:4});
   const fN = (v,u='') => v==null||isNaN(v) ? '—' : f2(v)+(u?' '+u:'');
 
-  const ch     = parseFloat(String(document.getElementById('ro-ch')?.value||'0').replace(',','.')) || 0;
+  const ch     = parseID(document.getElementById('ro-ch')?.value) || 0;
   const aktual = evaCurrAktual() || 0;
-  const Tc_    = parseFloat(String(document.getElementById('eva-temp')?.value||'25.35').replace(',','.')) || 25.35;
-  const RH_    = parseFloat(String(document.getElementById('eva-rh')?.value||'89.81').replace(',','.'))   || 89.81;
+  const Tc_    = parseID(document.getElementById('eva-temp')?.value) || 25.35;
+  const RH_    = parseID(document.getElementById('eva-rh')?.value)   || 89.81;
 
-  const validRO = roRows.filter(r => parseFloat(r.a) > 0);
+  const validRO = roRows.filter(r => parseID(r.a) > 0);
   let totalQ=0, totalEva=0, totalArea=0;
 
   const catchRows = validRO.map(r => {
-    const c=parseFloat(r.c)||0, a=parseFloat(r.a)||0;
+    const c=parseID(r.c)||0, a=parseID(r.a)||0;
     const q=c*ch*a*10, eva=(r.evaActive!==false)?aktual*a*10000:0;
-    const neto=Math.max(0,q-eva), gw=(gwData[r.id]?.active)?(parseFloat(gwData[r.id]?.q)||0):0;
+    const neto=Math.max(0,q-eva), gw=(gwData[r.id]?.active)?(parseID(gwData[r.id]?.q)||0):0;
     const akhir=neto+gw;
     const wtpName=r.wtpId?(wtpList.find(w=>w.id===r.wtpId)||{name:'Tidak Dialokasikan'}).name:'Tidak Dialokasikan';
     totalQ+=q; totalEva+=eva; totalArea+=a;
@@ -9366,9 +9475,9 @@ function buildLaporan() {
   const pondTb = document.getElementById('lap-pond-tbody2');
   const pondTf = document.getElementById('lap-pond-tfoot2');
   try {
-    const spSF  = parseFloat(String(document.getElementById('sp-sf')?.value||'1.5').replace(',','.')) || 1.5;
-    const sfRet = parseFloat(String(document.getElementById('rp-sf-val')?.value||'1.5').replace(',','.')) || 1.5;
-    const fac   = parseFloat(String(document.getElementById('rp-factor')?.value||'84').replace(',','.'))  || 84;
+    const spSF  = parseID(document.getElementById('sp-sf')?.value) || 1.5;
+    const sfRet = parseID(document.getElementById('rp-sf-val')?.value) || 1.5;
+    const fac   = parseID(document.getElementById('rp-factor')?.value)  || 84;
     const {groups} = _getWTPData ? _getWTPData() : {groups:[]};
     if (groups && groups.length && pondTb) {
       let tVSP=0, tVRP=0, tTot=0;
@@ -9592,12 +9701,12 @@ function historyBuildSummary() {
   }
 
   // Runoff
-  const chVal = parseFloat(document.getElementById('ro-ch')?.value);
+  const chVal = parseID(document.getElementById('ro-ch')?.value);
   if (roRows && roRows.length && chVal > 0) {
     summary.modules.push('runoff');
     const totalQ = roRows.reduce((s, r) => {
-      const c = parseFloat(r.c) || 0;
-      const a = parseFloat(r.a) || 0;
+      const c = parseID(r.c) || 0;
+      const a = parseID(r.a) || 0;
       return s + (c * a * chVal / 1000);
     }, 0);
     summary.runoff = {
@@ -9608,16 +9717,16 @@ function historyBuildSummary() {
   }
 
   // Sediment Pond
-  const spSf = parseFloat(document.getElementById('sp-sf')?.value);
-  const spDepth = parseFloat(document.getElementById('sp-depth')?.value);
+  const spSf = parseID(document.getElementById('sp-sf')?.value);
+  const spDepth = parseID(document.getElementById('sp-depth')?.value);
   if (spSf && spDepth) {
     summary.modules.push('sedpond');
     summary.sedpond = { sf: spSf, depth: spDepth };
   }
 
   // Retention Pond
-  const rpSf = parseFloat(document.getElementById('rp-sf-val')?.value);
-  const rpFactor = parseFloat(document.getElementById('rp-factor')?.value);
+  const rpSf = parseID(document.getElementById('rp-sf-val')?.value);
+  const rpFactor = parseID(document.getElementById('rp-factor')?.value);
   if (rpSf && rpFactor && Object.values(spNeedRetPond||{}).some(v=>v)) {
     summary.modules.push('retpond');
     summary.retpond = { sf: rpSf, factor: rpFactor };
@@ -10683,7 +10792,7 @@ async function chFetchData() {
   // Validate min 10 years
   var diffYears = (new Date(endDate)-new Date(startDate))/(1000*60*60*24*365.25);
   if (diffYears < 10) {
-    if (!confirm('Rentang data < 10 tahun (' + diffYears.toFixed(1) + ' tahun). Untuk analisis hidrologi disarankan ≥10 tahun. Lanjutkan?')) return;
+    if (!confirm('Rentang data < 10 tahun (' + diffYears.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' tahun). Untuk analisis hidrologi disarankan ≥10 tahun. Lanjutkan?')) return;
   }
 
   var btn    = document.getElementById('ch-fetch-btn');
@@ -10773,9 +10882,9 @@ function chRenderResults(s, startDate, endDate) {
   var pos        = chData.filter(function(d){return d.value>0;}).map(function(d){return d.value;});
   var totalDays  = chData.length;
   var wetDays    = pos.length;
-  var maxDaily   = pos.length ? Math.max.apply(null,pos).toFixed(1) : 0;
-  var totalCH    = pos.reduce(function(a,b){return a+b;},0).toFixed(0);
-  var avgAnnual  = (pos.reduce(function(a,b){return a+b;},0) / (totalDays/365.25)).toFixed(0);
+  var maxDaily   = pos.length ? Math.max.apply(null,pos).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1}) : '0';
+  var totalCH    = Math.round(pos.reduce(function(a,b){return a+b;},0)).toLocaleString('id-ID');
+  var avgAnnual  = Math.round(pos.reduce(function(a,b){return a+b;},0) / (totalDays/365.25)).toLocaleString('id-ID');
 
   // Titles
   document.getElementById('ch-result-title').textContent   = s[1] + ' · ' + startDate + ' — ' + endDate;
