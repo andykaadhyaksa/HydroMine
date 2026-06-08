@@ -1,8 +1,4 @@
-# HydroMine v2
+# HydroMine v4
+Mine Hydrology Analysis Platform
 
-Mine Hydrology Tool — Deploy ke GitHub Pages.
-
-## Deploy
-1. Upload `index.html`, `.nojekyll`, `README.md` ke root repo
-2. Settings → Pages → main branch / root
-3. Tunggu 1-2 menit
+Deploy via GitHub Pages — set source to branch `main`, folder `/root`.

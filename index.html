@@ -3422,6 +3422,9 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
   <!-- Daftar Retention Pond -->
   <div id="rp-units-container"></div>
 
+  <!-- Rekap Akhir Tabel -->
+  <div id="rp-rekap-container"></div>
+
   <!-- Empty state -->
   <div id="rp-empty" style="text-align:center;padding:48px 20px;color:var(--muted)">
     <svg viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:80px;height:60px;margin-bottom:12px;opacity:0.35">
@@ -8800,7 +8803,10 @@ function collectState() {
       depth: getV('sp-depth'),
       hrt:   getV('sp-hrt'),
       needRetPond: { ...spNeedRetPond },
-      design: JSON.parse(JSON.stringify(spDesign))
+      design: JSON.parse(JSON.stringify(spDesign)),
+      criteria: JSON.parse(JSON.stringify(spCriteria)),
+      chem: JSON.parse(JSON.stringify(spChem)),
+      sludge: JSON.parse(JSON.stringify(spSludge))
     },
     rpUnitsSaved: JSON.parse(JSON.stringify(rpUnits)),
     retpond: {
@@ -8890,6 +8896,15 @@ function restoreState(state) {
     setV('sp-depth', sp.depth);
     setV('sp-hrt',   sp.hrt);
     spNeedRetPond = { ...(sp.needRetPond || {}) };
+    if (sp.criteria) {
+      Object.entries(sp.criteria).forEach(([k,v]) => { spCriteria[+k] = v; });
+    }
+    if (sp.chem) {
+      Object.entries(sp.chem).forEach(([k,v]) => { spChem[+k] = v; });
+    }
+    if (sp.sludge) {
+      Object.entries(sp.sludge).forEach(([k,v]) => { spSludge[+k] = v; });
+    }
     if (sp.design) {
       spDesign = {};
       Object.entries(sp.design).forEach(([k,v]) => {
@@ -8997,7 +9012,7 @@ function calcSedPond() {
     const d = spDesign[g.id];
     const res = d ? spCalcUnit(g.id) : null;
     const vAkt = res ? res.totalVol : 0;
-    const badge = d && d.comps && d.comps.length
+    const badge = d && d.comps && d.comps.length && vAkt > 0
       ? (vAkt >= volMin
           ? `<span style="font-size:10px;background:#27ae60;color:#fff;border-radius:3px;padding:1px 5px">✓ ${spFmt(vAkt)} m³</span>`
           : `<span style="font-size:10px;background:#e74c3c;color:#fff;border-radius:3px;padding:1px 5px">✗ ${spFmt(vAkt)} m³</span>`)
@@ -11531,23 +11546,42 @@ function spSyncDesign(wtpId) {
       const el = document.getElementById(`spd-${f}-${c.id}`);
       if (el) c[f] = el.value;
     });
+    const nameEl = document.getElementById(`spd-name-${c.id}`);
+    if (nameEl) c.name = nameEl.value;
   });
 }
 
 // ── Toggle panel desain ─────────────────────────────────────────
 function spToggleDesignPanel(wtpId) {
+  // Pastikan state ada
   if (!spDesign[wtpId]) {
     spDesign[wtpId] = { open: true, comps: [] };
   } else {
     spDesign[wtpId].open = !spDesign[wtpId].open;
   }
-  const row = document.getElementById(`spd-panel-row-${wtpId}`);
-  if (row) {
-    row.style.display = spDesign[wtpId].open ? '' : 'none';
-    if (spDesign[wtpId].open) {
-      renderSpDesignPanel(wtpId);
-    }
+
+  const open  = spDesign[wtpId].open;
+  const row   = document.getElementById(`spd-panel-row-${wtpId}`);
+  const panel = document.getElementById(`spd-panel-${wtpId}`);
+
+  if (!row || !panel) {
+    // Panel row tidak ada di DOM — trigger full recalc
+    calcSedPond();
+    // Setelah render, buka panel
+    setTimeout(() => {
+      const row2   = document.getElementById(`spd-panel-row-${wtpId}`);
+      const panel2 = document.getElementById(`spd-panel-${wtpId}`);
+      if (row2 && panel2) {
+        spDesign[wtpId].open = true;
+        row2.style.display = '';
+        renderSpDesignPanel(wtpId);
+      }
+    }, 50);
+    return;
   }
+
+  row.style.display = open ? '' : 'none';
+  if (open) renderSpDesignPanel(wtpId);
 }
 
 // ── Tambah kompartemen ──────────────────────────────────────────
@@ -11557,6 +11591,7 @@ function spAddComp(wtpId) {
   spDesignCid++;
   spDesign[wtpId].comps.push({
     id: spDesignCid,
+    name: '',
     shape: 'frustum',
     inputMode: 'dims',
     P:'', L:'', T:'',
@@ -11599,8 +11634,17 @@ function spSetCompMode(wtpId, cid, mode) {
 function spDesignOnInput(wtpId) {
   spSyncDesign(wtpId);
   spUpdateDesignPanel(wtpId);
-  // Update badge di tabel (tanpa rebuild seluruh tbody)
   spUpdateTblBadge(wtpId);
+}
+
+// ── Force update criteria setelah render panel ────────────────────
+function spCriteriaForceUpdate(wtpId) {
+  // Dipanggil dengan setTimeout setelah renderSpDesignPanel selesai
+  const { totalVol, totalArea } = spCalcUnit(wtpId);
+  const critEl = document.getElementById(`spd-criteria-result-${wtpId}`);
+  if (critEl) {
+    critEl.innerHTML = spCriteriaResultHTML(wtpId, totalVol, totalArea);
+  }
 }
 
 // ── Update badge di tabel (ringan, tanpa rebuild) ───────────────
@@ -11669,6 +11713,21 @@ function spUpdateDesignPanel(wtpId) {
   const combEl = document.getElementById(`spd-combined-${wtpId}`);
   if (combEl) {
     combEl.innerHTML = spCombinedSVG(wtpId, compsRes);
+  }
+  // Update uji kriteria desain
+  const critEl = document.getElementById(`spd-criteria-result-${wtpId}`);
+  if (critEl) {
+    critEl.innerHTML = spCriteriaResultHTML(wtpId, totalVol, totalArea);
+  }
+  // Update kebutuhan bahan kimia
+  const chemEl = document.getElementById(`spc-chem-result-${wtpId}`);
+  if (chemEl) {
+    chemEl.innerHTML = spChemResultHTML(wtpId);
+  }
+  // Update ringkasan desain
+  const sumDesignEl = document.getElementById(`spd-design-summary-${wtpId}`);
+  if (sumDesignEl) {
+    sumDesignEl.innerHTML = spDesignSummaryHTML(wtpId, totalVol, totalArea, compsRes);
   }
 }
 
@@ -12051,6 +12110,7 @@ function renderSpDesignPanel(wtpId) {
   const g = groups.find(x => x.id === wtpId);
   const vMin = g ? g.totalNeto * sf : 0;
   const d = spDesign[wtpId] || { open: true, comps: [] };
+  spSyncDesign(wtpId); // sync DOM → state sebelum hitung
   const { totalVol, totalArea, compsRes } = spCalcUnit(wtpId);
 
   const btnGroupStyle = (active) =>
@@ -12060,8 +12120,13 @@ function renderSpDesignPanel(wtpId) {
     const r = compsRes[i] || { vol:0, area:0 };
     return `<div class="card" style="margin-bottom:10px;padding:12px 14px;border:1px solid var(--border)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-weight:700;font-size:13px">Kompartemen ${i+1}</span>
-        <button onclick="spRemoveComp(${wtpId},${c.id})" style="padding:2px 8px;font-size:11px;cursor:pointer;background:rgba(231,76,60,0.1);color:#e74c3c;border:1px solid #e74c3c;border-radius:4px">✕ Hapus</button>
+        <div style="display:flex;align-items:center;gap:8px;flex:1">
+          <span style="font-weight:700;font-size:13px;color:#9b59b6;flex-shrink:0">K-${i+1}</span>
+          <input id="spd-name-${c.id}" type="text" value="${c.name||''}" placeholder="Nama kompartemen (opsional)"
+            style="flex:1;padding:4px 8px;border:1px solid var(--border);border-radius:5px;background:var(--bg-secondary);color:var(--text);font-size:12px;font-weight:600"
+            oninput="spSyncCompName(${wtpId},${c.id})">
+        </div>
+        <button onclick="spRemoveComp(${wtpId},${c.id})" style="padding:2px 8px;font-size:11px;cursor:pointer;background:rgba(231,76,60,0.1);color:#e74c3c;border:1px solid #e74c3c;border-radius:4px;flex-shrink:0">✕ Hapus</button>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
         <div style="display:flex;gap:4px">
@@ -12101,17 +12166,1290 @@ function renderSpDesignPanel(wtpId) {
     <div class="card" style="margin-top:10px;padding:12px 14px;border:1px solid var(--border);overflow-x:auto">
       <div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--muted)">Diagram Gabungan</div>
       <div id="spd-combined-${wtpId}">${spCombinedSVG(wtpId, compsRes)}</div>
+    </div>
+    <div class="card" style="margin-top:10px;border:2px solid rgba(26,127,212,0.25);overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:rgba(26,127,212,0.05)">
+        <span style="font-size:15px">🔬</span>
+        <div>
+          <div style="font-weight:700;font-size:13px;color:#1a7fd4">Uji Kriteria Desain Sediment Pond</div>
+          <div style="font-size:11px;color:var(--muted)">Metode Stokes · Kathuria et al. (1976)</div>
+        </div>
+      </div>
+      <div style="padding:14px">
+        ${spCriteriaParamHTML(wtpId)}
+        <div id="spd-criteria-result-${wtpId}">${spCriteriaResultHTML(wtpId, totalVol, totalArea)}</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:10px;border:2px solid rgba(245,166,35,0.3);overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:rgba(245,166,35,0.05)">
+        <span style="font-size:15px">🧪</span>
+        <div>
+          <div style="font-weight:700;font-size:13px;color:#d97706">Kebutuhan Bahan Kimia Pengolahan</div>
+          <div style="font-size:11px;color:var(--muted)">Kapur (Ca(OH)₂) &amp; PAC (Poly Aluminium Chloride)</div>
+        </div>
+      </div>
+      <div style="padding:14px">
+        ${spChemHTML(wtpId)}
+      </div>
+    </div>
+    <div class="card" style="margin-top:10px;border:2px solid rgba(139,92,246,0.3);overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:rgba(139,92,246,0.05)">
+        <span style="font-size:15px">🗑️</span>
+        <div>
+          <div style="font-weight:700;font-size:13px;color:#7c3aed">Periode Pengurasan Lumpur</div>
+          <div style="font-size:11px;color:var(--muted)">Massa TSS · Volume Lumpur · Frekuensi Pengerukan</div>
+        </div>
+      </div>
+      <div style="padding:14px">
+        ${spSludgeHTML(wtpId)}
+      </div>
+    </div>
+    <div class="card" style="margin-top:10px;border:2px solid rgba(15,118,110,0.3);overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:rgba(15,118,110,0.05)">
+        <span style="font-size:15px">📋</span>
+        <div>
+          <div style="font-weight:700;font-size:13px;color:#0f766e">Ringkasan Desain Sediment Pond</div>
+          <div style="font-size:11px;color:var(--muted)">Dimensi & rekapitulasi seluruh kompartemen</div>
+        </div>
+      </div>
+      <div style="padding:14px" id="spd-design-summary-${wtpId}">
+        ${spDesignSummaryHTML(wtpId, totalVol, totalArea, compsRes)}
+      </div>
     </div>` : ''}
   </div>`;
 }
 
 
 /* ═══════════════════════════════════════════════════════════════
-   RETENTION POND — SISTEM BARU
-   State: rpUnits[] — setiap unit adalah satu kolam retensi
+   SEDIMENT POND — UJI KRITERIA DESAIN
+   Referensi:
+   - Kathuria, D.V., Nawrocky, M.A., & Becker, B.C. (1976) / US-EPA
+   - Persamaan Stokes (kecepatan pengendapan)
+   - Metcalf & Eddy (2014): td ≥ tv & th > tv
 ═══════════════════════════════════════════════════════════════ */
 
-let rpUnits   = [];
+if (typeof spCriteria === 'undefined') var spCriteria = {};
+
+function spCriteriaDefault(wtpId) {
+  if (!spCriteria[wtpId]) {
+    spCriteria[wtpId] = {
+      Dp:      '0,000003', // diameter partikel D (m) — default 3 µm sesuai contoh dokumen
+      Ps:      '2.500',    // berat jenis padatan PP (kg/m³)
+      Pw:      '1.000',    // berat jenis air PA (kg/m³)
+      mu:      '0,000001007', // viskositas KINEMATIK μ (m²/s) — 20°C
+      Xs:      '500',      // konsentrasi padatan (mg/L)
+      g:       '9,8',      // gravitasi (m/s²) — sesuai contoh dokumen
+      qMode:   'auto',
+      qManual: '',
+    };
+  }
+  return spCriteria[wtpId];
+}
+
+/* ── Tabel referensi ─────────────────────────────────────── */
+// μ di sini = viskositas KINEMATIK (m²/s), bukan dinamik
+const SP_MU_TABLE = [
+  [0,   1.787e-6],[5,   1.519e-6],[10,  1.308e-6],
+  [15,  1.140e-6],[20,  1.007e-6],[25,  0.893e-6],
+  [30,  0.801e-6],[40,  0.658e-6],[50,  0.553e-6],
+  [60,  0.474e-6],[70,  0.413e-6],[80,  0.364e-6],
+  [90,  0.326e-6],[100, 0.294e-6],
+];
+const SP_DP_TABLE = [
+  { label:'Kerikil halus (2–4 mm)',     dp:0.003,    note:'Jarang terbawa aliran jauh' },
+  { label:'Pasir kasar (0,6–2 mm)',     dp:0.001,    note:'Terendapkan cepat' },
+  { label:'Pasir halus (0,06–0,6 mm)', dp:0.0003,   note:'Masih bisa terbawa limpasan' },
+  { label:'Lanau/silt (2–60 µm)',       dp:0.000030, note:'Umum dominan di limpasan tambang' },
+  { label:'Lempung/clay (< 2 µm)',      dp:0.000001, note:'Butuh flokulan' },
+];
+const SP_PS_TABLE = [
+  { label:'Lempung / lanau halus',            ps:2500 },
+  { label:'Pasir halus',                      ps:2650 },
+  { label:'Material laterit / tanah tambang', ps:2700 },
+  { label:'Lumpur organik dominan',           ps:1500 },
+];
+
+/* ─────────────────────────────────────────────────────────────
+   KALKULASI STOKES — sesuai dokumen referensi:
+   
+   6.  Vt  = g × D² × (PP − PA) / (18 × μ)       μ = viskositas kinematik (m²/s)
+   7.  A_pond = Q / Vt                             luas kolam pengendapan
+   10. tv  = H / Vt                                waktu partikel mengendap
+   11. vh  = Q / (b × h) = Q / (Lebar × Kedalaman) kecepatan horizontal
+   12. th  = P_total / vh    dimana P_total = Panjang × n_kompartemen
+   
+   CATATAN: μ adalah viskositas KINEMATIK (m²/s), bukan dinamik (Pa·s)
+   Sehingga penyebut rumus Vt = 18 × μ (bukan 18 × μ / ρw)
+───────────────────────────────────────────────────────────── */
+function spGetCompDims(c) {
+  // Returns { H, b, p, area_top } for a compartment using top (water surface) dimensions
+  const getv = (f) => {
+    const v = c[f];
+    if (v !== undefined && v !== '') return v;
+    const el = document.getElementById('spd-'+f+'-'+c.id);
+    return el ? el.value : '';
+  };
+  const T = parseID(getv('T')) || 0;
+  let p = 0, b = 0, area_top = 0;
+  if (c.inputMode === 'dims') {
+    const Pb = parseID(getv('P')) || 0;
+    const Lb = parseID(getv('L')) || 0;
+    const Pt = parseID(getv('Patas')) || Pb;
+    const Lt = parseID(getv('Latas')) || Lb;
+    p = Pt || Pb;
+    b = Lt || Lb;
+    area_top = p * b;
+  } else if (c.shape === 'frustum') {
+    const Ab = parseID(getv('Abawah')) || 0;
+    const At = parseID(getv('Aatas')) || Ab;
+    area_top = At || Ab;
+    p = area_top > 0 ? Math.sqrt(area_top) : 0;
+    b = p;
+  } else {
+    const A = parseID(getv('Amanual')) || 0;
+    area_top = A;
+    p = A > 0 ? Math.sqrt(A) : 0;
+    b = p;
+  }
+  return { H: T, p, b, area_top };
+}
+
+// ── Per-compartment Stokes calculation ─────────────────────────────
+function spStokesCalcComp(c, Vt, Q, vol_comp, idx) {
+  const { H, p, b } = spGetCompDims(c);
+  const label = (c.name && c.name.trim()) ? c.name.trim() : 'Kompartemen '+(idx+1);
+
+  if (!H || !p || !b) return {
+    label, valid: false,
+    H, p, b, vol: vol_comp,
+    tv_s:0, vh:0, th_s:0, ok_th_tv:false, note:'Dimensi tidak lengkap'
+  };
+
+  const tv_s = Vt > 0 ? H / Vt : 0;
+  const A_cross = b * H;
+  const vh      = A_cross > 0 && Q > 0 ? Q / A_cross : 0;
+  const th_s    = vh > 0 ? p / vh : 0;
+  const ok_th_tv = th_s > 0 && tv_s > 0 && th_s > tv_s;
+
+  return {
+    label, valid: true,
+    H, p, b, vol: vol_comp,
+    tv_s, tv_min: tv_s/60, tv_hr: tv_s/3600,
+    A_cross, vh,
+    th_s, th_min: th_s/60, th_hr: th_s/3600,
+    ok_th_tv,
+    note: ''
+  };
+}
+
+function spStokesCalc(wtpId, volKolam, areaKolam) {
+  const cr = spCriteriaDefault(wtpId);
+  const D  = parseID(cr.Dp)  || 3e-6;
+  const PP = parseID(cr.Ps)  || 2500;
+  const PA = parseID(cr.Pw)  || 1000;
+  const mu = parseID(cr.mu)  || 1.007e-6;
+  const g  = parseID(cr.g)   || 9.8;
+
+  const D2 = D * D;
+  const Vt = (g * D2 * (PP - PA)) / (18 * mu);
+
+  const d = spDesign[wtpId];
+  let H_eff = 0, b_eff = 0, p_eff = 0, n_comp = 0;
+  let compsCalc = [];
+
+  const Qday = spCriteriaGetQ(wtpId);
+  const Q    = Qday / 86400;
+  const V    = volKolam || 0;
+
+  if (d && d.comps && d.comps.length) {
+    n_comp = d.comps.length;
+    const { compsRes } = spCalcUnit(wtpId);
+    d.comps.forEach((c, i) => {
+      const volComp = compsRes[i] ? compsRes[i].vol : 0;
+      const cc = spStokesCalcComp(c, Vt, Q, volComp, i);
+      compsCalc.push(cc);
+      if (cc.H > H_eff) H_eff = cc.H;
+      if (cc.p > p_eff) p_eff = cc.p;
+      if (cc.b > b_eff) b_eff = cc.b;
+    });
+  }
+
+  // Fallbacks
+  if (H_eff <= 0 && volKolam > 0 && areaKolam > 0) H_eff = volKolam / areaKolam;
+  if (b_eff <= 0 && areaKolam > 0) b_eff = Math.sqrt(areaKolam);
+  if (p_eff <= 0) p_eff = b_eff;
+  if (n_comp <= 0) n_comp = 1;
+
+  const A_pond_min = Vt > 0 && Q > 0 ? Q / Vt : 0;
+  const tv_s  = Vt > 0 && H_eff > 0 ? H_eff / Vt : 0;
+  const tv_hr = tv_s / 3600;
+  const tv_min= tv_s / 60;
+  const A_penampang = b_eff * H_eff;
+  const vh = A_penampang > 0 && Q > 0 ? Q / A_penampang : 0;
+  const P_total = p_eff * n_comp;
+  const th_s  = vh > 0 ? P_total / vh : 0;
+  const th_hr = th_s / 3600;
+  const th_min= th_s / 60;
+  const td_s  = Q > 0 ? V / Q : 0;
+  const td_hr = td_s / 3600;
+  const td_day= td_s / 86400;
+
+  return {
+    D, D2, PP, PA, mu, g, Vt,
+    H: H_eff, b: b_eff, p: p_eff, n_comp,
+    Q, Qday,
+    A_pond_min, A_penampang, V, P_total,
+    tv_s, tv_hr, tv_min,
+    vh,
+    th_s, th_hr, th_min,
+    td_s, td_hr, td_day,
+    ok_th_tv: th_s > 0 && tv_s > 0 && th_s > tv_s,
+    ok_td:    td_hr >= 10,
+    compsCalc,
+  };
+}
+
+/* ── Format helpers ──────────────────────────────────────── */
+function fmtSci(v, sig) {
+  sig = sig || 4;
+  if (!isFinite(v) || v === 0) return '0';
+  const exp = Math.floor(Math.log10(Math.abs(v)));
+  if (exp >= -3 && exp <= 6) {
+    const dec = Math.max(0, sig - exp - 1);
+    return v.toLocaleString('id-ID', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  }
+  const mantissa = (v / Math.pow(10, exp)).toFixed(sig - 1).replace('.', ',');
+  return `${mantissa} × 10<sup>${exp}</sup>`;
+}
+function fmtInput(v, dec) {
+  dec = dec !== undefined ? dec : 8;
+  return Number(v).toLocaleString('id-ID', { minimumFractionDigits:0, maximumFractionDigits:dec, useGrouping:false });
+}
+
+/* ── Q helper ────────────────────────────────────────────── */
+function spCriteriaGetQ(wtpId) {
+  const cr = spCriteriaDefault(wtpId);
+  if (cr.qMode === 'manual') return parseID(cr.qManual) || 0;
+  const { groups } = _getWTPData();
+  const g = groups.find(x => x.id === wtpId);
+  return g ? g.totalNeto : 0;
+}
+
+/* ── Sync & update ───────────────────────────────────────── */
+function spCriteriaSync(wtpId) {
+  const cr = spCriteriaDefault(wtpId);
+  ['Dp','Ps','Pw','mu','Xs','qManual'].forEach(f => {
+    const el = document.getElementById(`spc-${f}-${wtpId}`);
+    if (el) cr[f] = el.value;
+  });
+  spCriteriaUpdate(wtpId);
+}
+function spCriteriaUpdate(wtpId) {
+  const { totalVol, totalArea } = spCalcUnit(wtpId);
+  const el = document.getElementById(`spd-criteria-result-${wtpId}`);
+  if (el) el.innerHTML = spCriteriaResultHTML(wtpId, totalVol, totalArea);
+  spCriteriaUpdateQLabel(wtpId);
+}
+function spCriteriaUpdateQLabel(wtpId) {
+  const cr = spCriteriaDefault(wtpId);
+  const labelEl = document.getElementById(`spc-qlabel-${wtpId}`);
+  if (!labelEl) return;
+  if (cr.qMode === 'auto') {
+    const { groups } = _getWTPData();
+    const g = groups.find(x => x.id === wtpId);
+    labelEl.textContent = spFmt(g ? g.totalNeto : 0, 2) + ' m³/hari';
+  }
+}
+
+/* ── Preset setters ──────────────────────────────────────── */
+function spCriteriaSetDp(wtpId, val) {
+  const cr = spCriteriaDefault(wtpId);
+  cr.Dp = fmtInput(val, 9);
+  const el = document.getElementById(`spc-Dp-${wtpId}`);
+  if (el) el.value = cr.Dp;
+  spCriteriaUpdate(wtpId);
+}
+function spCriteriaSetPs(wtpId, val) {
+  const cr = spCriteriaDefault(wtpId);
+  cr.Ps = fmtInput(+val, 0);
+  const el = document.getElementById(`spc-Ps-${wtpId}`);
+  if (el) el.value = cr.Ps;
+  spCriteriaUpdate(wtpId);
+}
+function spCriteriaSetMu(wtpId, t) {
+  const cr  = spCriteriaDefault(wtpId);
+  const row = SP_MU_TABLE.find(r => r[0] === +t);
+  if (!row) return;
+  cr.mu = fmtInput(row[1], 10);
+  const elMu = document.getElementById(`spc-mu-${wtpId}`);
+  if (elMu) elMu.value = cr.mu;
+  spCriteriaUpdate(wtpId);
+}
+function spCriteriaSetQMode(wtpId, mode) {
+  const cr = spCriteriaDefault(wtpId);
+  cr.qMode = mode;
+  const manualWrap = document.getElementById(`spc-qmanual-wrap-${wtpId}`);
+  const autoWrap   = document.getElementById(`spc-qauto-wrap-${wtpId}`);
+  if (manualWrap) manualWrap.style.display = mode === 'manual' ? '' : 'none';
+  if (autoWrap)   autoWrap.style.display   = mode === 'auto'   ? '' : 'none';
+  const base = 'padding:5px 14px;font-size:11.5px;font-weight:700;cursor:pointer;border-radius:5px;border:1px solid';
+  const btnA = document.getElementById(`spc-qbtn-auto-${wtpId}`);
+  const btnM = document.getElementById(`spc-qbtn-manual-${wtpId}`);
+  if (btnA) btnA.style.cssText   = mode==='auto'   ? `${base} #1a7fd4;background:#1a7fd4;color:#fff` : `${base} var(--border);background:var(--bg-secondary);color:var(--text)`;
+  if (btnM) btnM.style.cssText   = mode==='manual' ? `${base} #1a7fd4;background:#1a7fd4;color:#fff` : `${base} var(--border);background:var(--bg-secondary);color:var(--text)`;
+  spCriteriaUpdate(wtpId);
+}
+
+/* ── HTML Parameter Input ────────────────────────────────── */
+function spCriteriaParamHTML(wtpId) {
+  const cr = spCriteriaDefault(wtpId);
+  const iS = `width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:5px;background:var(--bg-secondary);color:var(--text);font-family:var(--mono);font-size:12px`;
+  const dpO = SP_DP_TABLE.map(d=>`<option value="${d.dp}">${d.label} — ${d.note}</option>`).join('');
+  const psO = SP_PS_TABLE.map(d=>`<option value="${d.ps}">${d.label} (${d.ps.toLocaleString('id-ID')} kg/m³)</option>`).join('');
+  const muO = SP_MU_TABLE.map(r=>`<option value="${r[0]}">${r[0]} °C — μ = ${fmtInput(r[1],10)} m²/s</option>`).join('');
+  const { groups } = _getWTPData();
+  const g_ = groups.find(x => x.id === wtpId);
+  const qAuto = g_ ? g_.totalNeto : 0;
+  const isM = cr.qMode === 'manual';
+  const bB = 'padding:5px 14px;font-size:11.5px;font-weight:700;cursor:pointer;border-radius:5px;border:1px solid';
+  const bAct = `${bB} #1a7fd4;background:#1a7fd4;color:#fff`;
+  const bInact = `${bB} var(--border);background:var(--bg-secondary);color:var(--text)`;
+  return `<div style="background:rgba(26,127,212,0.04);border:1px solid rgba(26,127,212,0.15);border-radius:8px;padding:12px 14px;margin-bottom:14px">
+    <div style="font-size:11.5px;font-weight:700;color:#1a7fd4;margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">⚙ Parameter Uji Kriteria</div>
+    <div style="margin-bottom:12px;padding:10px 12px;background:rgba(39,174,96,0.06);border:1px solid rgba(39,174,96,0.2);border-radius:8px">
+      <div style="font-size:11px;font-weight:700;color:#27ae60;margin-bottom:8px">Debit Acuan Q (m³/hari)</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button id="spc-qbtn-auto-${wtpId}" style="${isM?bInact:bAct}" onclick="spCriteriaSetQMode(${wtpId},'auto')">⟳ Otomatis dari Runoff</button>
+        <button id="spc-qbtn-manual-${wtpId}" style="${isM?bAct:bInact}" onclick="spCriteriaSetQMode(${wtpId},'manual')">✎ Input Manual</button>
+      </div>
+      <div id="spc-qauto-wrap-${wtpId}" style="display:${isM?'none':''}">
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:5px">
+          <span style="font-size:11px;color:var(--muted)">Q neto WTP ini:</span>
+          <span id="spc-qlabel-${wtpId}" style="font-family:var(--mono);font-size:13px;font-weight:700;color:#27ae60">${spFmt(qAuto,2)} m³/hari</span>
+          <span style="font-size:10px;color:var(--muted);margin-left:auto">= ${(qAuto/86400).toLocaleString('id-ID',{minimumFractionDigits:8,maximumFractionDigits:8})} m³/detik</span>
+        </div>
+      </div>
+      <div id="spc-qmanual-wrap-${wtpId}" style="display:${isM?'':'none'}">
+        <input id="spc-qManual-${wtpId}" type="text" inputmode="decimal" value="${cr.qManual||''}" placeholder="Contoh: 50.000,00" style="${iS}" oninput="spCriteriaSync(${wtpId})">
+        <div style="font-size:10.5px;color:var(--muted);margin-top:4px">m³/hari — format Indonesia (titik ribuan, koma desimal)</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+      <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Suhu Air — auto-isi μ kinematik</label>
+        <select onchange="spCriteriaSetMu(${wtpId},this.value)" style="${iS}"><option value="">— Pilih suhu —</option>${muO}</select></div>
+      <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Viskositas Kinematik μ (m²/s)</label>
+        <input id="spc-mu-${wtpId}" type="text" inputmode="decimal" value="${cr.mu}" style="${iS}" oninput="spCriteriaSync(${wtpId})">
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">Contoh 20°C: 0,000001007</div></div>
+      <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Berat Jenis Air PA (kg/m³)</label>
+        <input id="spc-Pw-${wtpId}" type="text" inputmode="decimal" value="${cr.Pw}" style="${iS}" oninput="spCriteriaSync(${wtpId})"></div>
+      <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Fraksi Partikel — auto-isi Dp</label>
+        <select onchange="spCriteriaSetDp(${wtpId},this.value)" style="${iS}"><option value="">— Pilih fraksi —</option>${dpO}</select></div>
+      <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Diameter Partikel D (m)</label>
+        <input id="spc-Dp-${wtpId}" type="text" inputmode="decimal" value="${cr.Dp}" style="${iS}" oninput="spCriteriaSync(${wtpId})">
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">Contoh 3 µm = 0,000003</div></div>
+      <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Jenis Padatan — auto-isi PP</label>
+        <select onchange="spCriteriaSetPs(${wtpId},this.value)" style="${iS}"><option value="">— Pilih jenis padatan —</option>${psO}</select></div>
+      <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Berat Jenis Padatan PP (kg/m³)</label>
+        <input id="spc-Ps-${wtpId}" type="text" inputmode="decimal" value="${cr.Ps}" style="${iS}" oninput="spCriteriaSync(${wtpId})"></div>
+    </div>
+  </div>`;
+}
+
+/* ── HTML Hasil Uji Kriteria ─────────────────────────────── */
+function spCriteriaResultHTML(wtpId, totalVol, totalArea) {
+  let volFinal  = totalVol  || 0;
+  let areaFinal = totalArea || 0;
+  if (!volFinal || !areaFinal) {
+    if (typeof spSyncDesign === 'function') spSyncDesign(wtpId);
+    const fresh = spCalcUnit(wtpId);
+    volFinal  = fresh.totalVol  || 0;
+    areaFinal = fresh.totalArea || 0;
+  }
+  if (!volFinal || !areaFinal) {
+    return '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px;background:var(--bg-secondary);border-radius:8px">' +
+      '<div style="font-size:20px;margin-bottom:8px">📐</div>' +
+      '<div style="font-weight:700;margin-bottom:4px">Isi dimensi kompartemen di atas</div>' +
+      '<div style="font-size:11px">Masukkan nilai P, L, T (atau A dan T) pada kompartemen, lalu uji kriteria akan otomatis muncul di sini.</div></div>';
+  }
+
+  let r;
+  try { r = spStokesCalc(wtpId, volFinal, areaFinal); }
+  catch(e) { return '<div style="color:#e74c3c;padding:12px;font-size:12px">Error kalkulasi: '+e.message+'</div>'; }
+  if (!r) return '<div style="color:#e74c3c;padding:12px;font-size:12px">Kalkulasi gagal.</div>';
+
+  const cr  = spCriteriaDefault(wtpId);
+  const fS  = (v,dec) => { dec=dec||9; if(!isFinite(v)||v===0)return'0'; if(Math.abs(v)<0.001){const s=v.toFixed(dec).replace(/0+$/,'').replace(/\.$/,'');return s.replace('.',',');}return spFmt(v,Math.min(dec,6));};
+  const qSrc= cr.qMode==='manual'
+    ? '<span style="font-size:10px;background:rgba(231,76,60,0.1);color:#e74c3c;border-radius:3px;padding:1px 5px;margin-left:4px">Manual</span>'
+    : '<span style="font-size:10px;background:rgba(39,174,96,0.1);color:#27ae60;border-radius:3px;padding:1px 5px;margin-left:4px">Otomatis</span>';
+
+  // ── TABEL PARAMETER STOKES (Global) ──────────────────────────
+  const row=(no,label,val,sat,ket,hl)=>'<tr style="'+(hl?'background:rgba(26,127,212,0.07)':'')+'">'+
+    '<td style="padding:6px 10px;text-align:center;color:var(--muted);font-size:11px;border-bottom:1px solid var(--border)">'+no+'</td>'+
+    '<td style="padding:6px 10px;font-size:12px;border-bottom:1px solid var(--border)">'+label+'</td>'+
+    '<td style="padding:6px 10px;text-align:right;font-family:var(--mono);font-size:12px;font-weight:700;color:#1a7fd4;border-bottom:1px solid var(--border)">'+val+'</td>'+
+    '<td style="padding:6px 10px;text-align:center;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border)">'+sat+'</td>'+
+    '<td style="padding:6px 10px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border)">'+ket+'</td></tr>';
+
+  const tbody=[
+    row(1,'Diameter Partikel (D)',fS(r.D,9),'m','D\u00b2 = '+fS(r.D2,14)),
+    row(2,'Berat Jenis Padatan (PP)',spFmt(r.PP,0),'kg/m\u00b3','Input pengguna'),
+    row(3,'Berat Jenis Air (PA)',spFmt(r.PA,0),'kg/m\u00b3','Input pengguna'),
+    row(4,'Viskositas Kinematik (\u03bc)',fS(r.mu,10),'m\u00b2/s','Dari tabel referensi'),
+    row(5,'Gravitasi (g)',spFmt(r.g,1),'m/s\u00b2','Ketetapan'),
+    row(6,'<strong>Kecepatan Pengendapan (Vt)</strong><br><small style="color:var(--muted)">Vt = g \u00d7 D\u00b2 \u00d7 (PP\u2212PA) / (18 \u00d7 \u03bc)</small>',fS(r.Vt,7),'m/detik','= '+spFmt(r.Vt*100,5)+' cm/detik',true),
+    row(7,'<strong>Luas Kolam Min. yang Dibutuhkan</strong><br><small style="color:var(--muted)">A<sub>min</sub> = Q / Vt</small>',spFmt(r.A_pond_min,2),'m\u00b2','Q = '+fS(r.Q,8)+' m\u00b3/detik',true),
+    row(8,'Debit Acuan (Q) '+qSrc,spFmt(r.Qday,2),'m\u00b3/hari','= '+fS(r.Q,8)+' m\u00b3/detik'),
+    row(9,'Volume Kolam Total (V)',spFmt(r.V,2),'m\u00b3','Dari desain kompartemen'),
+    row(10,'Waktu Tinggal Total (td)<br><small style="color:var(--muted)">td = V / Q</small>',spFmt(r.td_hr,2),'jam','= '+spFmt(r.td_day,2)+' hari',true),
+  ].join('');
+
+  // ── TABEL PER KOMPARTEMEN ──────────────────────────────────────
+  const hasMultiple = r.compsCalc && r.compsCalc.length > 0;
+  let perCompHTML = '';
+
+  if (hasMultiple) {
+    const allCompOk = r.compsCalc.every(cc => !cc.valid || cc.ok_th_tv);
+    const bottleneck = r.compsCalc.filter(cc => cc.valid && !cc.ok_th_tv);
+    const headerColor = allCompOk ? '#16a34a' : '#dc2626';
+    const headerBg    = allCompOk ? 'rgba(22,163,74,0.07)' : 'rgba(220,38,38,0.07)';
+    const headerLabel = allCompOk
+      ? '✅ Semua kompartemen memenuhi kriteria th &gt; tv'
+      : '⚠️ '+bottleneck.length+' kompartemen BELUM memenuhi kriteria th &gt; tv';
+
+    const compRows = r.compsCalc.map((cc, i) => {
+      if (!cc.valid) {
+        return '<tr style="background:rgba(0,0,0,0.03)">'+
+          '<td style="padding:8px 10px;font-size:12px;font-weight:600;color:var(--muted)">'+cc.label+'</td>'+
+          '<td colspan="8" style="padding:8px 10px;font-size:11px;color:var(--muted)">— '+cc.note+'</td></tr>';
+      }
+      const ok     = cc.ok_th_tv;
+      const okBg   = ok ? 'rgba(22,163,74,0.06)'  : 'rgba(220,38,38,0.06)';
+      const okColor= ok ? '#16a34a' : '#dc2626';
+      const okIcon = ok ? '✅' : '❌';
+      const ratio  = cc.tv_s > 0 ? cc.th_s / cc.tv_s : 0;
+      const barW   = Math.min(100, ratio * 50);
+      const barColor = ok ? '#16a34a' : ratio > 0.8 ? '#d97706' : '#dc2626';
+      const barHTML = '<div style="display:flex;align-items:center;gap:4px;min-width:80px">'+
+        '<div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden">'+
+        '<div style="height:6px;width:'+barW+'%;background:'+barColor+';border-radius:3px"></div></div>'+
+        '<span style="font-size:10px;color:'+barColor+';font-weight:700">'+spFmt(ratio,2)+'×</span></div>';
+
+      return '<tr style="background:'+okBg+'">'+
+        '<td style="padding:8px 10px;font-size:12px;font-weight:700;color:var(--text)">'+cc.label+'</td>'+
+        '<td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-size:11.5px">'+spFmt(cc.H,2)+'</td>'+
+        '<td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-size:11.5px">'+spFmt(cc.p,2)+'</td>'+
+        '<td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-size:11.5px">'+spFmt(cc.b,2)+'</td>'+
+        '<td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-size:11.5px;color:#6366f1">'+spFmt(cc.tv_min,2)+' mnt</td>'+
+        '<td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-size:11.5px;color:#0891b2">'+spFmt(cc.th_min,2)+' mnt</td>'+
+        '<td style="padding:8px 10px">'+barHTML+'</td>'+
+        '<td style="padding:8px 10px;text-align:center;font-size:14px">'+okIcon+'</td>'+
+        '<td style="padding:8px 10px;font-size:11px;color:'+okColor+';font-weight:600">'+(ok?'Memenuhi':'th < tv — perbesar p atau perkecil b/H')+'</td>'+
+        '</tr>';
+    }).join('');
+
+    perCompHTML = '<div style="margin-bottom:14px">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+      '<div style="font-size:12px;font-weight:700;color:#1a7fd4;text-transform:uppercase;letter-spacing:.04em">🔍 Analisis Per Kompartemen</div>'+
+      '<div style="flex:1;height:1px;background:var(--border)"></div>'+
+      '<span style="font-size:10px;color:var(--muted)">Vt = '+fS(r.Vt,5)+' m/s · Q = '+spFmt(r.Qday,1)+' m\u00b3/hari</span></div>'+
+      '<div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">'+
+      '<div style="padding:9px 12px;background:'+headerBg+';border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:'+headerColor+'">'+headerLabel+'</div>'+
+      '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:700px">'+
+      '<thead><tr style="background:var(--bg-secondary)">'+
+      '<th style="padding:7px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">Kompartemen</th>'+
+      '<th style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">H (m)</th>'+
+      '<th style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">p (m)</th>'+
+      '<th style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">b (m)</th>'+
+      '<th style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:#6366f1;border-bottom:1px solid var(--border)">tv</th>'+
+      '<th style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:#0891b2;border-bottom:1px solid var(--border)">th</th>'+
+      '<th style="padding:7px 10px;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">Rasio th/tv</th>'+
+      '<th style="padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">Status</th>'+
+      '<th style="padding:7px 10px;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">Keterangan</th>'+
+      '</tr></thead><tbody>'+compRows+'</tbody></table></div></div>'+
+      '<div style="margin-top:8px;font-size:11px;color:var(--muted);padding:7px 10px;background:rgba(99,102,241,0.05);border:1px solid rgba(99,102,241,0.15);border-radius:6px">'+
+      '<strong>tv</strong> = waktu partikel mengendap (H/Vt) &nbsp;·&nbsp; <strong>th</strong> = waktu air melintasi kompartemen (p/vh) &nbsp;·&nbsp; <strong>Kriteria: th &gt; tv</strong> tiap kompartemen'+
+      '</div></div>';
+  }
+
+  // ── RINGKASAN KRITERIA GLOBAL ──────────────────────────────────
+  const allOk = r.ok_th_tv && r.ok_td;
+  const allPerCompOk = !hasMultiple || r.compsCalc.every(cc => !cc.valid || cc.ok_th_tv);
+  const checks = [
+    {label:'td \u2265 10 jam — waktu tinggal minimum (Kathuria et al., 1976)',ok:r.ok_td,
+     detail:'td = '+spFmt(r.td_hr,2)+' jam'+(r.ok_td?' \u2265 10 jam \u2713':' < 10 jam \u2717'),
+     rek:r.ok_td?'':'Tambah volume kolam (V) atau kurangi debit Q.'},
+    {label:'A aktual \u2265 A<sub>min</sub> = Q/Vt',
+     ok: areaFinal >= r.A_pond_min && r.A_pond_min > 0,
+     detail:'A aktual = '+spFmt(areaFinal,2)+' m\u00b2 | A min = '+spFmt(r.A_pond_min,2)+' m\u00b2',
+     rek:areaFinal < r.A_pond_min?'Perluas area kolam.':''},
+  ];
+  if (!hasMultiple) {
+    checks.unshift({label:'th &gt; tv — air tinggal cukup lama agar partikel mengendap (nilai representatif)',ok:r.ok_th_tv,
+      detail:'th = '+spFmt(r.th_s,2)+' detik ('+spFmt(r.th_min,2)+' menit) \u2194 tv = '+spFmt(r.tv_s,2)+' detik ('+spFmt(r.tv_min,2)+' menit)'+(r.ok_th_tv?' \u2192 th > tv \u2713':' \u2192 th \u2264 tv \u2717'),
+      rek:r.ok_th_tv?'':'Tambah panjang kolam (p) atau tambah jumlah kompartemen.'});
+  }
+
+  const totalOk = allPerCompOk && r.ok_td && (areaFinal >= r.A_pond_min);
+  const cRows = checks.map(c =>
+    '<div style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);align-items:flex-start">'+
+    '<div style="font-size:18px;line-height:1;flex-shrink:0;padding-top:1px">'+(c.ok?'✅':'❌')+'</div>'+
+    '<div style="flex:1"><div style="font-size:12.5px;font-weight:700;color:var(--text)">'+c.label+'</div>'+
+    '<div style="font-size:11.5px;font-family:var(--mono);color:var(--muted);margin-top:3px">'+c.detail+'</div>'+
+    (c.rek?'<div style="font-size:11.5px;color:#e67e22;margin-top:4px">\ud83d\udca1 '+c.rek+'</div>':'')+'</div></div>'
+  ).join('');
+
+  return '<div style="margin-bottom:14px">'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+    '<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Parameter Stokes Global</div>'+
+    '<div style="flex:1;height:1px;background:var(--border)"></div></div>'+
+    '<div style="overflow-x:auto;margin-bottom:14px">'+
+    '<table style="width:100%;border-collapse:collapse;min-width:560px">'+
+    '<thead><tr style="background:var(--bg-secondary)">'+
+    '<th style="padding:7px 10px;width:36px;text-align:center;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">No</th>'+
+    '<th style="padding:7px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">Parameter</th>'+
+    '<th style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:#1a7fd4;border-bottom:1px solid var(--border)">Nilai</th>'+
+    '<th style="padding:7px 10px;width:80px;text-align:center;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">Satuan</th>'+
+    '<th style="padding:7px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">Keterangan</th>'+
+    '</tr></thead><tbody>'+tbody+'</tbody></table></div></div>'+
+    perCompHTML+
+    '<div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px">'+
+    '<div style="padding:10px 14px;background:'+(totalOk?'rgba(22,163,74,0.08)':'rgba(231,76,60,0.07)')+';border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">'+
+    '<div style="font-weight:700;font-size:13px;color:'+(totalOk?'#16a34a':'#e74c3c')+'">'+(totalOk?'✅ Seluruh kriteria desain TERPENUHI':'⚠️ Ada kriteria desain yang belum terpenuhi')+'</div>'+
+    '<div style="font-size:11px;color:var(--muted)">Kathuria et al. (1976)</div></div>'+
+    cRows+'</div>'+
+    '<div style="background:rgba(26,127,212,0.05);border:1px solid rgba(26,127,212,0.15);border-radius:8px;padding:10px 14px;font-size:11.5px;color:var(--muted);line-height:1.9">'+
+    '<strong style="color:#1a7fd4">Referensi:</strong> Vt = g\u00d7D\u00b2\u00d7(PP\u2212PA)/(18\u00d7\u03bc) &nbsp;|\u00a0 tv = H/Vt &nbsp;|\u00a0 vh = Q/(b\u00d7H) &nbsp;|\u00a0 th = p/vh (per kompartemen) &nbsp;|\u00a0 td = V<sub>total</sub>/Q<br>'+
+    'Kriteria: <strong>th &gt; tv</strong> tiap kompartemen &nbsp;&amp;&nbsp; <strong>td \u2265 10 jam</strong> &nbsp;&amp;&nbsp; <strong>A aktual \u2265 A<sub>min</sub></strong>'+
+    '</div>';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SEDIMENT POND — RINGKASAN DESAIN DIMENSI
+═══════════════════════════════════════════════════════════════ */
+
+function spDesignSummaryHTML(wtpId, totalVol, totalArea, compsRes) {
+  const d = spDesign[wtpId];
+  if (!d || !d.comps || !d.comps.length) {
+    return '<div style="text-align:center;color:var(--muted);font-size:12px;padding:18px;background:var(--bg-secondary);border-radius:8px">Belum ada kompartemen yang didesain.</div>';
+  }
+
+  spSyncDesign(wtpId);
+  const { compsRes: cr2, totalVol: tv2, totalArea: ta2 } = spCalcUnit(wtpId);
+  const cRes  = (compsRes && compsRes.length) ? compsRes : cr2;
+  const tVol  = totalVol  || tv2  || 0;
+  const tArea = totalArea || ta2  || 0;
+
+  // Build Stokes quick-ref (Vt, tv global)
+  const stokes = (() => {
+    try { return spStokesCalc(wtpId, tVol, tArea); } catch(e) { return null; }
+  })();
+
+  const fv = (v, d2) => (v == null || isNaN(v) || v === 0) ? '—' : spFmt(v, d2 != null ? d2 : 2);
+  const fS = (v, dec) => { if (!isFinite(v) || v === 0) return '—'; if (Math.abs(v) < 0.001) return v.toFixed(dec||9).replace(/0+$/, '').replace(/\.$/, '').replace('.', ','); return spFmt(v, Math.min(dec||6, 6)); };
+
+  // ── Tabel kompartemen ─────────────────────────────────────────
+  const compRows = d.comps.map((c, i) => {
+    const r   = cRes[i] || { vol: 0, area: 0 };
+    const cc  = stokes && stokes.compsCalc ? stokes.compsCalc[i] : null;
+    const lbl = (c.name && c.name.trim()) ? c.name.trim() : 'Kompartemen ' + (i + 1);
+    const T   = parseID(c.T) || 0;
+
+    // Dimensi bawah & atas
+    let Pb = 0, Lb = 0, Pt = 0, Lt = 0, Ab = 0, At = 0;
+    if (c.inputMode === 'dims') {
+      Pb = parseID(c.P) || 0; Lb = parseID(c.L) || 0;
+      Pt = parseID(c.Patas) || Pb; Lt = parseID(c.Latas) || Lb;
+      Ab = Pb * Lb; At = Pt * Lt;
+    } else if (c.shape === 'frustum') {
+      Ab = parseID(c.Abawah) || 0; At = parseID(c.Aatas) || Ab;
+      Pb = Ab > 0 ? Math.sqrt(Ab) : 0; Lb = Pb;
+      Pt = At > 0 ? Math.sqrt(At) : 0; Lt = Pt;
+    } else {
+      Ab = At = parseID(c.Amanual) || 0;
+      Pb = Lb = Pt = Lt = Ab > 0 ? Math.sqrt(Ab) : 0;
+    }
+
+    const isFrustum = c.shape === 'frustum' && c.inputMode !== 'area';
+    const isDims    = c.inputMode === 'dims';
+    const shapeLabel = c.shape === 'cube' ? 'Kubus' : 'Frustum';
+
+    // Slope angle jika frustum + dims
+    let slopeHTML = '—';
+    if (c.shape === 'frustum' && T > 0 && Pb > 0 && Pt > Pb) {
+      const dP  = (Pt - Pb) / 2;
+      const angD = Math.atan2(dP, T) * 180 / Math.PI;
+      slopeHTML = spFmt(angD, 1) + '°';
+    }
+
+    const okIcon = cc ? (cc.ok_th_tv ? '<span style="color:#16a34a;font-weight:700">✓</span>' : '<span style="color:#dc2626;font-weight:700">✗</span>') : '—';
+
+    const cellStyle  = 'padding:8px 10px;font-size:12px;border-bottom:1px solid var(--border)';
+    const numStyle   = cellStyle + ';text-align:right;font-family:var(--mono)';
+    const hlStyle    = numStyle  + ';color:#1a7fd4;font-weight:700';
+    const greenStyle = numStyle  + ';color:#16a34a;font-weight:700';
+    const rowBg      = i % 2 === 0 ? '' : 'background:rgba(0,0,0,0.025)';
+
+    return '<tr style="' + rowBg + '">' +
+      '<td style="' + cellStyle + ';font-weight:700;color:#0f766e">' + (i+1) + '</td>' +
+      '<td style="' + cellStyle + ';font-weight:600">' + lbl + '</td>' +
+      '<td style="' + cellStyle + ';text-align:center;font-size:11px;color:var(--muted)">' + shapeLabel + '</td>' +
+      // Bawah
+      '<td style="' + numStyle + '">' + fv(Pb) + '</td>' +
+      '<td style="' + numStyle + '">' + fv(Lb) + '</td>' +
+      // Atas
+      '<td style="' + numStyle + ';color:#0891b2">' + (c.shape !== 'cube' && c.inputMode === 'dims' ? fv(Pt) : fv(Pt)) + '</td>' +
+      '<td style="' + numStyle + ';color:#0891b2">' + (c.shape !== 'cube' && c.inputMode === 'dims' ? fv(Lt) : fv(Lt)) + '</td>' +
+      // Tinggi
+      '<td style="' + numStyle + ';color:#9333ea">' + fv(T) + '</td>' +
+      // Slope
+      '<td style="' + cellStyle + ';text-align:center;font-size:11.5px;color:#d97706">' + slopeHTML + '</td>' +
+      // Luas & Volume
+      '<td style="' + numStyle + ';color:#27ae60">' + fv(r.area) + '</td>' +
+      '<td style="' + hlStyle + '">' + fv(r.vol) + '</td>' +
+      // Status Stokes
+      '<td style="' + cellStyle + ';text-align:center;font-size:14px">' + okIcon + '</td>' +
+      '</tr>';
+  });
+
+  // ── Baris total ───────────────────────────────────────────────
+  const totalRow = '<tr style="background:rgba(15,118,110,0.08)">' +
+    '<td colspan="3" style="padding:8px 10px;font-size:12px;font-weight:700;border-top:2px solid rgba(15,118,110,0.3);color:#0f766e">TOTAL</td>' +
+    '<td colspan="6" style="padding:8px 10px;border-top:2px solid rgba(15,118,110,0.3)"></td>' +
+    '<td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-size:12px;font-weight:700;color:#27ae60;border-top:2px solid rgba(15,118,110,0.3)">' + fv(tArea) + '</td>' +
+    '<td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-size:13px;font-weight:700;color:#1a7fd4;border-top:2px solid rgba(15,118,110,0.3)">' + fv(tVol) + '</td>' +
+    '<td style="padding:8px 10px;border-top:2px solid rgba(15,118,110,0.3)"></td>' +
+    '</tr>';
+
+  // ── Panel ringkasan numerik ───────────────────────────────────
+  const n = d.comps.length;
+  const Qday = stokes ? stokes.Qday : spCriteriaGetQ(wtpId);
+  const td_hr = (stokes && stokes.td_hr) ? stokes.td_hr : (Qday > 0 ? tVol / (Qday / 24) : 0);
+  const sf    = parseID(document.getElementById('sp-sf')?.value) || 1.5;
+  const { groups } = _getWTPData();
+  const g_ = groups.find(x => x.id === wtpId);
+  const qNeto = g_ ? g_.totalNeto : 0;
+  const vMin  = qNeto * sf;
+  const vOk   = tVol >= vMin && vMin > 0;
+  const tdOk  = td_hr >= 10;
+
+  const statPill = (ok, label) =>
+    '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;' +
+    (ok ? 'background:rgba(22,163,74,0.12);color:#16a34a' : 'background:rgba(220,38,38,0.1);color:#dc2626') +
+    '">' + (ok ? '✅' : '❌') + ' ' + label + '</span>';
+
+  const statsHTML =
+    '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">' +
+      _spSumCard('Jumlah Kompartemen', n + ' buah', '#0f766e') +
+      _spSumCard('Volume Total', fv(tVol) + ' m³', '#1a7fd4') +
+      _spSumCard('Luas Total', fv(tArea) + ' m²', '#27ae60') +
+      _spSumCard('td (Waktu Tinggal)', fv(td_hr, 1) + ' jam', tdOk ? '#16a34a' : '#dc2626') +
+      _spSumCard('V min (SF=' + sf + ')', fv(vMin) + ' m³', vOk ? '#16a34a' : '#dc2626') +
+    '</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">' +
+      statPill(vOk, 'Volume ' + (vOk ? 'Cukup ≥ V min' : 'Kurang < V min')) +
+      statPill(tdOk, 'td ' + (tdOk ? '≥ 10 jam ✓' : '< 10 jam')) +
+      (stokes && stokes.compsCalc.length > 0
+        ? statPill(stokes.compsCalc.every(cc => !cc.valid || cc.ok_th_tv), 'Kriteria th > tv ' + (stokes.compsCalc.every(cc => !cc.valid || cc.ok_th_tv) ? 'Semua Terpenuhi' : 'Ada yang Gagal'))
+        : '') +
+    '</div>';
+
+  return statsHTML +
+    '<div style="overflow-x:auto">' +
+    '<table style="width:100%;border-collapse:collapse;min-width:820px;font-size:12px">' +
+    '<thead>' +
+    '<tr style="background:rgba(15,118,110,0.08)">' +
+    '<th colspan="3" style="padding:7px 10px;text-align:left;font-size:10px;font-weight:700;color:#0f766e;border-bottom:1px solid var(--border);letter-spacing:.04em">KOMPARTEMEN</th>' +
+    '<th colspan="2" style="padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);border-left:1px solid var(--border);letter-spacing:.04em">DIMENSI BAWAH</th>' +
+    '<th colspan="2" style="padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:#0891b2;border-bottom:1px solid var(--border);border-left:1px solid var(--border);letter-spacing:.04em">DIMENSI ATAS</th>' +
+    '<th colspan="2" style="padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:#9333ea;border-bottom:1px solid var(--border);border-left:1px solid var(--border);letter-spacing:.04em">KEDALAMAN</th>' +
+    '<th colspan="2" style="padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:#27ae60;border-bottom:1px solid var(--border);border-left:1px solid var(--border);letter-spacing:.04em">KAPASITAS</th>' +
+    '<th style="padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);border-left:1px solid var(--border)">STOKES</th>' +
+    '</tr>' +
+    '<tr style="background:var(--bg-secondary)">' +
+    '<th style="padding:6px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">#</th>' +
+    '<th style="padding:6px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">Nama</th>' +
+    '<th style="padding:6px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">Bentuk</th>' +
+    '<th style="padding:6px 10px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);border-left:1px solid var(--border)">P bawah (m)</th>' +
+    '<th style="padding:6px 10px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">L bawah (m)</th>' +
+    '<th style="padding:6px 10px;text-align:right;font-size:10px;font-weight:700;color:#0891b2;border-bottom:1px solid var(--border);border-left:1px solid var(--border)">P atas (m)</th>' +
+    '<th style="padding:6px 10px;text-align:right;font-size:10px;font-weight:700;color:#0891b2;border-bottom:1px solid var(--border)">L atas (m)</th>' +
+    '<th style="padding:6px 10px;text-align:right;font-size:10px;font-weight:700;color:#9333ea;border-bottom:1px solid var(--border);border-left:1px solid var(--border)">T (m)</th>' +
+    '<th style="padding:6px 10px;text-align:center;font-size:10px;font-weight:700;color:#d97706;border-bottom:1px solid var(--border)">Slope</th>' +
+    '<th style="padding:6px 10px;text-align:right;font-size:10px;font-weight:700;color:#27ae60;border-bottom:1px solid var(--border);border-left:1px solid var(--border)">Luas (m²)</th>' +
+    '<th style="padding:6px 10px;text-align:right;font-size:10px;font-weight:700;color:#1a7fd4;border-bottom:1px solid var(--border)">Volume (m³)</th>' +
+    '<th style="padding:6px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);border-left:1px solid var(--border)">th>tv</th>' +
+    '</tr>' +
+    '</thead>' +
+    '<tbody>' + compRows.join('') + totalRow + '</tbody>' +
+    '</table></div>' +
+    '<div style="margin-top:8px;font-size:11px;color:var(--muted);padding:7px 10px;background:rgba(15,118,110,0.04);border:1px solid rgba(15,118,110,0.2);border-radius:6px;line-height:1.8">' +
+    '<strong>P/L bawah</strong> = dimensi dasar kolam &nbsp;·&nbsp; <strong>P/L atas</strong> = dimensi permukaan air (digunakan untuk uji Stokes) &nbsp;·&nbsp; ' +
+    '<strong>Slope</strong> = sudut kemiringan dinding terhadap vertikal &nbsp;·&nbsp; <strong>th>tv</strong> = uji kriteria Stokes per kompartemen' +
+    '</div>';
+}
+
+// Helper: stat card mini
+function _spSumCard(label, val, color) {
+  return '<div style="flex:1;min-width:120px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-secondary)">' +
+    '<div style="font-size:10px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em">' + label + '</div>' +
+    '<div style="font-family:var(--mono);font-size:14px;font-weight:700;color:' + color + '">' + val + '</div>' +
+    '</div>';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SEDIMENT POND — KEBUTUHAN BAHAN KIMIA (KAPUR & PAC)
+═══════════════════════════════════════════════════════════════ */
+
+if (typeof spChem === 'undefined') var spChem = {};
+
+function spChemDefault(wtpId) {
+  if (!spChem[wtpId]) {
+    spChem[wtpId] = {
+      qMode:      'auto',   // 'auto' | 'manual'
+      qManual:    '',       // Q manual (m³/hari) format ID
+      kapurMode:  'auto',
+      kapurDosis: '0,31',
+      pacMode:    'auto',
+      pacDosis:   '0,2',
+    };
+  }
+  return spChem[wtpId];
+}
+
+function spChemSync(wtpId) {
+  const ch = spChemDefault(wtpId);
+  ['kapurDosis','pacDosis','qManual'].forEach(f => {
+    const el = document.getElementById(`spc-chem-${f}-${wtpId}`) ||
+               document.getElementById(`spc-chem-${f.replace('Dosis','Dosis')}-${wtpId}`);
+    if (el) ch[f] = el.value;
+  });
+  // Baca qManual khusus
+  const qEl = document.getElementById(`spc-chem-qManual-${wtpId}`);
+  if (qEl) ch.qManual = qEl.value;
+  const kEl = document.getElementById(`spc-chem-kapurDosis-${wtpId}`);
+  if (kEl) ch.kapurDosis = kEl.value;
+  const pEl = document.getElementById(`spc-chem-pacDosis-${wtpId}`);
+  if (pEl) ch.pacDosis = pEl.value;
+  spChemUpdate(wtpId);
+}
+
+function spChemSetQMode(wtpId, mode) {
+  const ch = spChemDefault(wtpId);
+  ch.qMode = mode;
+  const autoW   = document.getElementById(`spc-chem-q-auto-${wtpId}`);
+  const inpW    = document.getElementById(`spc-chem-q-inp-${wtpId}`);
+  if (autoW) autoW.style.display = mode==='auto'   ? '' : 'none';
+  if (inpW)  inpW.style.display  = mode==='manual' ? '' : 'none';
+  const bB  = 'padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;border-radius:5px;border:1px solid';
+  const bAct   = `${bB} #1a7fd4;background:#1a7fd4;color:#fff`;
+  const bInact = `${bB} var(--border);background:var(--bg-secondary);color:var(--text)`;
+  const bA = document.getElementById(`spc-chem-q-bauto-${wtpId}`);
+  const bM = document.getElementById(`spc-chem-q-bmanual-${wtpId}`);
+  if (bA) bA.style.cssText = mode==='auto'   ? bAct : bInact;
+  if (bM) bM.style.cssText = mode==='manual' ? bAct : bInact;
+  spChemUpdate(wtpId);
+}
+
+function spChemSetMode(wtpId, bahan, mode) {
+  const ch = spChemDefault(wtpId);
+  ch[bahan+'Mode'] = mode;
+
+  const inpWrap = document.getElementById(`spc-chem-${bahan}-inp-${wtpId}`);
+  const autoWrap = document.getElementById(`spc-chem-${bahan}-auto-${wtpId}`);
+  if (inpWrap)  inpWrap.style.display  = mode === 'manual' ? '' : 'none';
+  if (autoWrap) autoWrap.style.display = mode === 'auto'   ? '' : 'none';
+
+  // Update tombol style
+  const bB = 'padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;border-radius:5px;border:1px solid';
+  const bAct   = `${bB} #d97706;background:#d97706;color:#fff`;
+  const bInact = `${bB} var(--border);background:var(--bg-secondary);color:var(--text)`;
+  const btnAuto   = document.getElementById(`spc-chem-${bahan}-bauto-${wtpId}`);
+  const btnManual = document.getElementById(`spc-chem-${bahan}-bmanual-${wtpId}`);
+  if (btnAuto)   btnAuto.style.cssText   = mode==='auto'   ? bAct : bInact;
+  if (btnManual) btnManual.style.cssText = mode==='manual' ? bAct : bInact;
+
+  spChemUpdate(wtpId);
+}
+
+function spChemUpdate(wtpId) {
+  const el = document.getElementById(`spc-chem-result-${wtpId}`);
+  if (el) el.innerHTML = spChemResultHTML(wtpId);
+}
+
+function spChemHTML(wtpId) {
+  const ch  = spChemDefault(wtpId);
+  const iS  = `width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:5px;background:var(--bg-secondary);color:var(--text);font-family:var(--mono);font-size:12px`;
+  const bB  = 'padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;border-radius:5px;border:1px solid';
+  const bAct   = `${bB} #d97706;background:#d97706;color:#fff`;
+  const bInact = `${bB} var(--border);background:var(--bg-secondary);color:var(--text)`;
+
+  // Q auto value
+  const { groups } = _getWTPData();
+  const g_ = groups.find(x => x.id === wtpId);
+  const qAuto = g_ ? g_.totalNeto : 0;
+  const isQM  = ch.qMode === 'manual';
+
+  const bahanBlock = (bahan, label, satuanLabel, defaultDosis, warna) => {
+    const isM = ch[bahan+'Mode'] === 'manual';
+    const dosis = ch[bahan+'Dosis'] || defaultDosis;
+    return `
+    <div style="flex:1;min-width:220px;padding:12px 14px;border:1px solid var(--border);border-radius:8px;background:rgba(${warna},0.04)">
+      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px">${label}</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button id="spc-chem-${bahan}-bauto-${wtpId}"   style="${isM?bInact:bAct}" onclick="spChemSetMode(${wtpId},'${bahan}','auto')">⟳ Default</button>
+        <button id="spc-chem-${bahan}-bmanual-${wtpId}" style="${isM?bAct:bInact}" onclick="spChemSetMode(${wtpId},'${bahan}','manual')">✎ Manual</button>
+      </div>
+      <div id="spc-chem-${bahan}-auto-${wtpId}" style="display:${isM?'none':''}">
+        <div style="padding:6px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:5px;font-family:var(--mono);font-size:12px;color:var(--muted)">
+          ${defaultDosis} ${satuanLabel} <span style="font-size:10px">(nilai default referensi)</span>
+        </div>
+      </div>
+      <div id="spc-chem-${bahan}-inp-${wtpId}" style="display:${isM?'':'none'}">
+        <input id="spc-chem-${bahan}Dosis-${wtpId}" type="text" inputmode="decimal"
+          value="${dosis}" placeholder="${defaultDosis}"
+          style="${iS}" oninput="spChemSync(${wtpId})">
+        <div style="font-size:10.5px;color:var(--muted);margin-top:3px">${satuanLabel}</div>
+      </div>
+    </div>`;
+  };
+
+  return `
+  <!-- Sumber Debit Q -->
+  <div style="margin-bottom:12px;padding:10px 12px;background:rgba(26,127,212,0.05);border:1px solid rgba(26,127,212,0.2);border-radius:8px">
+    <div style="font-size:11px;font-weight:700;color:#1a7fd4;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Debit Air Limbah (Q)</div>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <button id="spc-chem-q-bauto-${wtpId}"   style="${isQM?bInact:bAct.replace('#d97706','#1a7fd4').replace('#d97706','#1a7fd4')}" onclick="spChemSetQMode(${wtpId},'auto')">⟳ Q Neto dari Runoff</button>
+      <button id="spc-chem-q-bmanual-${wtpId}" style="${isQM?bAct.replace('#d97706','#1a7fd4').replace('#d97706','#1a7fd4'):bInact}" onclick="spChemSetQMode(${wtpId},'manual')">✎ Input Manual</button>
+    </div>
+    <div id="spc-chem-q-auto-${wtpId}" style="display:${isQM?'none':''}">
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:5px">
+        <span style="font-size:11px;color:var(--muted)">Q neto WTP ini:</span>
+        <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:#1a7fd4">${spFmt(qAuto,2)} m³/hari</span>
+      </div>
+    </div>
+    <div id="spc-chem-q-inp-${wtpId}" style="display:${isQM?'':'none'}">
+      <input id="spc-chem-qManual-${wtpId}" type="text" inputmode="decimal"
+        value="${ch.qManual||''}" placeholder="Contoh: 50.000,00"
+        style="${iS}" oninput="spChemSync(${wtpId})">
+      <div style="font-size:10.5px;color:var(--muted);margin-top:3px">m³/hari — format Indonesia (titik ribuan, koma desimal)</div>
+    </div>
+  </div>
+
+  <!-- Dosis bahan kimia -->
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+    ${bahanBlock('kapur','Kapur / Ca(OH)₂','kg Kapur / m³ air limbah','0,31','180,120,60')}
+    ${bahanBlock('pac','PAC (Poly Aluminium Chloride)','kg PAC / m³ air limbah','0,2','39,174,96')}
+  </div>
+  <div id="spc-chem-result-${wtpId}">${spChemResultHTML(wtpId)}</div>`;
+}
+
+function spChemResultHTML(wtpId) {
+  const ch = spChemDefault(wtpId);
+
+  // Ambil Q sesuai mode
+  let Q = 0;
+  if (ch.qMode === 'manual') {
+    Q = parseID(ch.qManual) || 0;
+  } else {
+    const { groups } = _getWTPData();
+    const g = groups.find(x => x.id === wtpId);
+    Q = g ? g.totalNeto : 0;
+  }
+  const qLabel = ch.qMode === 'manual'
+    ? `<span style="font-size:10px;background:rgba(231,76,60,0.1);color:#e74c3c;border-radius:3px;padding:1px 5px;margin-left:4px">Manual</span>`
+    : `<span style="font-size:10px;background:rgba(26,127,212,0.1);color:#1a7fd4;border-radius:3px;padding:1px 5px;margin-left:4px">Q Neto</span>`;
+
+  const kapurDosis = parseID(ch.kapurMode==='manual' ? ch.kapurDosis : '0,31') || 0.31;
+  const pacDosis   = parseID(ch.pacMode==='manual'   ? ch.pacDosis   : '0,2')  || 0.2;
+
+  const kapurPerHari  = Q * kapurDosis;
+  const pacPerHari    = Q * pacDosis;
+  const kapurPerBulan = kapurPerHari * 30;
+  const pacPerBulan   = pacPerHari   * 30;
+  const kapurPerTahun = kapurPerHari * 365;
+  const pacPerTahun   = pacPerHari   * 365;
+
+  if (!Q) {
+    return `<div style="text-align:center;color:var(--muted);font-size:12px;padding:14px;background:var(--bg-secondary);border-radius:8px">
+      ${ch.qMode==='manual' ? 'Masukkan nilai Q manual di atas.' : 'Data Q neto belum tersedia. Lengkapi menu Runoff Contact Water terlebih dahulu.'}
+    </div>`;
+  }
+
+  const row = (label, kapur, pac, bold) => `
+    <tr style="${bold?'background:rgba(245,166,35,0.08)':''}">
+      <td style="padding:7px 12px;font-size:12.5px;${bold?'font-weight:700':''}">${label}</td>
+      <td style="padding:7px 12px;text-align:right;font-family:var(--mono);font-size:12.5px;color:#d97706;${bold?'font-weight:700':''}">${kapur}</td>
+      <td style="padding:7px 12px;text-align:right;font-family:var(--mono);font-size:12.5px;color:#27ae60;${bold?'font-weight:700':''}">${pac}</td>
+    </tr>`;
+
+  return `
+  <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:var(--bg-secondary)">
+          <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)">Parameter</th>
+          <th style="padding:8px 12px;text-align:right;font-size:10px;font-weight:700;color:#d97706;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)">⬡ Kapur (kg)</th>
+          <th style="padding:8px 12px;text-align:right;font-size:10px;font-weight:700;color:#27ae60;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)">⬡ PAC (kg)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding:7px 12px;font-size:12.5px">Q Air Limbah ${qLabel}</td>
+            <td colspan="2" style="padding:7px 12px;text-align:right;font-family:var(--mono);font-size:12.5px;font-weight:700;color:#1a7fd4">${spFmt(Q,2)} m³/hari</td></tr>
+        ${row('Dosis',                             spFmt(kapurDosis,2)+' kg/m³', spFmt(pacDosis,2)+' kg/m³')}
+        <tr><td colspan="3" style="padding:0;border-top:1px solid var(--border)"></td></tr>
+        ${row('Kebutuhan per Hari',                spFmt(kapurPerHari,2)+' kg',  spFmt(pacPerHari,2)+' kg',   true)}
+        ${row('Kebutuhan per Bulan (30 hari)',      spFmt(kapurPerBulan,2)+' kg', spFmt(pacPerBulan,2)+' kg')}
+        ${row('Kebutuhan per Tahun (365 hari)',     spFmt(kapurPerTahun,2)+' kg', spFmt(pacPerTahun,2)+' kg')}
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.7;padding:8px 12px;background:rgba(245,166,35,0.05);border:1px solid rgba(245,166,35,0.2);border-radius:6px">
+    Dosis default: Kapur <strong>0,31 kg/m³</strong> · PAC <strong>0,20 kg/m³</strong> air limbah.<br>
+    Nilai aktual dapat berbeda tergantung karakteristik air (pH, turbiditas, alkalinitas) — lakukan jar test untuk verifikasi.
+  </div>`;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SEDIMENT POND — PERIODE PENGURASAN LUMPUR
+   i.   Massa TSS = TSS removal (mg/L) × Q (L/hari) / 1e6  → kg/hari
+   ii.  Volume lumpur = Massa TSS / rho_lumpur  → m3/hari
+        rho default = 1,08 kg/L
+   iii. Periode = (Vol Kolam × kapasitas%) / Vol lumpur harian
+═══════════════════════════════════════════════════════════════ */
+
+if (typeof spSludge === 'undefined') var spSludge = {};
+
+const SP_RHO_TABLE = [
+  { label: 'Lumpur cair / encer (limpasan tambang umum)',  rho: 1.08, note: 'Standar umum praktik tambang Indonesia' },
+  { label: 'Lumpur sedikit padat',                         rho: 1.15, note: 'TSS lebih tinggi, banyak partikel halus' },
+  { label: 'Lumpur pasir (kandungan pasir dominan)',        rho: 1.30, note: 'Material kasar, cepat mengendap' },
+  { label: 'Lumpur padat / kental',                        rho: 1.50, note: 'Sudah terkonsolidasi sebagian' },
+];
+
+function spSludgeDefault(wtpId) {
+  if (!spSludge[wtpId]) {
+    spSludge[wtpId] = {
+      tssInlet:    '',
+      removalMode: 'pct',
+      removalPct:  '80',
+      tssOutlet:   '',
+      qMode:       'auto',
+      qManual:     '',
+      rhoMode:     'ref',
+      rhoRef:      0,
+      rhoManual:   '1,08',
+      kapasitas:   '20',
+    };
+  }
+  return spSludge[wtpId];
+}
+
+function spSludgeSync(wtpId) {
+  const sl = spSludgeDefault(wtpId);
+  ['tssInlet','removalPct','tssOutlet','qManual','rhoManual','kapasitas'].forEach(f => {
+    const el = document.getElementById('sps-'+f+'-'+wtpId);
+    if (el) sl[f] = el.value;
+  });
+  spSludgeUpdate(wtpId);
+}
+
+function spSludgeSetRemovalMode(wtpId, mode) {
+  const sl = spSludgeDefault(wtpId);
+  sl.removalMode = mode;
+  const pctW = document.getElementById('sps-pct-wrap-'+wtpId);
+  const outW = document.getElementById('sps-out-wrap-'+wtpId);
+  const outRes = document.getElementById('sps-outlet-result-'+wtpId);
+  if (pctW)   pctW.style.display   = mode==='pct'    ? '' : 'none';
+  if (outW)   outW.style.display   = mode==='outlet' ? '' : 'none';
+  if (outRes) outRes.style.display = mode==='pct'    ? '' : 'none';
+  const bB = 'padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;border-radius:5px;border:1px solid';
+  const bAct   = bB+' #7c3aed;background:#7c3aed;color:#fff';
+  const bInact = bB+' var(--border);background:var(--bg-secondary);color:var(--text)';
+  const bP = document.getElementById('sps-bpct-'+wtpId);
+  const bO = document.getElementById('sps-bout-'+wtpId);
+  if (bP) bP.style.cssText = mode==='pct'    ? bAct : bInact;
+  if (bO) bO.style.cssText = mode==='outlet' ? bAct : bInact;
+  spSludgeUpdate(wtpId);
+}
+
+function spSludgeSetQMode(wtpId, mode) {
+  const sl = spSludgeDefault(wtpId);
+  sl.qMode = mode;
+  const autoW = document.getElementById('sps-q-auto-'+wtpId);
+  const inpW  = document.getElementById('sps-q-inp-'+wtpId);
+  if (autoW) autoW.style.display = mode==='auto'   ? '' : 'none';
+  if (inpW)  inpW.style.display  = mode==='manual' ? '' : 'none';
+  const bB = 'padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;border-radius:5px;border:1px solid';
+  const bAct   = bB+' #7c3aed;background:#7c3aed;color:#fff';
+  const bInact = bB+' var(--border);background:var(--bg-secondary);color:var(--text)';
+  const bA = document.getElementById('sps-q-bauto-'+wtpId);
+  const bM = document.getElementById('sps-q-bmanual-'+wtpId);
+  if (bA) bA.style.cssText = mode==='auto'   ? bAct : bInact;
+  if (bM) bM.style.cssText = mode==='manual' ? bAct : bInact;
+  spSludgeUpdate(wtpId);
+}
+
+function spSludgeSetRhoMode(wtpId, mode) {
+  const sl = spSludgeDefault(wtpId);
+  sl.rhoMode = mode;
+  const refW = document.getElementById('sps-rho-ref-wrap-'+wtpId);
+  const manW = document.getElementById('sps-rho-man-wrap-'+wtpId);
+  if (refW) refW.style.display = mode==='ref'    ? '' : 'none';
+  if (manW) manW.style.display = mode==='manual' ? '' : 'none';
+  const bB = 'padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;border-radius:5px;border:1px solid';
+  const bAct   = bB+' #7c3aed;background:#7c3aed;color:#fff';
+  const bInact = bB+' var(--border);background:var(--bg-secondary);color:var(--text)';
+  const bR = document.getElementById('sps-rho-bref-'+wtpId);
+  const bM2 = document.getElementById('sps-rho-bman-'+wtpId);
+  if (bR)  bR.style.cssText  = mode==='ref'    ? bAct : bInact;
+  if (bM2) bM2.style.cssText = mode==='manual' ? bAct : bInact;
+  spSludgeUpdate(wtpId);
+}
+
+function spSludgeSetRhoRef(wtpId, idx) {
+  const sl = spSludgeDefault(wtpId);
+  sl.rhoRef = idx;
+  const ref = SP_RHO_TABLE[idx];
+  if (ref) {
+    const noteEl = document.getElementById('sps-rho-note-'+wtpId);
+    if (noteEl) noteEl.textContent = ref.note;
+    const valEl = document.getElementById('sps-rho-val-'+wtpId);
+    if (valEl) valEl.textContent = ref.rho.toFixed(2).replace('.',',') + ' kg/L';
+  }
+  spSludgeUpdate(wtpId);
+}
+
+function spSludgeGetRho(wtpId) {
+  const sl = spSludgeDefault(wtpId);
+  if (sl.rhoMode === 'manual') return parseID(sl.rhoManual) || 1.08;
+  const ref = SP_RHO_TABLE[sl.rhoRef || 0];
+  return ref ? ref.rho : 1.08;
+}
+
+function spSludgeGetQ(wtpId) {
+  const sl = spSludgeDefault(wtpId);
+  if (sl.qMode === 'manual') return parseID(sl.qManual) || 0;
+  const { groups } = _getWTPData();
+  const g = groups.find(x => x.id === wtpId);
+  return g ? g.totalNeto : 0;
+}
+
+function spSludgeUpdate(wtpId) {
+  const el = document.getElementById('sps-result-'+wtpId);
+  if (el) el.innerHTML = spSludgeResultHTML(wtpId);
+  const sl = spSludgeDefault(wtpId);
+  if (sl.removalMode === 'pct') {
+    const tssIn  = parseID(sl.tssInlet) || 0;
+    const pct    = parseID(sl.removalPct) || 0;
+    const tssOut = tssIn * (1 - pct/100);
+    const outEl  = document.getElementById('sps-outlet-result-'+wtpId);
+    if (outEl) outEl.textContent = tssIn > 0
+      ? 'TSS Outlet = ' + spFmt(tssOut,2) + ' mg/L'
+      : '—';
+  }
+}
+
+function spSludgeHTML(wtpId) {
+  const sl = spSludgeDefault(wtpId);
+  const iS  = 'width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:5px;background:var(--bg-secondary);color:var(--text);font-family:var(--mono);font-size:12px';
+  const bB  = 'padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;border-radius:5px;border:1px solid';
+  const bAct   = bB+' #7c3aed;background:#7c3aed;color:#fff';
+  const bInact = bB+' var(--border);background:var(--bg-secondary);color:var(--text)';
+
+  const { groups } = _getWTPData();
+  const g_ = groups.find(x => x.id === wtpId);
+  const qAuto = g_ ? g_.totalNeto : 0;
+  const isQM     = sl.qMode === 'manual';
+  const isPct    = sl.removalMode === 'pct';
+  const isRhoMan = sl.rhoMode === 'manual';
+
+  const tssIn  = parseID(sl.tssInlet) || 0;
+  const remPct = parseID(sl.removalPct) || 0;
+  const tssOutCalc = tssIn * (1 - remPct/100);
+
+  const selRhoRef = SP_RHO_TABLE[sl.rhoRef || 0];
+  const rhoOptions = SP_RHO_TABLE.map((r,i) =>
+    '<option value="'+i+'"'+(sl.rhoRef==i?' selected':'')+'>'+r.label+' — ρ = '+r.rho.toFixed(2)+' kg/L</option>'
+  ).join('');
+
+  const secStyle = 'margin-bottom:12px;padding:10px 12px;background:rgba(139,92,246,0.04);border:1px solid rgba(139,92,246,0.2);border-radius:8px';
+  const hdrStyle = 'font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em';
+
+  return `
+  <div style="${secStyle}">
+    <div style="${hdrStyle}">① Konsentrasi TSS</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+      <div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">TSS Inlet (mg/L)</div>
+        <input id="sps-tssInlet-${wtpId}" type="text" inputmode="decimal"
+          value="${sl.tssInlet}" placeholder="Contoh: 250"
+          style="${iS}" oninput="spSludgeSync(${wtpId})">
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Mode Removal</div>
+        <div style="display:flex;gap:5px">
+          <button id="sps-bpct-${wtpId}"  style="${isPct?bAct:bInact}" onclick="spSludgeSetRemovalMode(${wtpId},'pct')">% Removal</button>
+          <button id="sps-bout-${wtpId}"  style="${isPct?bInact:bAct}" onclick="spSludgeSetRemovalMode(${wtpId},'outlet')">TSS Outlet</button>
+        </div>
+      </div>
+    </div>
+    <div id="sps-pct-wrap-${wtpId}" style="display:${isPct?'':'none'}">
+      <div style="display:flex;align-items:center;gap:8px">
+        <input id="sps-removalPct-${wtpId}" type="text" inputmode="decimal"
+          value="${sl.removalPct}" placeholder="80"
+          style="${iS};max-width:100px" oninput="spSludgeSync(${wtpId})">
+        <span style="font-size:12px;color:var(--muted)">% removal</span>
+        <span id="sps-outlet-result-${wtpId}" style="font-size:11.5px;color:#7c3aed;font-weight:600;padding:3px 8px;background:rgba(139,92,246,0.1);border-radius:4px">
+          ${tssIn > 0 ? 'TSS Outlet = '+spFmt(tssOutCalc,2)+' mg/L' : '—'}
+        </span>
+      </div>
+    </div>
+    <div id="sps-out-wrap-${wtpId}" style="display:${isPct?'none':''}">
+      <div style="display:flex;align-items:center;gap:8px">
+        <input id="sps-tssOutlet-${wtpId}" type="text" inputmode="decimal"
+          value="${sl.tssOutlet}" placeholder="Contoh: 50"
+          style="${iS};max-width:160px" oninput="spSludgeSync(${wtpId})">
+        <span style="font-size:12px;color:var(--muted)">mg/L TSS outlet</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="${secStyle}">
+    <div style="${hdrStyle}">② Debit Air Limbah (Q)</div>
+    <div style="display:flex;gap:5px;margin-bottom:8px">
+      <button id="sps-q-bauto-${wtpId}"   style="${isQM?bInact:bAct}" onclick="spSludgeSetQMode(${wtpId},'auto')">⟳ Q Neto dari Runoff</button>
+      <button id="sps-q-bmanual-${wtpId}" style="${isQM?bAct:bInact}" onclick="spSludgeSetQMode(${wtpId},'manual')">✎ Input Manual</button>
+    </div>
+    <div id="sps-q-auto-${wtpId}" style="display:${isQM?'none':''}">
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:5px">
+        <span style="font-size:11px;color:var(--muted)">Q neto WTP ini:</span>
+        <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:#7c3aed">${spFmt(qAuto,2)} m³/hari</span>
+      </div>
+    </div>
+    <div id="sps-q-inp-${wtpId}" style="display:${isQM?'':'none'}">
+      <input id="sps-qManual-${wtpId}" type="text" inputmode="decimal"
+        value="${sl.qManual||''}" placeholder="Contoh: 50.000,00"
+        style="${iS}" oninput="spSludgeSync(${wtpId})">
+      <div style="font-size:10.5px;color:var(--muted);margin-top:3px">m³/hari</div>
+    </div>
+  </div>
+
+  <div style="${secStyle}">
+    <div style="${hdrStyle}">③ Massa Jenis Lumpur (ρ)</div>
+    <div style="display:flex;gap:5px;margin-bottom:8px">
+      <button id="sps-rho-bref-${wtpId}"  style="${isRhoMan?bInact:bAct}" onclick="spSludgeSetRhoMode(${wtpId},'ref')">📚 Referensi</button>
+      <button id="sps-rho-bman-${wtpId}"  style="${isRhoMan?bAct:bInact}" onclick="spSludgeSetRhoMode(${wtpId},'manual')">✎ Manual</button>
+    </div>
+    <div id="sps-rho-ref-wrap-${wtpId}" style="display:${isRhoMan?'none':''}">
+      <select onchange="spSludgeSetRhoRef(${wtpId},+this.value)"
+        style="${iS};margin-bottom:6px">${rhoOptions}</select>
+      <div style="display:flex;gap:8px;align-items:center;font-size:11.5px;padding:5px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:5px">
+        <span style="font-weight:700;color:#7c3aed" id="sps-rho-val-${wtpId}">${selRhoRef ? selRhoRef.rho.toFixed(2).replace('.',',')+' kg/L' : '—'}</span>
+        <span style="color:var(--muted)" id="sps-rho-note-${wtpId}">${selRhoRef ? selRhoRef.note : ''}</span>
+      </div>
+    </div>
+    <div id="sps-rho-man-wrap-${wtpId}" style="display:${isRhoMan?'':'none'}">
+      <div style="display:flex;align-items:center;gap:8px">
+        <input id="sps-rhoManual-${wtpId}" type="text" inputmode="decimal"
+          value="${sl.rhoManual||'1,08'}" placeholder="1,08"
+          style="${iS};max-width:140px" oninput="spSludgeSync(${wtpId})">
+        <span style="font-size:12px;color:var(--muted)">kg/L</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="${secStyle}">
+    <div style="${hdrStyle}">④ Batas Kapasitas Pengurasan</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <input id="sps-kapasitas-${wtpId}" type="text" inputmode="decimal"
+        value="${sl.kapasitas||'20'}" placeholder="20"
+        style="${iS};max-width:100px" oninput="spSludgeSync(${wtpId})">
+      <span style="font-size:12px;color:var(--muted)">% dari volume Sediment Pond — pengurasan dilakukan saat lumpur mencapai nilai ini</span>
+    </div>
+  </div>
+
+  <div id="sps-result-${wtpId}">${spSludgeResultHTML(wtpId)}</div>`;
+}
+
+function spSludgeResultHTML(wtpId) {
+  const sl = spSludgeDefault(wtpId);
+  const tssIn = parseID(sl.tssInlet) || 0;
+  let tssRemoval = 0, remPct = 0;
+  if (sl.removalMode === 'pct') {
+    remPct = parseID(sl.removalPct) || 0;
+    tssRemoval = tssIn * (remPct / 100);
+  } else {
+    const tssOut = parseID(sl.tssOutlet) || 0;
+    tssRemoval = Math.max(0, tssIn - tssOut);
+    remPct = tssIn > 0 ? tssRemoval / tssIn * 100 : 0;
+  }
+
+  const Q_m3day = spSludgeGetQ(wtpId);
+  const Q_Lday  = Q_m3day * 1000;
+  const massaTSS_kg = (tssRemoval * Q_Lday) / 1e6;
+  const rho = spSludgeGetRho(wtpId);
+  const volLumpur_m3day = rho > 0 ? (massaTSS_kg / rho) / 1000 : 0;
+
+  const { totalVol } = spCalcUnit(wtpId);
+  const kapasitas  = (parseID(sl.kapasitas) || 20) / 100;
+  const volTrigger = totalVol * kapasitas;
+  const periode_hari = volLumpur_m3day > 0 ? volTrigger / volLumpur_m3day : 0;
+  const periode_bln  = periode_hari / 30;
+
+  const hasData = tssIn > 0 && Q_m3day > 0 && rho > 0;
+  if (!hasData) {
+    const missing = [];
+    if (!tssIn)   missing.push('TSS Inlet');
+    if (!Q_m3day) missing.push('Debit Q');
+    return '<div style="text-align:center;color:var(--muted);font-size:12px;padding:14px;background:var(--bg-secondary);border-radius:8px">Lengkapi input: <strong>'+missing.join(', ')+'</strong></div>';
+  }
+  if (!totalVol) {
+    return '<div style="text-align:center;color:var(--muted);font-size:12px;padding:14px;background:var(--bg-secondary);border-radius:8px">Volume Sediment Pond belum tersedia. Lengkapi dimensi kolam terlebih dahulu.</div>';
+  }
+
+  const sc = periode_hari >= 30 ? '#16a34a' : periode_hari >= 14 ? '#d97706' : '#dc2626';
+  const sl2 = periode_hari >= 30 ? '✅ Baik — pengurasan cukup jarang'
+            : periode_hari >= 14 ? '⚠️ Perlu perhatian — pengurasan cukup sering'
+            :                      '🚨 Kritis — pengurasan sangat sering';
+
+  const rowHTML = (lbl, val, sub, hl) =>
+    '<tr style="'+(hl?'background:rgba(139,92,246,0.07)':'')+'">'+
+    '<td style="padding:7px 12px;font-size:12.5px;'+(hl?'font-weight:700':'')+'">'+lbl+'</td>'+
+    '<td style="padding:7px 12px;text-align:right;font-family:var(--mono);font-size:12.5px;color:'+(hl?'#7c3aed':'var(--text)+')+';'+(hl?'font-weight:700':'')+'">'+val+'</td>'+
+    '<td style="padding:7px 12px;font-size:11px;color:var(--muted)">'+sub+'</td></tr>';
+
+  return '<div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">'+
+    '<table style="width:100%;border-collapse:collapse">'+
+    '<thead><tr style="background:var(--bg-secondary)">'+
+    '<th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)">Parameter</th>'+
+    '<th style="padding:8px 12px;text-align:right;font-size:10px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)">Nilai</th>'+
+    '<th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)">Keterangan</th>'+
+    '</tr></thead><tbody>'+
+    rowHTML('TSS Inlet', spFmt(tssIn,2)+' mg/L', '', false)+
+    rowHTML('TSS Removal', spFmt(tssRemoval,2)+' mg/L', spFmt(remPct,1)+'% efisiensi', false)+
+    rowHTML('Debit Q', spFmt(Q_m3day,2)+' m\u00b3/hari', spFmt(Q_Lday,0)+' L/hari', false)+
+    '<tr><td colspan="3" style="padding:0;border-top:1px solid var(--border)"></td></tr>'+
+    rowHTML('Massa TSS', spFmt(massaTSS_kg,4)+' kg/hari', 'TSS\u1d63\u2091\u2098\u2092\u1d65\u2090\u2097 \u00d7 Q', true)+
+    rowHTML('\u03c1 Lumpur', spFmt(rho,2)+' kg/L', sl.rhoMode==='manual'?'Input manual':'Referensi tabel', false)+
+    rowHTML('Volume Lumpur Harian', spFmt(volLumpur_m3day,4)+' m\u00b3/hari', spFmt(volLumpur_m3day*1000,2)+' L/hari', true)+
+    '<tr><td colspan="3" style="padding:0;border-top:1px solid var(--border)"></td></tr>'+
+    rowHTML('Volume Sediment Pond', spFmt(totalVol,2)+' m\u00b3', '', false)+
+    rowHTML('Batas Pengurasan ('+spFmt(kapasitas*100,0)+'%)', spFmt(volTrigger,2)+' m\u00b3', '= Vol \u00d7 '+spFmt(kapasitas*100,0)+'%', false)+
+    '<tr style="background:rgba(139,92,246,0.12)">'+
+    '<td style="padding:9px 12px;font-size:13px;font-weight:700;color:#7c3aed">Periode Pengurasan</td>'+
+    '<td style="padding:9px 12px;text-align:right;font-family:var(--mono);font-size:14px;font-weight:700;color:#7c3aed">'+spFmt(periode_hari,1)+' hari</td>'+
+    '<td style="padding:9px 12px;font-size:11.5px;color:var(--muted)">\u2248 '+spFmt(periode_bln,1)+' bulan</td>'+
+    '</tr></tbody></table></div>'+
+    '<div style="margin-top:10px;font-size:11.5px;font-weight:600;padding:8px 12px;background:transparent;border:1px solid '+sc+';border-radius:6px;color:'+sc+'">'+sl2+'</div>'+
+    '<div style="margin-top:8px;font-size:11px;color:var(--muted);line-height:1.7;padding:8px 12px;background:rgba(139,92,246,0.04);border:1px solid rgba(139,92,246,0.15);border-radius:6px">'+
+    '<strong>Rumus:</strong> Massa TSS = TSS<sub>removal</sub> (mg/L) \u00d7 Q (L/hari) \u00f7 10\u2076 &nbsp;|\u00a0'+
+    'Vol. Lumpur = Massa TSS / \u03c1 &nbsp;|\u00a0'+
+    'Periode = (Vol. Kolam \u00d7 '+spFmt(kapasitas*100,0)+'%) / Vol. Lumpur harian'+
+    '</div>';
+}
+
 let rpUnitCid = 0;
 let rpCompCid = 0;
 
@@ -12119,6 +13457,17 @@ function rpAddUnit() {
   rpUnitCid++;
   rpUnits.push({ id:rpUnitCid, name:'Retention Pond '+rpUnitCid, catchments:[], sf:'1,5', rt:'1', design:{open:false,comps:[]} });
   rpRender();
+}
+
+function spSyncCompName(wtpId, cid) {
+  const d = spDesign[wtpId];
+  if (!d) return;
+  const c = d.comps.find(x => x.id === cid);
+  if (!c) return;
+  const el = document.getElementById('spd-name-'+cid);
+  if (el) c.name = el.value;
+  // Update criteria panel to reflect new name
+  spCriteriaUpdate(wtpId);
 }
 
 function rpDeleteUnit(uid) {
@@ -12240,9 +13589,25 @@ function rpUpdateSummary(uid) {
   const sf=parseID(u.sf)||1,rt=parseID(u.rt)||1;
   const totalQ=u.catchments.filter(c=>c.active).reduce((s,c)=>s+c.q,0);
   const vMin=totalQ*sf*rt;
+
+  // Update box summary (V minimum)
   const sumEl=document.getElementById(`rp-summary-${uid}`);
   if(sumEl) sumEl.innerHTML=rpSummaryHTML(u,totalQ,vMin);
+
+  // Update Total Q di tfoot tabel catchment — live tanpa re-render
+  const tqEl=document.getElementById(`rp-totalq-${uid}`);
+  if(tqEl) tqEl.textContent=spFmt(totalQ)+' m³/hari';
+
+  // Update Q tiap baris runoff (nilai bisa berubah saat ch/evaporasi berubah)
+  u.catchments.forEach((c,i)=>{
+    if(c.type==='runoff'){
+      const qEl=document.getElementById(`rp-qval-${uid}-${i}`);
+      if(qEl) qEl.textContent=spFmt(c.q);
+    }
+  });
+
   rpDesignUpdateBadge(uid,vMin);
+  rpRenderRekap();
 }
 
 function rpSummaryHTML(u,totalQ,vMin) {
@@ -12267,10 +13632,170 @@ function rpRender() {
   const emptyEl=document.getElementById('rp-empty');
   const container=document.getElementById('rp-units-container');
   if(!container) return;
-  if(!rpUnits.length){emptyEl.style.display='block';container.innerHTML='';return;}
+  if(!rpUnits.length){emptyEl.style.display='block';container.innerHTML='';rpRenderRekap();return;}
   emptyEl.style.display='none';
   container.innerHTML=rpUnits.map(u=>rpUnitHTML(u)).join('');
   rpUnits.forEach(u=>{if(u.design.open) rpDesignRender(u.id);});
+  rpRenderRekap();
+}
+
+/* ── Rekap Akhir Tabel ──────────────────────────────────────── */
+function rpRenderRekap() {
+  const el = document.getElementById('rp-rekap-container');
+  if (!el) return;
+  if (!rpUnits.length) { el.innerHTML = ''; return; }
+
+  // Sync semua q dari runoff dulu
+  const ch = parseID(document.getElementById('ro-ch')?.value)||0;
+  const aktual = evaCurrAktual()||0;
+  rpUnits.forEach(u=>{
+    u.catchments.forEach(c=>{
+      if(c.type==='runoff'){
+        const r=roRows.find(x=>x.id===c.rowId);
+        if(r){
+          const cv=parseID(r.c)||0,a=parseID(r.a)||0,q=cv*ch*a*10;
+          const eva=r.evaActive!==false?aktual*a*10000:0;
+          const neto=Math.max(0,q-eva);
+          const gw=(typeof gwData!=='undefined'&&gwData[r.id]?.active)?(parseID(gwData[r.id]?.q)||0):0;
+          c.q=neto+gw; c.name=r.name||c.name;
+        }
+      }
+    });
+  });
+
+  // Hitung per unit
+  const unitData = rpUnits.map((u,ui) => {
+    const sf=parseID(u.sf)||1, rt=parseID(u.rt)||1;
+    const activeCatch = u.catchments.filter(c=>c.active);
+    const totalQ = activeCatch.reduce((s,c)=>s+c.q, 0);
+    const vMin = totalQ * sf * rt;
+    const {totalVol: vDesain} = rpCalcUnitDesign(u);
+    const kapasitas = vDesain > 0 ? vDesain : vMin;
+    return { u, sf, rt, activeCatch, totalQ, vMin, kapasitas, no: ui+1 };
+  });
+
+  // Total baris
+  const grandTotalQ   = unitData.reduce((s,d)=>s+d.totalQ, 0);
+  const grandTotalMin = unitData.reduce((s,d)=>s+d.vMin, 0);
+  const grandKap      = unitData.reduce((s,d)=>s+d.kapasitas, 0);
+
+  // Build rows dengan rowspan
+  let bodyRows = '';
+  let noCounter = 0;
+
+  unitData.forEach((d, di) => {
+    const { u, activeCatch, vMin, kapasitas } = d;
+    const nCatch = activeCatch.length;
+
+    if (nCatch === 0) {
+      // Unit tanpa catchment — satu baris kosong
+      noCounter++;
+      bodyRows += `<tr>
+        <td style="${tdS('center')}">${noCounter}</td>
+        <td style="${tdS()}" colspan="2"><em style="color:var(--muted)">${esc2(u.name)}</em></td>
+        <td style="${tdS('right')}">—</td>
+        <td style="${tdS('right')}">—</td>
+        <td style="${tdS('center')}">${esc2(u.name)}</td>
+        <td style="${tdS('right')}">—</td>
+      </tr>`;
+      return;
+    }
+
+    activeCatch.forEach((c, ci) => {
+      const kBR  = vMin;        // kebutuhan per unit (ditampilkan hanya pada baris pertama unit)
+      const isFirst = ci === 0;
+
+      if (ci === 0) noCounter++;
+      const noCell = isFirst
+        ? `<td style="${tdS('center')}" rowspan="${nCatch}">${noCounter}</td>`
+        : '';
+
+      // Catchment area cell
+      const caCell = `<td style="${tdS()};font-style:italic">${esc2(c.name)}</td>`;
+
+      // Q air limbah
+      const qCell = `<td style="${tdS('right')};font-family:var(--mono)">${spFmt(c.q, 2)}</td>`;
+
+      // Kebutuhan retensi per catchment — proporsi dari totalQ
+      const qTotal = activeCatch.reduce((s,x)=>s+x.q,0)||1;
+      const kCatch = vMin * (c.q / qTotal);
+      const kCell = `<td style="${tdS('right')};font-family:var(--mono)">${spFmt(kCatch, 2)}</td>`;
+
+      // Unit Kolam Retensi — rowspan seluruh unit
+      const unitCell = isFirst
+        ? `<td style="${tdS('center')};font-style:italic" rowspan="${nCatch}">${esc2(u.name)}</td>`
+        : '';
+
+      // Kapasitas Kolam Retensi — rowspan seluruh unit
+      const kapCell = isFirst
+        ? `<td style="${tdS('right')};font-family:var(--mono);font-weight:700;color:#27ae60" rowspan="${nCatch}">${spFmt(kapasitas, 2)}</td>`
+        : '';
+
+      bodyRows += `<tr>${noCell}${caCell}${qCell}${kCell}${unitCell}${kapCell}</tr>`;
+    });
+  });
+
+  // Footer total
+  const footRow = `<tr style="background:var(--bg-secondary);font-weight:700">
+    <td colspan="2" style="${tdS('center')};font-size:12px">TOTAL</td>
+    <td style="${tdS('right')};font-family:var(--mono);color:#1a7fd4">${spFmt(grandTotalQ,2)}</td>
+    <td style="${tdS('right')};font-family:var(--mono);color:#27ae60">${spFmt(grandTotalMin,2)}</td>
+    <td style="${tdS('center')}">—</td>
+    <td style="${tdS('right')};font-family:var(--mono);color:#27ae60">${spFmt(grandKap,2)}</td>
+  </tr>`;
+
+  // Helper untuk style td
+  function tdS(align) {
+    return `padding:8px 12px;border:1px solid var(--border);text-align:${align||'left'};font-size:12.5px;vertical-align:middle`;
+  }
+  function esc2(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  el.innerHTML = `
+    <div class="card" style="margin-top:8px;overflow:hidden">
+      <div class="section-title" style="padding:14px 18px;border-bottom:1px solid var(--border);margin-bottom:0">
+        <div class="dot" style="background:#27ae60"></div>
+        Rekap Kebutuhan Retention Pond
+      </div>
+      <div style="overflow-x:auto;padding:18px">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+          <thead>
+            <tr style="background:var(--bg-secondary)">
+              <th style="${thS('center')};width:48px" rowspan="2">No</th>
+              <th style="${thS()}" rowspan="2"><em>Catchment Area</em></th>
+              <th style="${thS('center')}" rowspan="2">
+                Jumlah Air Limbah<br>
+                <span style="font-weight:400;font-size:10px">(m³/hari) <sup>[1]</sup></span>
+              </th>
+              <th style="${thS('center')}" rowspan="2">
+                Kebutuhan Kolam<br>Retensi (m³) <sup>[2]</sup>
+              </th>
+              <th style="${thS('center')}" rowspan="2">
+                Unit Kolam<br>Retensi <sup>[3]</sup>
+              </th>
+              <th style="${thS('center')}" rowspan="2">
+                Kapasitas<br>Kolam Retensi<br>
+                <span style="font-weight:400;font-size:10px">(m³) <sup>[4]</sup></span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>${bodyRows}</tbody>
+          <tfoot>${footRow}</tfoot>
+        </table>
+        <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8">
+          <sup>[1]</sup> Jumlah air limbah = Q limpasan – Evaporasi + Groundwater per catchment aktif<br>
+          <sup>[2]</sup> Kebutuhan Kolam Retensi = Jumlah Air Limbah × SF × RT (proporsional per catchment)<br>
+          <sup>[3]</sup> Nama unit kolam retensi sesuai input di atas<br>
+          <sup>[4]</sup> Kapasitas = Volume desain kompartemen (jika sudah didesain) atau V minimum
+        </div>
+      </div>
+    </div>`;
+
+  // Helper thS di luar fungsi (dipanggil oleh template literal di atas)
+  function thS(align) {
+    return `padding:9px 12px;border:1px solid var(--border);background:var(--bg-secondary);text-align:${align||'left'};font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;vertical-align:middle`;
+  }
 }
 
 function rpUnitHTML(u) {
@@ -12292,7 +13817,7 @@ function rpUnitHTML(u) {
       :`<span style="font-size:12.5px">${escS(c.name)}</span><span style="font-size:10px;background:rgba(26,127,212,0.1);color:#1a7fd4;border-radius:3px;padding:1px 5px;margin-left:6px">Runoff</span>`;
     const qCell=c.type==='manual'
       ?`<input id="rp-cq-${u.id}-${i}" type="text" inputmode="decimal" value="${c.q||''}" style="width:100%;padding:4px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg-secondary);color:var(--text);font-size:12px;text-align:right;font-family:var(--mono)" placeholder="0" oninput="rpSyncCatch(${u.id})">`
-      :`<span style="font-family:var(--mono);font-size:12.5px;color:#27ae60;font-weight:700">${spFmt(c.q)}</span>`;
+      :`<span id="rp-qval-${u.id}-${i}" style="font-family:var(--mono);font-size:12.5px;color:#27ae60;font-weight:700">${spFmt(c.q)}</span>`;
     return `<tr style="${!c.active?'opacity:0.45':''}">
       <td style="padding:7px 12px">${nameCell}</td>
       <td style="padding:7px 12px;text-align:right">${qCell}</td>
@@ -12338,7 +13863,7 @@ function rpUnitHTML(u) {
           <tbody>${catchRows}</tbody>
           <tfoot><tr style="background:rgba(39,174,96,0.06)">
             <td style="padding:8px 12px;font-weight:700;font-size:12.5px">Total Q Masuk (aktif)</td>
-            <td style="padding:8px 12px;text-align:right;font-weight:800;font-family:var(--mono);color:#1a7fd4;font-size:14px">${spFmt(totalQ)} m³/hari</td>
+            <td id="rp-totalq-${u.id}" style="padding:8px 12px;text-align:right;font-weight:800;font-family:var(--mono);color:#1a7fd4;font-size:14px">${spFmt(totalQ)} m³/hari</td>
             <td colspan="2"></td>
           </tr></tfoot>
         </table>
@@ -12442,6 +13967,7 @@ function rpDesignOnInput(uid) {
   rpSyncDesignComps(uid);
   rpDesignUpdatePanel(uid);
   rpDesignUpdateBadge(uid);
+  rpRenderRekap();
 }
 
 function rpDesignUpdateBadge(uid,vMinArg) {
