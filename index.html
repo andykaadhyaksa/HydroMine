@@ -433,14 +433,25 @@ body:not(.dark) .nav-dropdown {
 .hm-tb-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 32px; height: 32px;
+  padding: 0;
   background: transparent; border: 1px solid var(--border);
-  border-radius: 8px; color: var(--muted);
+  border-radius: 8px; color: var(--text);
+  opacity: 0.75;
   cursor: pointer; transition: all 0.15s;
+  flex-shrink: 0;
 }
-.hm-tb-btn:hover { background: rgba(142,203,106,0.08); border-color: rgba(142,203,106,0.3); color: var(--text); }
+.hm-tb-btn svg { flex-shrink: 0; pointer-events: none; }
+.hm-tb-btn:hover { background: rgba(142,203,106,0.1); border-color: rgba(142,203,106,0.4); color: var(--green); opacity: 1; }
 
-/* User button — slightly rounded border */
-.hm-tb-btn-user { border-radius: 50%; width: 30px; height: 30px; }
+/* User/Folder button — circular, brand-colored icon for visibility */
+.hm-tb-btn-user {
+  border-radius: 50%; width: 30px; height: 30px; padding: 0;
+  color: #0D6EFD; opacity: 0.85;
+  border-color: rgba(13,110,253,0.3);
+}
+.hm-tb-btn-user:hover { color: #0B3D91; opacity: 1; background: rgba(13,110,253,0.1); border-color: rgba(13,110,253,0.5); }
+body.dark .hm-tb-btn-user { color: #7fbbee; border-color: rgba(127,187,238,0.3); }
+body.dark .hm-tb-btn-user:hover { color: #a8d8ff; background: rgba(127,187,238,0.12); }
 
 /* View: Dark/Light toggle */
 .hm-tb-theme-v2 {
@@ -1164,7 +1175,7 @@ body.dark .flow-tbl th { background: #0e2240; }
 }
 
 /* ═══════════════════════════════════════════════════
-   LOADING SCREEN
+   LOADING SCREEN — v2 elaborate animated
 ═══════════════════════════════════════════════════ */
 #hm-loader {
   position: fixed;
@@ -1176,12 +1187,16 @@ body.dark .flow-tbl th { background: #0e2240; }
   align-items: center;
   justify-content: center;
   gap: 0;
-  transition: opacity 0.6s ease, visibility 0.6s ease;
+  overflow: hidden;
+  transition: opacity 0.6s ease, visibility 0.6s ease, background 0.4s ease;
 }
 #hm-loader.hide {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+}
+#hm-loader.light-theme {
+  background: linear-gradient(160deg, #eaf6ff 0%, #e3f7ec 45%, #f0faff 100%);
 }
 
 /* Grid scan bg */
@@ -1195,6 +1210,11 @@ body.dark .flow-tbl th { background: #0e2240; }
   background-size: 44px 44px;
   animation: gridPulse 4s ease-in-out infinite;
 }
+#hm-loader.light-theme::before {
+  background-image:
+    linear-gradient(rgba(13,110,253,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13,110,253,0.08) 1px, transparent 1px);
+}
 @keyframes gridPulse {
   0%, 100% { opacity: 0.4; }
   50%       { opacity: 1; }
@@ -1204,14 +1224,127 @@ body.dark .flow-tbl th { background: #0e2240; }
 #hm-loader::after {
   content: '';
   position: absolute;
-  width: 500px; height: 500px;
+  width: 600px; height: 600px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(13,110,253,0.2) 0%, rgba(52,168,83,0.08) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(13,110,253,0.22) 0%, rgba(52,168,83,0.1) 50%, transparent 70%);
   animation: glowPulse 2.5s ease-in-out infinite;
+}
+#hm-loader.light-theme::after {
+  background: radial-gradient(circle, rgba(13,110,253,0.18) 0%, rgba(52,168,83,0.12) 50%, transparent 70%);
 }
 @keyframes glowPulse {
   0%, 100% { transform: scale(1); opacity: 0.6; }
   50%       { transform: scale(1.3); opacity: 1; }
+}
+
+/* ── Floating particle/bubble layer ── */
+#hm-loader-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.hm-bubble {
+  position: absolute;
+  bottom: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.55), rgba(13,110,253,0.12) 70%, transparent 100%);
+  border: 1px solid rgba(127,187,238,0.3);
+  animation: bubbleRise linear infinite;
+}
+#hm-loader.light-theme .hm-bubble {
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.85), rgba(13,110,253,0.18) 70%, transparent 100%);
+  border: 1px solid rgba(13,110,253,0.25);
+}
+@keyframes bubbleRise {
+  0%   { transform: translateY(0) translateX(0) scale(0.6); opacity: 0; }
+  10%  { opacity: 0.9; }
+  50%  { transform: translateY(-50vh) translateX(20px) scale(1); }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(-105vh) translateX(-15px) scale(0.8); opacity: 0; }
+}
+
+/* ── Falling raindrop layer ── */
+.hm-raindrop {
+  position: absolute;
+  top: -30px;
+  width: 2px;
+  height: 22px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, transparent, #7fbbee 60%, #ffffff);
+  opacity: 0.55;
+  animation: rainFall linear infinite;
+}
+#hm-loader.light-theme .hm-raindrop {
+  background: linear-gradient(180deg, transparent, #0D6EFD 55%, #5ac8f8);
+  opacity: 0.4;
+}
+@keyframes rainFall {
+  0%   { transform: translateY(0); opacity: 0; }
+  8%   { opacity: 0.6; }
+  92%  { opacity: 0.4; }
+  100% { transform: translateY(115vh); opacity: 0; }
+}
+
+/* ── Ripple rings at "water surface" bottom ── */
+.hm-ripple {
+  position: absolute;
+  bottom: 8%;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(127,187,238,0.5);
+  animation: rippleExpand 2.4s ease-out infinite;
+}
+#hm-loader.light-theme .hm-ripple {
+  border-color: rgba(13,110,253,0.4);
+}
+@keyframes rippleExpand {
+  0%   { width: 4px; height: 4px; opacity: 0.8; border-width: 2px; }
+  100% { width: 160px; height: 160px; opacity: 0; border-width: 0.5px; margin-left: -78px; margin-bottom: -78px; }
+}
+
+/* ── Drifting leaf shapes (brand accent) ── */
+.hm-leaf {
+  position: absolute;
+  width: 16px; height: 16px;
+  opacity: 0.35;
+  animation: leafDrift linear infinite;
+}
+.hm-leaf svg { width: 100%; height: 100%; }
+@keyframes leafDrift {
+  0%   { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.4; }
+  50%  { transform: translateY(50vh) translateX(40px) rotate(180deg); }
+  90%  { opacity: 0.3; }
+  100% { transform: translateY(115vh) translateX(-30px) rotate(360deg); opacity: 0; }
+}
+
+/* ── Orbiting droplets around the logo ── */
+.hm-orbit {
+  position: absolute;
+  inset: -55px;
+  pointer-events: none;
+}
+.hm-orbit-dot {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #0D6EFD);
+  box-shadow: 0 0 10px rgba(13,110,253,0.8);
+  transform-origin: 0 0;
+}
+#hm-loader.light-theme .hm-orbit-dot {
+  background: radial-gradient(circle at 30% 30%, #fff, #34A853);
+  box-shadow: 0 0 10px rgba(52,168,83,0.7);
+}
+.hm-orbit-dot:nth-child(1) { animation: orbitSpin 3.5s linear infinite; }
+.hm-orbit-dot:nth-child(2) { animation: orbitSpin 3.5s linear infinite -1.16s; }
+.hm-orbit-dot:nth-child(3) { animation: orbitSpin 3.5s linear infinite -2.33s; }
+@keyframes orbitSpin {
+  0%   { transform: rotate(0deg) translateX(55px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(55px) rotate(-360deg); }
 }
 
 .hm-loader-inner {
@@ -1233,11 +1366,15 @@ body.dark .flow-tbl th { background: #0e2240; }
   height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 0 18px rgba(13,110,253,0.7)) drop-shadow(0 4px 12px rgba(52,168,83,0.4));
-  animation: logoFloat 3s ease-in-out infinite;
+  animation: logoFloat 3s ease-in-out infinite, logoPulseScale 2s ease-in-out infinite;
 }
 @keyframes logoFloat {
-  0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 18px rgba(13,110,253,0.7)) drop-shadow(0 4px 12px rgba(52,168,83,0.4)); }
-  50%       { transform: translateY(-8px); filter: drop-shadow(0 0 32px rgba(13,110,253,1)) drop-shadow(0 6px 18px rgba(52,168,83,0.6)); }
+  0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 18px rgba(13,110,253,0.7)) drop-shadow(0 4px 12px rgba(52,168,83,0.4)); }
+  50%       { transform: translateY(-8px) scale(1); filter: drop-shadow(0 0 32px rgba(13,110,253,1)) drop-shadow(0 6px 18px rgba(52,168,83,0.6)); }
+}
+@keyframes logoPulseScale {
+  0%, 100% { }
+  50% { }
 }
 
 /* Ring spinner — outer: blue brand, inner: green accent */
@@ -1259,6 +1396,15 @@ body.dark .flow-tbl th { background: #0e2240; }
   border-left-color: rgba(52,168,83,0.2);
   animation: spin 2.2s linear infinite reverse;
 }
+.hm-ring-3 {
+  position: absolute;
+  inset: -42px;
+  border-radius: 50%;
+  border: 1px dashed transparent;
+  border-top-color: rgba(127,187,238,0.4);
+  border-left-color: rgba(127,187,238,0.15);
+  animation: spin 5s linear infinite;
+}
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Wordmark */
@@ -1269,11 +1415,17 @@ body.dark .flow-tbl th { background: #0e2240; }
   font-family: 'Sora', 'Inter', sans-serif;
   font-size: 42px;
   letter-spacing: 6px;
-  background: linear-gradient(135deg, #0D6EFD, #0B3D91, #34A853);
+  background: linear-gradient(135deg, #0D6EFD, #0B3D91, #34A853, #0D6EFD);
+  background-size: 300% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: titleReveal 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+  animation: titleReveal 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s both, titleShimmer 3s linear infinite;
+  position: relative;
+}
+@keyframes titleShimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
 }
 .hm-wm-sub {
   font-family: 'Inter', monospace;
@@ -1284,6 +1436,7 @@ body.dark .flow-tbl th { background: #0e2240; }
   margin-top: 4px;
   animation: titleReveal 0.8s cubic-bezier(0.16,1,0.3,1) 0.4s both;
 }
+#hm-loader.light-theme .hm-wm-sub { color: rgba(11,61,145,0.6); }
 @keyframes titleReveal {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -1291,29 +1444,65 @@ body.dark .flow-tbl th { background: #0e2240; }
 
 /* Progress bar */
 .hm-progress-wrap {
-  width: 240px;
-  height: 2px;
+  width: 260px;
+  height: 4px;
   background: rgba(13,110,253,0.15);
-  border-radius: 2px;
+  border-radius: 4px;
   overflow: hidden;
+  position: relative;
 }
+#hm-loader.light-theme .hm-progress-wrap { background: rgba(13,110,253,0.12); }
 .hm-progress-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #0B3D91, #0D6EFD, #34A853);
-  border-radius: 2px;
+  background: linear-gradient(90deg, #0B3D91, #0D6EFD, #34A853, #7BC043);
+  background-size: 200% 100%;
+  border-radius: 4px;
   transition: width 0.3s ease;
-  box-shadow: 0 0 10px rgba(13,110,253,0.7);
+  box-shadow: 0 0 12px rgba(13,110,253,0.8);
+  animation: progressShimmer 1.5s linear infinite;
+  position: relative;
+  overflow: hidden;
+}
+.hm-progress-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: progressSweep 1.2s ease-in-out infinite;
+}
+@keyframes progressShimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: -200% 50%; }
+}
+@keyframes progressSweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 .hm-status {
   font-family: 'Inter', monospace;
   font-size: 10px;
   color: rgba(13,110,253,0.5);
   letter-spacing: 1.5px;
-  margin-top: 6px;
+  margin-top: 8px;
   min-height: 14px;
   text-transform: uppercase;
+  text-align: center;
 }
+#hm-loader.light-theme .hm-status { color: rgba(11,61,145,0.55); }
+
+/* Percentage counter */
+.hm-percent {
+  font-family: 'Sora', 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0D6EFD;
+  margin-top: 2px;
+  letter-spacing: 1px;
+}
+#hm-loader.light-theme .hm-percent { color: #0B3D91; }
+
+
 
 /* ═══════════════════════════════════════════════════
    PAGE ENTRANCE ANIMATIONS
@@ -2069,8 +2258,15 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
 
 <!-- ═══════ LOADING SCREEN ═══════ -->
 <div id="hm-loader">
+  <div id="hm-loader-particles"></div>
   <div class="hm-loader-inner">
     <div class="hm-logo-wrap">
+      <div class="hm-orbit">
+        <div class="hm-orbit-dot"></div>
+        <div class="hm-orbit-dot"></div>
+        <div class="hm-orbit-dot"></div>
+      </div>
+      <div class="hm-ring-3"></div>
       <div class="hm-ring-2"></div>
       <div class="hm-ring"></div>
       <img class="hm-logo-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZHJvcEdyYWQiIHgxPSIyMCUiIHkxPSIwJSIgeDI9IjgwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMEQ2RUZEIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBCM0Q5MSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibGVhZkdyYWQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjN0JDMDQzIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzM0QTg1MyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZHJvcFNoaW5lIiB4MT0iMjAlIiB5MT0iMTAlIiB4Mj0iNTAlIiB5Mj0iNjAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0icmdiYSgyNTUsMjU1LDI1NSwwLjQ1KSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9InJnYmEoMjU1LDI1NSwyNTUsMCkiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgoKICA8IS0tIFdhdGVyIGRyb3AgYm9keSAtLT4KICA8cGF0aCBkPSJNNjAsMTAgQzYwLDEwIDg4LDUwIDg4LDcwIEM4OCw4NiA3NS41LDk4IDYwLDk4IEM0NC41LDk4IDMyLDg2IDMyLDcwIEMzMiw1MCA2MCwxMCA2MCwxMFoiCiAgICBmaWxsPSJ1cmwoI2Ryb3BHcmFkKSIvPgoKICA8IS0tIERyb3AgaW5uZXIgc2hpbmUgaGlnaGxpZ2h0IC0tPgogIDxwYXRoIGQ9Ik02MCwxMCBDNjAsMTAgODgsNTAgODgsNzAgQzg4LDg2IDc1LjUsOTggNjAsOTggQzQ0LjUsOTggMzIsODYgMzIsNzAgQzMyLDUwIDYwLDEwIDYwLDEwWiIKICAgIGZpbGw9InVybCgjZHJvcFNoaW5lKSIgb3BhY2l0eT0iMC42Ii8+CgogIDwhLS0gV2hpdGUgaW5uZXIgaGlnaGxpZ2h0IGN1cnZlIC0tPgogIDxwYXRoIGQ9Ik00OCw0MiBDNDQsNTIgNDIsNjIgNDIsNzAiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjU1KSIgc3Ryb2tlLXdpZHRoPSI0IgogICAgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CgogIDwhLS0gTGVhZiAoYm90dG9tLXJpZ2h0LCBvdmVybGFwcGluZyBkcm9wKSAtLT4KICA8IS0tIExlYWYgYm9keSAtLT4KICA8cGF0aCBkPSJNNTgsNzIgQzU4LDcyIDcyLDYwIDg0LDY0IEM4NCw2NCA4Miw3OCA3MCw4NCBDNjIsODggNTQsODQgNTIsNzggQzUwLDcyIDU4LDcyIDU4LDcyWiIKICAgIGZpbGw9InVybCgjbGVhZkdyYWQpIi8+CiAgPCEtLSBMZWFmIHZlaW4gLS0+CiAgPHBhdGggZD0iTTU4LDc0IEM2NCw3MiA3NCw3MCA4Miw2NSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuNCkiIHN0cm9rZS13aWR0aD0iMS41IgogICAgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBMZWFmIHNlY29uZGFyeSB2ZWluIC0tPgogIDxwYXRoIGQ9Ik02Miw3OCBDNjYsNzUgNzIsNzMgNzgsNzAiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjI1KSIgc3Ryb2tlLXdpZHRoPSIxIgogICAgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CgogIDwhLS0gRHJvcCB0aXAgc3BlY3VsYXIgLS0+CiAgPGVsbGlwc2UgY3g9IjU0IiBjeT0iMzAiIHJ4PSI1IiByeT0iOCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjI4KSIgdHJhbnNmb3JtPSJyb3RhdGUoLTE4LDU0LDMwKSIvPgo8L3N2Zz4=" alt="HydroMine Logo">
@@ -2083,10 +2279,79 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
       <div class="hm-progress-wrap">
         <div class="hm-progress-bar" id="hm-progress"></div>
       </div>
+      <div class="hm-percent" id="hm-percent">0%</div>
       <div class="hm-status" id="hm-status">Initializing...</div>
     </div>
   </div>
 </div>
+
+<script>
+(function(){
+  // Detect theme preference for loader styling
+  try {
+    var savedDark = localStorage.getItem('hm-dark');
+    var isLoaderDark = savedDark === null ? true : savedDark === 'true';
+    var loaderEl = document.getElementById('hm-loader');
+    if (loaderEl && !isLoaderDark) loaderEl.classList.add('light-theme');
+  } catch(e) {}
+
+  var particlesContainer = document.getElementById('hm-loader-particles');
+  if (!particlesContainer) return;
+
+  var frag = document.createDocumentFragment();
+
+  // Bubbles (12)
+  for (var i = 0; i < 12; i++) {
+    var b = document.createElement('div');
+    b.className = 'hm-bubble';
+    var size = 6 + Math.random() * 22;
+    b.style.width = size + 'px';
+    b.style.height = size + 'px';
+    b.style.left = (Math.random() * 100) + '%';
+    b.style.animationDuration = (4 + Math.random() * 5) + 's';
+    b.style.animationDelay = (Math.random() * 5) + 's';
+    frag.appendChild(b);
+  }
+
+  // Raindrops (20)
+  for (var i = 0; i < 20; i++) {
+    var r = document.createElement('div');
+    r.className = 'hm-raindrop';
+    r.style.left = (Math.random() * 100) + '%';
+    r.style.height = (14 + Math.random() * 20) + 'px';
+    r.style.animationDuration = (0.8 + Math.random() * 1.2) + 's';
+    r.style.animationDelay = (Math.random() * 2) + 's';
+    frag.appendChild(r);
+  }
+
+  // Ripples (5)
+  for (var i = 0; i < 5; i++) {
+    var rp = document.createElement('div');
+    rp.className = 'hm-ripple';
+    rp.style.left = (10 + Math.random() * 80) + '%';
+    rp.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+    rp.style.animationDelay = (Math.random() * 3) + 's';
+    frag.appendChild(rp);
+  }
+
+  // Drifting leaves (6)
+  var leafSVG = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6 2 2 8 2 14c0 4 3 8 7 8 6 0 13-6 13-14 0-2-1-4-2-5-1 3-3 5-6 6-2 .6-4 .3-2-1 1.5-1.5 2-3.5 0-5z" fill="#34A853" opacity="0.8"/></svg>';
+  for (var i = 0; i < 6; i++) {
+    var lf = document.createElement('div');
+    lf.className = 'hm-leaf';
+    lf.innerHTML = leafSVG;
+    lf.style.left = (Math.random() * 100) + '%';
+    lf.style.animationDuration = (6 + Math.random() * 5) + 's';
+    lf.style.animationDelay = (Math.random() * 6) + 's';
+    var sz = 12 + Math.random() * 10;
+    lf.style.width = sz + 'px';
+    lf.style.height = sz + 'px';
+    frag.appendChild(lf);
+  }
+
+  particlesContainer.appendChild(frag);
+})();
+</script>
 
 <!-- Ambient particle canvas -->
 <canvas id="hm-canvas"></canvas>
@@ -2193,7 +2458,7 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
 
       <!-- User icon button (load project) -->
       <button class="hm-tb-btn hm-tb-btn-user" onclick="document.getElementById('load-file-input').click()" title="Buka Proyek">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path d="M2 11l1.5 7.5a1 1 0 0 0 1 .8h15a1 1 0 0 0 1-.8L22 11"/></svg>
       </button>
       <input type="file" id="load-file-input" accept=".hydromine,.json" style="display:none" onchange="loadProjectFile(this)">
 
@@ -10887,7 +11152,7 @@ const BMKG_STATIONS = [
   [215,'Stasiun Klimatologi Maros','Sulawesi Selatan','Kab. Maros',-5.0167,119.5667,'Klim'],
   [216,'Stasiun Meteorologi Tampa Padang','Sulawesi Selatan','Kab. Mamuju',-2.5836,119.0310,'Met'],
   [217,'Stasiun Meteorologi Soroako','Sulawesi Selatan','Kab. Luwu Timur',-2.5325,121.3588,'Met'],
-  [218,'Stasiun Meteorologi Andi Jemma','Sulawesi Selatan','Kab. Luwu Utara',2.5598,120.3177,'Met'],
+  [218,'Stasiun Meteorologi Andi Jemma','Sulawesi Selatan','Kab. Luwu Utara',-2.5598,120.3177,'Met'],
   [219,'Stasiun Geofisika Makassar','Sulawesi Selatan','Kota Makassar',-5.1167,119.4000,'Geo'],
   [220,'Pos Hujan Makassar','Sulawesi Selatan','Kota Makassar',-5.1478,119.4328,'Hidr'],
   [221,'Pos Hujan Parepare','Sulawesi Selatan','Kota Parepare',-4.0167,119.6333,'Hidr'],
@@ -11657,6 +11922,7 @@ function bmkgFilterStations() { chFilterStations(); }
   var loader   = document.getElementById('hm-loader');
   var progress = document.getElementById('hm-progress');
   var status   = document.getElementById('hm-status');
+  var percent  = document.getElementById('hm-percent');
   var canvas   = document.getElementById('hm-canvas');
 
   var steps = [
@@ -11669,6 +11935,17 @@ function bmkgFilterStations() { chFilterStations(); }
   ];
 
   var i = 0;
+  var curPct = 0;
+  function animatePercent(target) {
+    function tick() {
+      if (curPct < target) {
+        curPct = Math.min(target, curPct + Math.ceil((target - curPct) / 6) + 1);
+        if (percent) percent.textContent = curPct + '%';
+        requestAnimationFrame(tick);
+      }
+    }
+    tick();
+  }
   function runStep() {
     if (i >= steps.length) {
       setTimeout(dismiss, 400);
@@ -11677,6 +11954,7 @@ function bmkgFilterStations() { chFilterStations(); }
     var s = steps[i++];
     if (progress) progress.style.width = s.pct + '%';
     if (status)   status.textContent   = s.msg;
+    animatePercent(s.pct);
     setTimeout(runStep, i === 1 ? 120 : 180 + Math.random() * 120);
   }
   setTimeout(runStep, 200);
