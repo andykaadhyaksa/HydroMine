@@ -1004,6 +1004,102 @@ body.dark #page-evaporation #eva-sensitivity tr:hover td { background: #162030; 
   text-align: center;
   letter-spacing: 0.5px;
 }
+
+/* ── Evaporation Wizard (4-step) ── */
+.eva-wiz-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 22px;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.eva-wiz-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+.eva-wiz-tab.active { opacity: 1; }
+.eva-wiz-tab.done { opacity: 0.75; }
+.eva-wiz-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--muted);
+  transition: all 0.2s;
+}
+.eva-wiz-tab.active .eva-wiz-num {
+  background: var(--blue-grad);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 2px 10px rgba(26,127,212,0.4);
+}
+.eva-wiz-tab.done .eva-wiz-num {
+  background: rgba(39,174,96,0.15);
+  border-color: #27ae60;
+  color: #27ae60;
+}
+.eva-wiz-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+.eva-wiz-tab:not(.active) .eva-wiz-label { color: var(--muted); }
+.eva-wiz-line {
+  width: 36px; height: 2px;
+  background: var(--border);
+  flex-shrink: 0;
+  margin: 0 2px;
+  margin-bottom: 19px;
+}
+
+.eva-wiz-step {
+  display: none;
+  animation: fadeUpIn 0.3s cubic-bezier(0.16,1,0.3,1) both;
+}
+.eva-wiz-step.active { display: block; }
+
+.eva-wiz-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.eva-wiz-btn-next, .eva-wiz-btn-back {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+.eva-wiz-btn-next {
+  background: var(--blue-grad);
+  color: white;
+  box-shadow: 0 3px 12px rgba(26,127,212,0.3);
+}
+.eva-wiz-btn-next:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(26,127,212,0.42); }
+.eva-wiz-btn-back {
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid var(--border);
+}
+.eva-wiz-btn-back:hover { color: var(--text); border-color: var(--muted); background: rgba(255,255,255,0.04); }
+
 /* Psychrometric chart canvas wrapper */
 .psy-chart-wrap {
   position: relative;
@@ -1022,17 +1118,18 @@ body.dark #page-evaporation #eva-sensitivity tr:hover td { background: #162030; 
 }
 .psy-tooltip {
   position: absolute;
-  background: rgba(14,22,33,0.92);
+  background: rgba(14,22,33,0.94);
   color: #7dd3fc;
-  font-family: var(--mono);
-  font-size: 11px;
-  padding: 8px 12px;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 10px 14px;
   border-radius: 8px;
   pointer-events: none;
   display: none;
-  border: 1px solid rgba(56,189,248,0.3);
+  border: 1px solid rgba(56,189,248,0.35);
   z-index: 10;
-  line-height: 1.7;
+  line-height: 1.8;
   white-space: nowrap;
 }
 /* Range slider */
@@ -2450,6 +2547,11 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
 
       <div class="hm-tb-sep"></div>
 
+      <!-- Copyright -->
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap;padding:0 4px">© Andyka Adhyaksa Sumarno</div>
+
+      <div class="hm-tb-sep"></div>
+
       <!-- Simpan button — solid green -->
       <button class="hm-tb-btn-save" onclick="saveProject()" title="Simpan Proyek">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -2868,81 +2970,106 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
       <div class="page-title">Rainfall Analysis</div>
       <div class="page-subtitle">Analisis statistik data curah hujan harian · mendukung data >30 tahun</div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <div class="toggle-lbl" id="dm-label" style="font-size:11px;color:var(--muted)">☀️ Light</div>
-      <div class="toggle-sw" id="dm-switch" onclick="toggleDarkMode()" title="Dark / Light Mode"></div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--blue-soft);border:1px solid var(--border);border-radius:6px;padding:4px 10px">© Andyka Adhyaksa Sumarno</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       WIZARD STEP TABS (indicator only, klik tidak aktif — navigasi via tombol)
+  ══════════════════════════════════════════ -->
+  <div class="eva-wiz-tabs">
+    <div class="eva-wiz-tab active" id="ra-wt-1" data-step="1">
+      <span class="eva-wiz-num">1</span>
+      <span class="eva-wiz-label">Input</span>
+    </div>
+    <div class="eva-wiz-line"></div>
+    <div class="eva-wiz-tab" id="ra-wt-2" data-step="2">
+      <span class="eva-wiz-num">2</span>
+      <span class="eva-wiz-label">Grafik Utama</span>
+    </div>
+    <div class="eva-wiz-line"></div>
+    <div class="eva-wiz-tab" id="ra-wt-3" data-step="3">
+      <span class="eva-wiz-num">3</span>
+      <span class="eva-wiz-label">Statistik</span>
     </div>
   </div>
 
-  <!-- ── STAT STRIP ── -->
-  <div class="stat-strip cols-4" style="margin-bottom:14px">
-    <div class="stat-card">
-      <div class="stat-bar" style="background:linear-gradient(to bottom,#2bb8f0,#1a7fd4)"></div>
-      <div class="stat-body">
-        <div class="stat-val" id="sc-total">—<span class="u">mm</span></div>
-        <div class="stat-lbl">Total Curah Hujan</div>
+  <!-- ══════════════════════════════════════════
+       STEP 1 — INPUT
+  ══════════════════════════════════════════ -->
+  <div class="eva-wiz-step active" id="ra-step-1">
+
+    <div class="card" style="max-width:620px;margin:0 auto 14px">
+      <div class="section-title"><div class="dot"></div>Input Data Curah Hujan</div>
+      <div class="input-hint" style="font-size:11.5px;line-height:1.6;margin-bottom:8px">
+        <strong>📋 Paste dari Excel</strong> — 2 kolom: Tanggal &amp; CH (mm), dipisah TAB.
+        <div class="fmt-tags" style="margin-top:6px">
+          <span class="fmt-tag">DD/MM/YYYY ⇥ 12.5</span>
+          <span class="fmt-tag">YYYY-MM-DD ⇥ 0</span>
+          <span class="fmt-tag">DD-MM-YYYY ⇥ 45.2</span>
+        </div>
+        <div style="margin-top:5px;font-size:10.5px;color:var(--muted)">Hari hujan = CH &gt; 0,5 mm</div>
+      </div>
+      <textarea id="ra-input" rows="10" placeholder="01/01/1990&#9;0&#10;02/01/1990&#9;5,2&#10;03/01/1990&#9;22,8&#10;..." style="font-size:12px;font-family:var(--mono)"></textarea>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn-primary" onclick="raAnalyze(); raWizAfterAnalyze();">⚡ Analisis</button>
+        <button class="btn-secondary" onclick="raSample()">📥 Contoh</button>
+        <button class="btn-ghost" onclick="raClear()">✕ Hapus</button>
+      </div>
+      <div style="margin-top:8px;min-height:20px">
+        <span class="status-pill" id="ra-status"></span>
+        <span class="error-pill" id="ra-error"></span>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-bar" style="background:linear-gradient(to bottom,#27ae60,#1e8449)"></div>
-      <div class="stat-body">
-        <div class="stat-val" id="sc-avg">—<span class="u">mm/hari</span></div>
-        <div class="stat-lbl">Rata-rata Harian</div>
-      </div>
+
+    <!-- Mini stat pills -->
+    <div class="card" id="ra-mini-stats" style="display:none;max-width:620px;margin:0 auto">
+      <div class="section-title" style="margin-bottom:8px"><div class="dot"></div>Ringkasan Cepat</div>
+      <div id="ra-mini-content" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div>
     </div>
-    <div class="stat-card">
-      <div class="stat-bar" style="background:linear-gradient(to bottom,#e74c3c,#c0392b)"></div>
-      <div class="stat-body">
-        <div class="stat-val" id="sc-max">—<span class="u">mm</span></div>
-        <div class="stat-lbl">CH Maksimum</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-bar" style="background:linear-gradient(to bottom,#f39c12,#d68910)"></div>
-      <div class="stat-body">
-        <div class="stat-val" id="sc-wetdays">—<span class="u">hari</span></div>
-        <div class="stat-lbl">Hari Hujan (&gt;0,5 mm)</div>
-      </div>
+
+    <div class="eva-wiz-nav" style="max-width:620px;margin:20px auto 0">
+      <span></span>
+      <button class="eva-wiz-btn-next" id="ra-wiz-next-1" onclick="raWizGoto(2)" disabled style="opacity:0.4;cursor:not-allowed">Lanjut: Lihat Grafik →</button>
     </div>
   </div>
 
-  <!-- ── MAIN GRID: Input kiri | Chart kanan ── -->
-  <div style="display:grid;grid-template-columns:minmax(280px,340px) 1fr;gap:14px;margin-bottom:14px;align-items:stretch">
+  <!-- ══════════════════════════════════════════
+       STEP 2 — GRAFIK UTAMA (Stat strip + Time series chart)
+  ══════════════════════════════════════════ -->
+  <div class="eva-wiz-step" id="ra-step-2">
 
-    <!-- INPUT PANEL -->
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <div class="card">
-        <div class="section-title"><div class="dot"></div>Input Data Curah Hujan</div>
-        <div class="input-hint" style="font-size:11.5px;line-height:1.6;margin-bottom:8px">
-          <strong>📋 Paste dari Excel</strong> — 2 kolom: Tanggal &amp; CH (mm), dipisah TAB.
-          <div class="fmt-tags" style="margin-top:6px">
-            <span class="fmt-tag">DD/MM/YYYY ⇥ 12.5</span>
-            <span class="fmt-tag">YYYY-MM-DD ⇥ 0</span>
-            <span class="fmt-tag">DD-MM-YYYY ⇥ 45.2</span>
-          </div>
-          <div style="margin-top:5px;font-size:10.5px;color:var(--muted)">Hari hujan = CH &gt; 0,5 mm</div>
-        </div>
-        <textarea id="ra-input" rows="10" placeholder="01/01/1990&#9;0&#10;02/01/1990&#9;5,2&#10;03/01/1990&#9;22,8&#10;..." style="font-size:12px;font-family:var(--mono)"></textarea>
-        <div class="btn-row" style="margin-top:8px">
-          <button class="btn-primary" onclick="raAnalyze()">⚡ Analisis</button>
-          <button class="btn-secondary" onclick="raSample()">📥 Contoh</button>
-          <button class="btn-ghost" onclick="raClear()">✕ Hapus</button>
-        </div>
-        <div style="margin-top:8px;min-height:20px">
-          <span class="status-pill" id="ra-status"></span>
-          <span class="error-pill" id="ra-error"></span>
+    <!-- STAT STRIP -->
+    <div class="stat-strip cols-4" style="margin-bottom:14px">
+      <div class="stat-card">
+        <div class="stat-bar" style="background:linear-gradient(to bottom,#2bb8f0,#1a7fd4)"></div>
+        <div class="stat-body">
+          <div class="stat-val" id="sc-total">—<span class="u">mm</span></div>
+          <div class="stat-lbl">Total Curah Hujan</div>
         </div>
       </div>
-
-      <!-- Mini stat pills -->
-      <div class="card" id="ra-mini-stats" style="display:none">
-        <div class="section-title" style="margin-bottom:8px"><div class="dot"></div>Ringkasan Cepat</div>
-        <div id="ra-mini-content" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div>
+      <div class="stat-card">
+        <div class="stat-bar" style="background:linear-gradient(to bottom,#27ae60,#1e8449)"></div>
+        <div class="stat-body">
+          <div class="stat-val" id="sc-avg">—<span class="u">mm/hari</span></div>
+          <div class="stat-lbl">Rata-rata Harian</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-bar" style="background:linear-gradient(to bottom,#e74c3c,#c0392b)"></div>
+        <div class="stat-body">
+          <div class="stat-val" id="sc-max">—<span class="u">mm</span></div>
+          <div class="stat-lbl">CH Maksimum</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-bar" style="background:linear-gradient(to bottom,#f39c12,#d68910)"></div>
+        <div class="stat-body">
+          <div class="stat-val" id="sc-wetdays">—<span class="u">hari</span></div>
+          <div class="stat-lbl">Hari Hujan (&gt;0,5 mm)</div>
+        </div>
       </div>
     </div>
 
-    <!-- CHART PANEL (kanan, lebih lebar) -->
+    <!-- CHART PANEL -->
     <div class="card" style="display:flex;flex-direction:column;min-height:480px">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
         <div class="section-title" style="margin-bottom:0"><div class="dot"></div>Grafik Time Series</div>
@@ -2951,8 +3078,9 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
             <option value="daily">Harian</option>
             <option value="monthly_total" selected>Total Bulanan</option>
             <option value="monthly_avg">Rerata Bulanan</option>
+            <option value="monthly_max">CH Harian Tertinggi / Bulan</option>
             <option value="yearly">Total Tahunan</option>
-            <option value="annual_max">Maks Tahunan</option>
+            <option value="annual_max">CH Harian Tertinggi / Tahun</option>
           </select>
           <select id="ra-chart-style" onchange="raUpdateChart()" style="font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);font-family:var(--sans)">
             <option value="bar">Bar</option>
@@ -2973,171 +3101,177 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
           </button>
         </div>
       </div>
-      <!-- Chart container — tinggi proporsional, mengisi sisa ruang -->
-      <div style="position:relative;width:100%;flex:1;min-height:420px">
+      <div style="position:relative;width:100%;flex:1;min-height:420px;background:#ffffff;border-radius:8px;padding:8px">
         <canvas id="ra-chart"></canvas>
       </div>
-      <!-- Zoom hint untuk data besar -->
       <div id="ra-zoom-hint" style="display:none;margin-top:6px;font-size:10.5px;color:var(--muted);text-align:center;font-family:var(--mono)">
         💡 Data &gt;30 tahun: gunakan tampilan <strong>Total Bulanan</strong> atau <strong>Total Tahunan</strong> untuk keterbacaan optimal
       </div>
     </div>
+
+    <div class="eva-wiz-nav">
+      <button class="eva-wiz-btn-back" onclick="raWizGoto(1)">← Kembali: Input</button>
+      <button class="eva-wiz-btn-next" onclick="raWizGoto(3)">Lanjut: Lihat Statistik →</button>
+    </div>
   </div>
 
-  <!-- ── RESULTS SECTION (tersembunyi sampai data masuk) ── -->
-  <div id="ra-results" style="display:none">
+  <!-- ══════════════════════════════════════════
+       STEP 3 — SEMUA STATISTIK
+  ══════════════════════════════════════════ -->
+  <div class="eva-wiz-step" id="ra-step-3">
 
-    <!-- Info data kosong + toggle mode perhitungan -->
-    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);margin-bottom:12px">
-      <div id="ra-zero-info" style="display:flex;align-items:center;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:11px;flex:1;min-width:0"></div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-      <span style="font-size:11px;font-weight:600;color:var(--muted);font-family:var(--mono)">Mode Perhitungan Statistik:</span>
-      <button id="ra-mode-btn-all" onclick="raSetCalcModeAndRender('all')"
-        style="padding:5px 14px;border-radius:20px;border:1.5px solid var(--blue);background:var(--blue);color:#fff;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s">
-        Semua Data
-      </button>
-      <button id="ra-mode-btn-wet" onclick="raSetCalcModeAndRender('wet')"
-        style="padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--mono);font-size:11px;font-weight:400;cursor:pointer;transition:all .15s">
-        Hari Hujan Saja (&gt; 0,5 mm)
-      </button>
-      <button id="ra-mode-btn-annual_max" onclick="raSetCalcModeAndRender('annual_max')"
-        style="padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--mono);font-size:11px;font-weight:400;cursor:pointer;transition:all .15s">
-        CH Maks Tahunan
-      </button>
-      <span style="font-size:10px;color:var(--muted);font-style:italic">Persentil &amp; statistik mengikuti mode ini</span>
-    </div>
-    <!-- Keterangan mode annual_max -->
-    <div id="ra-amax-note" style="display:none;padding:9px 14px;background:var(--blue-soft);border:1px solid var(--border);border-radius:var(--rs);font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:12px">
-      📌 <strong style="color:var(--blue)">Mode CH Maks Tahunan:</strong>
-      Statistik dan persentil dihitung dari <strong>1 nilai tertinggi per tahun</strong> (Annual Maximum Series).
-      Metode ini digunakan dalam analisis frekuensi banjir dan penentuan curah hujan rancangan periode ulang.
-    </div>
+    <div id="ra-results">
 
-    <!-- Row 2: Panel biru statistik kunci (padat, 4 kartu) -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
-      <div class="bp">
-        <div><div class="bp-lbl">Rerata Bulanan</div><div class="bp-val" id="bp-monthly">—</div><div class="bp-unit">mm / bulan</div></div>
-        <div class="mini-bars" id="mb1"></div>
+      <!-- Info data kosong + toggle mode perhitungan -->
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);margin-bottom:12px">
+        <div id="ra-zero-info" style="display:flex;align-items:center;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:11px;flex:1;min-width:0"></div>
       </div>
-      <div class="bp">
-        <div><div class="bp-lbl">Rerata Tahunan</div><div class="bp-val" id="bp-yearly">—</div><div class="bp-unit">mm / tahun</div></div>
-        <div class="mini-bars" id="mb2"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:600;color:var(--muted);font-family:var(--mono)">Mode Perhitungan Statistik:</span>
+        <button id="ra-mode-btn-all" onclick="raSetCalcModeAndRender('all')"
+          style="padding:5px 14px;border-radius:20px;border:1.5px solid var(--blue);background:var(--blue);color:#fff;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s">
+          Semua Data
+        </button>
+        <button id="ra-mode-btn-wet" onclick="raSetCalcModeAndRender('wet')"
+          style="padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--mono);font-size:11px;font-weight:400;cursor:pointer;transition:all .15s">
+          Hari Hujan Saja
+        </button>
+        <button id="ra-mode-btn-annual_max" onclick="raSetCalcModeAndRender('annual_max')"
+          style="padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--mono);font-size:11px;font-weight:400;cursor:pointer;transition:all .15s">
+          CH Maks Tahunan
+        </button>
+        <span style="font-size:10px;color:var(--muted);font-style:italic">Persentil &amp; statistik mengikuti mode ini</span>
       </div>
-      <div class="bp" style="background:linear-gradient(135deg,#1e8449,#2ecc71)">
-        <div><div class="bp-lbl">Total Hari Hujan</div><div class="bp-val" id="bp-wetdays">—</div><div class="bp-unit">hari (&gt; 0,5 mm)</div></div>
-        <div class="mini-bars" id="mb3"></div>
+      <!-- Keterangan mode annual_max -->
+      <div id="ra-amax-note" style="display:none;padding:9px 14px;background:var(--blue-soft);border:1px solid var(--border);border-radius:var(--rs);font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:12px">
+        📌 <strong style="color:var(--blue)">Mode CH Maks Tahunan:</strong>
+        Statistik dan persentil dihitung dari <strong>1 nilai tertinggi per tahun</strong> (Annual Maximum Series).
+        Metode ini digunakan dalam analisis frekuensi banjir dan penentuan curah hujan rancangan periode ulang.
       </div>
-      <div class="bp" style="background:linear-gradient(135deg,#c0392b,#e74c3c)">
-        <div><div class="bp-lbl">Standar Deviasi</div><div class="bp-val" id="bp-sd">—</div><div class="bp-unit">mm</div></div>
-        <div class="mini-bars" id="mb4"></div>
-      </div>
-    </div>
 
-    <!-- Row 3: 2 Grafik tambahan — Distribusi Bulanan & Klasifikasi -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-      <!-- Distribusi rerata bulanan (bar chart) -->
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div class="section-title" style="margin-bottom:0"><div class="dot" style="background:#27ae60"></div>Pola Musiman — Rerata Bulanan</div>
-          <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">mm/bulan</span>
+      <!-- Row 2: Panel biru statistik kunci (padat, 4 kartu) -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
+        <div class="bp">
+          <div><div class="bp-lbl">Rerata Bulanan</div><div class="bp-val" id="bp-monthly">—</div><div class="bp-unit">mm / bulan</div></div>
+          <div class="mini-bars" id="mb1"></div>
         </div>
-        <div style="position:relative;width:100%;height:180px">
-          <canvas id="ra-monthly-chart"></canvas>
+        <div class="bp">
+          <div><div class="bp-lbl">Rerata Tahunan</div><div class="bp-val" id="bp-yearly">—</div><div class="bp-unit">mm / tahun</div></div>
+          <div class="mini-bars" id="mb2"></div>
         </div>
-        <div style="margin-top:8px;font-size:10.5px;color:var(--muted);background:var(--blue-soft);border-radius:5px;padding:6px 10px;line-height:1.5">
-          <strong style="color:var(--blue)">💡 Pola musim</strong>: bulan dengan batang tertinggi = musim hujan puncak. Penting untuk dimensi kolam retensi.
+        <div class="bp" style="background:linear-gradient(135deg,#1e8449,#2ecc71)">
+          <div><div class="bp-lbl">Total Hari Hujan</div><div class="bp-val" id="bp-wetdays">—</div><div class="bp-unit">hari (&gt; 0,5 mm)</div></div>
+          <div class="mini-bars" id="mb3"></div>
         </div>
-      </div>
-      <!-- Pie chart klasifikasi hujan -->
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div class="section-title" style="margin-bottom:0"><div class="dot" style="background:#e67e22"></div>Distribusi Kelas Hujan</div>
-          <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">% hari hujan</span>
-        </div>
-        <div style="position:relative;width:100%;height:180px">
-          <canvas id="ra-cls-chart"></canvas>
-        </div>
-        <div style="margin-top:8px;font-size:10.5px;color:var(--muted);background:var(--blue-soft);border-radius:5px;padding:6px 10px;line-height:1.5">
-          <strong style="color:#e67e22">💡 Klasifikasi</strong>: proporsi hari hujan lebat mempengaruhi risiko limpasan permukaan dan kebutuhan kolam.
+        <div class="bp" style="background:linear-gradient(135deg,#c0392b,#e74c3c)">
+          <div><div class="bp-lbl">Standar Deviasi</div><div class="bp-val" id="bp-sd">—</div><div class="bp-unit">mm</div></div>
+          <div class="mini-bars" id="mb4"></div>
         </div>
       </div>
-    </div>
 
-    <!-- Row 4: Box-plot / persentil visual + statistik hari hujan + klasifikasi tabel -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
-      <!-- Persentil + box visual -->
-      <div class="card">
-        <div class="section-title"><div class="dot"></div>Persentil Curah Hujan</div>
-        <table><thead><tr><th>Persentil</th><th style="text-align:right">Nilai (mm)</th><th style="width:80px">Bar</th></tr></thead>
-          <tbody id="ra-pct"></tbody></table>
-        <div style="margin-top:12px">
-          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Box Plot Distribusi CH</div>
-          <div style="position:relative;width:100%;height:100px">
-            <canvas id="ra-box-chart"></canvas>
+      <!-- Row 3: 2 Grafik tambahan — Distribusi Bulanan & Klasifikasi -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div class="section-title" style="margin-bottom:0"><div class="dot" style="background:#27ae60"></div>Pola Musiman — Rerata Bulanan</div>
+            <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">mm/bulan</span>
+          </div>
+          <div style="position:relative;width:100%;height:180px">
+            <canvas id="ra-monthly-chart"></canvas>
+          </div>
+          <div style="margin-top:8px;font-size:10.5px;color:var(--muted);background:var(--blue-soft);border-radius:5px;padding:6px 10px;line-height:1.5">
+            <strong style="color:var(--blue)">💡 Pola musim</strong>: bulan dengan batang tertinggi = musim hujan puncak. Penting untuk dimensi kolam retensi.
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div class="section-title" style="margin-bottom:0"><div class="dot" style="background:#e67e22"></div>Distribusi Kelas Hujan</div>
+            <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">% hari hujan</span>
+          </div>
+          <div style="position:relative;width:100%;height:180px">
+            <canvas id="ra-cls-chart"></canvas>
+          </div>
+          <div style="margin-top:8px;font-size:10.5px;color:var(--muted);background:var(--blue-soft);border-radius:5px;padding:6px 10px;line-height:1.5">
+            <strong style="color:#e67e22">💡 Klasifikasi</strong>: proporsi hari hujan lebat mempengaruhi risiko limpasan permukaan dan kebutuhan kolam.
           </div>
         </div>
       </div>
 
-      <!-- Klasifikasi tabel -->
-      <div class="card" style="display:flex;flex-direction:column">
-        <div class="section-title"><div class="dot"></div>Klasifikasi Curah Hujan</div>
-        <div style="flex:1;overflow-y:auto">
-          <table style="width:100%"><thead><tr><th>Kelas</th><th style="text-align:right">Hari</th><th style="text-align:right">%</th></tr></thead>
-            <tbody id="ra-cls"></tbody></table>
+      <!-- Row 4: Box-plot / persentil visual + statistik hari hujan + klasifikasi tabel -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
+        <div class="card">
+          <div class="section-title"><div class="dot"></div>Persentil Curah Hujan</div>
+          <table><thead><tr><th>Persentil</th><th style="text-align:right">Nilai (mm)</th><th style="width:80px">Bar</th></tr></thead>
+            <tbody id="ra-pct"></tbody></table>
+          <div style="margin-top:12px">
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Box Plot Distribusi CH</div>
+            <div style="position:relative;width:100%;height:100px">
+              <canvas id="ra-box-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="display:flex;flex-direction:column">
+          <div class="section-title"><div class="dot"></div>Klasifikasi Curah Hujan</div>
+          <div style="flex:1;overflow-y:auto">
+            <table style="width:100%"><thead><tr><th>Kelas</th><th style="text-align:right">Hari</th><th style="text-align:right">%</th></tr></thead>
+              <tbody id="ra-cls"></tbody></table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title"><div class="dot"></div>Statistik Hari Hujan</div>
+          <table><thead><tr><th>Parameter</th><th style="text-align:right">Nilai</th></tr></thead>
+            <tbody id="ra-wet"></tbody></table>
         </div>
       </div>
 
-      <!-- Statistik hari hujan -->
-      <div class="card">
-        <div class="section-title"><div class="dot"></div>Statistik Hari Hujan</div>
-        <table><thead><tr><th>Parameter</th><th style="text-align:right">Nilai</th></tr></thead>
-          <tbody id="ra-wet"></tbody></table>
+      <!-- Row 5: CH Maksimum Tahunan line chart — full width -->
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="section-title" style="margin-bottom:0"><div class="dot" style="background:#e74c3c"></div>Tren CH Maksimum Tahunan</div>
+          <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">CH Maks per tahun (mm)</span>
+        </div>
+        <div style="position:relative;width:100%;height:160px">
+          <canvas id="ra-annual-max-chart"></canvas>
+        </div>
+        <div style="margin-top:8px;font-size:10.5px;color:var(--muted);background:var(--blue-soft);border-radius:5px;padding:6px 10px;line-height:1.5">
+          <strong style="color:#e74c3c">💡 Analisis frekuensi</strong>: grafik ini menunjukkan tren CH maksimum tiap tahun — krusial untuk menentukan CH desain Q25, Q50, Q100.
+        </div>
       </div>
+
+      <!-- Row 6: Statistik lengkap + preview data -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:4px">
+        <div class="card">
+          <div class="section-title"><div class="dot"></div>Ringkasan Statistik Lengkap</div>
+          <div class="scrollable" style="max-height:220px">
+            <table><thead><tr><th>#</th><th>Parameter</th><th style="text-align:right">Mode Aktif</th><th id="ra-full-hdr" style="text-align:right;color:var(--green)">Hari Hujan Saja</th></tr></thead>
+              <tbody id="ra-full"></tbody></table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;align-items:center;gap:6px"><div class="dot"></div>Preview Data</div>
+            <span id="ra-preview-lbl" style="font-size:10px;color:var(--muted);font-family:var(--mono)"></span>
+          </div>
+          <div class="scrollable" style="max-height:220px">
+            <table><thead><tr><th>#</th><th>Tanggal</th><th style="text-align:right">CH (mm)</th><th>Kelas</th></tr></thead>
+              <tbody id="ra-preview"></tbody></table>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Row 5: CH Maksimum Tahunan line chart — full width -->
-    <div class="card" style="margin-bottom:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="section-title" style="margin-bottom:0"><div class="dot" style="background:#e74c3c"></div>Tren CH Maksimum Tahunan</div>
-        <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">CH Maks per tahun (mm)</span>
-      </div>
-      <div style="position:relative;width:100%;height:160px">
-        <canvas id="ra-annual-max-chart"></canvas>
-      </div>
-      <div style="margin-top:8px;font-size:10.5px;color:var(--muted);background:var(--blue-soft);border-radius:5px;padding:6px 10px;line-height:1.5">
-        <strong style="color:#e74c3c">💡 Analisis frekuensi</strong>: grafik ini menunjukkan tren CH maksimum tiap tahun — krusial untuk menentukan CH desain Q25, Q50, Q100.
-      </div>
+    <div class="eva-wiz-nav">
+      <button class="eva-wiz-btn-back" onclick="raWizGoto(2)">← Kembali: Grafik Utama</button>
+      <span></span>
     </div>
-
-    <!-- Row 6: Statistik lengkap + preview data -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-      <div class="card">
-        <div class="section-title"><div class="dot"></div>Ringkasan Statistik Lengkap</div>
-        <div class="scrollable" style="max-height:220px">
-          <table><thead><tr><th>#</th><th>Parameter</th><th style="text-align:right">Mode Aktif</th><th id="ra-full-hdr" style="text-align:right;color:var(--green)">Hari Hujan Saja</th></tr></thead>
-            <tbody id="ra-full"></tbody></table>
-        </div>
-      </div>
-      <div class="card">
-        <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
-          <div style="display:flex;align-items:center;gap:6px"><div class="dot"></div>Preview Data</div>
-          <span id="ra-preview-lbl" style="font-size:10px;color:var(--muted);font-family:var(--mono)"></span>
-        </div>
-        <div class="scrollable" style="max-height:220px">
-          <table><thead><tr><th>#</th><th>Tanggal</th><th style="text-align:right">CH (mm)</th><th>Kelas</th></tr></thead>
-            <tbody id="ra-preview"></tbody></table>
-        </div>
-      </div>
-    </div>
-
   </div>
+
 </div><!-- /page-rainfall -->
 
 
-<!-- ╔══════════════════════════════════════╗
-     ║   PAGE 2 — RUNOFF CONTACT WATER     ║
-     ╚══════════════════════════════════════╝ -->
 <div class="page" id="page-runoff">
 
   <div class="page-header">
@@ -3384,14 +3518,107 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
   <div class="page-header">
     <div>
       <div class="page-title">Evaporation Analysis</div>
-      <div class="page-subtitle">Laju penguapan Irving Langmuir via Diagram Psikrometrik — otomatis</div>
+      <div class="page-subtitle">Laju penguapan Irving Langmuir via Diagram Psikrometrik</div>
     </div>
   </div>
 
-  <!-- ── BARIS 1: Formula Banner + 4 Stat Cards ── -->
-  <div style="display:grid;grid-template-columns:1fr auto;gap:14px;margin-bottom:14px;align-items:stretch">
-    <!-- Formula -->
-    <div class="eva-formula-box" style="margin-bottom:0;overflow:hidden">
+  <!-- ══════════════════════════════════════════
+       WIZARD STEP TABS (indicator only, klik tidak aktif — navigasi via tombol)
+  ══════════════════════════════════════════ -->
+  <div class="eva-wiz-tabs">
+    <div class="eva-wiz-tab active" id="eva-wt-1" data-step="1">
+      <span class="eva-wiz-num">1</span>
+      <span class="eva-wiz-label">Input</span>
+    </div>
+    <div class="eva-wiz-line"></div>
+    <div class="eva-wiz-tab" id="eva-wt-2" data-step="2">
+      <span class="eva-wiz-num">2</span>
+      <span class="eva-wiz-label">Proses</span>
+    </div>
+    <div class="eva-wiz-line"></div>
+    <div class="eva-wiz-tab" id="eva-wt-3" data-step="3">
+      <span class="eva-wiz-num">3</span>
+      <span class="eva-wiz-label">Grafik</span>
+    </div>
+    <div class="eva-wiz-line"></div>
+    <div class="eva-wiz-tab" id="eva-wt-4" data-step="4">
+      <span class="eva-wiz-num">4</span>
+      <span class="eva-wiz-label">Hasil</span>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       STEP 1 — INPUT
+  ══════════════════════════════════════════ -->
+  <div class="eva-wiz-step active" id="eva-step-1">
+
+    <div class="card" style="padding:20px;max-width:560px;margin:0 auto 16px">
+      <div class="section-title" style="margin-bottom:14px">
+        <div class="dot" style="background:#f39c12"></div>Input Data Iklim
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">🌡️ Temperatur <span>(°C)</span></label>
+          <input type="text" inputmode="decimal" id="eva-temp" value="25,35" oninput="evaCalc()">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">💧 Kelembaban <span>(%)</span></label>
+          <input type="text" inputmode="decimal" id="eva-rh" value="89,81" oninput="evaCalc()">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">🏔️ Tek. Atmosfir <span>(Pa)</span></label>
+          <input type="text" inputmode="decimal" id="eva-press" value="101325" oninput="evaCalc()">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">📐 Faktor Aktual <span>(÷)</span></label>
+          <input type="text" inputmode="decimal" id="eva-factor" value="1.000.000" oninput="evaCalc()">
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--muted);background:var(--blue-soft);border-radius:6px;padding:8px 12px;line-height:1.6;border-left:3px solid var(--blue)">
+        ✅ Rasio kelembaban (humidity ratio) dihitung <strong>otomatis</strong> dari temperatur, RH, dan tekanan atmosfir di atas.
+      </div>
+    </div>
+
+    <!-- Preview ringkas hasil utama, agar user tahu input sudah berpengaruh -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:560px;margin:0 auto">
+      <div class="stat-card" style="border-left:4px solid #e67e22">
+        <div class="stat-body">
+          <div style="font-size:9px;font-weight:700;color:#e67e22;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px">Flux</div>
+          <div class="stat-val" id="er-flux" style="font-size:14px">—<span class="u">kg/m²/s</span></div>
+        </div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid #27ae60">
+        <div class="stat-body">
+          <div style="font-size:9px;font-weight:700;color:#27ae60;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px">Teoritis</div>
+          <div class="stat-val" id="er-m3day" style="font-size:14px">—<span class="u">m³/m²/hr</span></div>
+        </div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid #1a7fd4;background:linear-gradient(135deg,var(--card),var(--blue-soft))">
+        <div class="stat-body">
+          <div style="font-size:9px;font-weight:700;color:#1a7fd4;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px">Aktual ★</div>
+          <div class="stat-val" id="er-aktual" style="font-size:14px;color:#1a7fd4">—<span class="u">m³/m²/hr</span></div>
+        </div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid #9b59b6">
+        <div class="stat-body">
+          <div style="font-size:9px;font-weight:700;color:#9b59b6;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px">ΔP</div>
+          <div class="stat-val" id="er-dp" style="font-size:14px;color:#9b59b6">—<span class="u">Pa</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="eva-wiz-nav">
+      <span></span>
+      <button class="eva-wiz-btn-next" onclick="evaWizGoto(2)">Lanjut: Lihat Proses Hitung →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       STEP 2 — PROSES (Properti Psikrometrik + Step 1/2/3 perhitungan)
+  ══════════════════════════════════════════ -->
+  <div class="eva-wiz-step" id="eva-step-2">
+
+    <div class="eva-formula-box" style="margin-bottom:14px">
       <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
         <div style="flex:1;min-width:200px">
           <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.6;margin-bottom:6px">Irving Langmuir — Evaporation Flux</div>
@@ -3405,127 +3632,72 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
         </div>
       </div>
     </div>
-    <!-- 4 stat cards vertikal -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;min-width:0">
-      <div class="stat-card" style="border-left:4px solid #e67e22">
-        <div class="stat-body">
-          <div style="font-size:9px;font-weight:700;color:#e67e22;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px">dM/dt — Flux</div>
-          <div class="stat-val" id="er-flux" style="font-size:15px">—<span class="u">kg/m²/s</span></div>
-          <div class="stat-lbl" style="font-size:9px">Laju massa penguapan</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card" style="padding:14px">
+          <div class="section-title" style="margin-bottom:10px"><div class="dot"></div>Properti Psikrometrik</div>
+          <table class="psy-table" style="width:100%">
+            <thead><tr>
+              <th>Properti</th>
+              <th style="text-align:right">RH=100%</th>
+              <th style="text-align:right">Aktual</th>
+              <th style="text-align:right">Satuan</th>
+            </tr></thead>
+            <tbody id="tbl-allpsy"></tbody>
+          </table>
+        </div>
+
+        <div class="card" style="padding:14px">
+          <div class="section-title" style="margin-bottom:10px"><div class="dot" style="background:#e67e22"></div>① Antoine — Tekanan Uap Jenuh</div>
+          <table class="psy-table" style="width:100%">
+            <thead><tr><th>Parameter</th><th style="text-align:right">Nilai</th><th>Satuan</th></tr></thead>
+            <tbody id="tbl-antoine"></tbody>
+          </table>
         </div>
       </div>
-      <div class="stat-card" style="border-left:4px solid #27ae60">
-        <div class="stat-body">
-          <div style="font-size:9px;font-weight:700;color:#27ae60;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px">Teoritis</div>
-          <div class="stat-val" id="er-m3day" style="font-size:15px">—<span class="u">m³/m²/hari</span></div>
-          <div class="stat-lbl" style="font-size:9px">L/m²/hari ÷ 1000</div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card" style="padding:14px">
+          <div class="section-title" style="margin-bottom:10px"><div class="dot" style="background:#2bb8f0"></div>② Psikrometrik — Pv &amp; Pp</div>
+          <table class="psy-table" style="width:100%">
+            <thead><tr><th>Parameter</th><th style="text-align:right">Nilai</th><th>Satuan</th></tr></thead>
+            <tbody id="tbl-psycro"></tbody>
+          </table>
+        </div>
+
+        <div class="card" style="padding:14px">
+          <div class="section-title" style="margin-bottom:10px"><div class="dot" style="background:#27ae60"></div>③ Irving Langmuir — Hasil</div>
+          <table class="psy-table" style="width:100%">
+            <thead><tr><th>Parameter</th><th style="text-align:right">Nilai</th><th>Satuan</th></tr></thead>
+            <tbody id="tbl-langmuir"></tbody>
+          </table>
         </div>
       </div>
-      <div class="stat-card" style="border-left:4px solid #1a7fd4;background:linear-gradient(135deg,var(--card),var(--blue-soft))">
-        <div class="stat-body">
-          <div style="font-size:9px;font-weight:700;color:#1a7fd4;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px">Aktual ★ Hasil Akhir</div>
-          <div class="stat-val" id="er-aktual" style="font-size:15px;color:#1a7fd4">—<span class="u">m³/m²/hari</span></div>
-          <div class="stat-lbl" style="font-size:9px">Teoritis ÷ Faktor</div>
-        </div>
-      </div>
-      <div class="stat-card" style="border-left:4px solid #9b59b6">
-        <div class="stat-body">
-          <div style="font-size:9px;font-weight:700;color:#9b59b6;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px">ΔP = Pv − Pp</div>
-          <div class="stat-val" id="er-dp" style="font-size:15px;color:#9b59b6">—<span class="u">Pa</span></div>
-          <div class="stat-lbl" style="font-size:9px">Perbedaan tekanan uap</div>
-        </div>
-      </div>
+
+    </div>
+
+    <div class="eva-wiz-nav">
+      <button class="eva-wiz-btn-back" onclick="evaWizGoto(1)">← Kembali: Input</button>
+      <button class="eva-wiz-btn-next" onclick="evaWizGoto(3)">Lanjut: Lihat Grafik →</button>
     </div>
   </div>
 
-  <!-- ── BARIS 2: Kolom Kiri Sempit | Kolom Kanan Lebar ── -->
-  <div class="eva-3col" style="display:grid;grid-template-columns:270px minmax(0,1fr);gap:14px;align-items:start;margin-bottom:14px;min-width:0">
+  <!-- ══════════════════════════════════════════
+       STEP 3 — GRAFIK (Psychrometric Chart + Sensitivitas)
+  ══════════════════════════════════════════ -->
+  <div class="eva-wiz-step" id="eva-step-3">
 
-    <!-- ═══ KOLOM KIRI: Input + Properti + Step ①②③ ═══ -->
-    <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
-
-      <!-- Input Data -->
-      <div class="card" style="padding:14px">
-        <div class="section-title" style="margin-bottom:10px">
-          <div class="dot" style="background:#f39c12"></div>Input Data
+    <div class="card" style="padding:0;overflow:hidden;margin-bottom:14px">
+      <div style="padding:11px 16px 9px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div class="section-title" style="margin-bottom:1px">
+            <div class="dot" style="background:#e67e22"></div>Psychrometric Chart — SI
+          </div>
+          <div style="font-size:11px;color:var(--muted)" id="psy-patm-label">P = 101325 Pa</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="form-group" style="margin-bottom:0">
-            <label class="form-label" style="font-size:9.5px">🌡️ Temperatur <span>(°C)</span></label>
-            <input type="text" inputmode="decimal" id="eva-temp" value="25,35" oninput="evaCalc()" style="font-size:12px;padding:6px 9px">
-          </div>
-          <div class="form-group" style="margin-bottom:0">
-            <label class="form-label" style="font-size:9.5px">💧 Kelembaban <span>(%)</span></label>
-            <input type="text" inputmode="decimal" id="eva-rh" value="89,81" oninput="evaCalc()" style="font-size:12px;padding:6px 9px">
-          </div>
-          <div class="form-group" style="margin-bottom:0">
-            <label class="form-label" style="font-size:9.5px">🏔️ Tek. Atmosfir <span>(Pa)</span></label>
-            <input type="text" inputmode="decimal" id="eva-press" value="101325" oninput="evaCalc()" style="font-size:12px;padding:6px 9px">
-          </div>
-          <div class="form-group" style="margin-bottom:0">
-            <label class="form-label" style="font-size:9.5px">📐 Faktor Aktual <span>(÷)</span></label>
-            <input type="text" inputmode="decimal" id="eva-factor" value="1.000.000" oninput="evaCalc()" style="font-size:12px;padding:6px 9px">
-          </div>
-        </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);background:var(--blue-soft);border-radius:5px;padding:5px 9px;line-height:1.5;border-left:3px solid var(--blue)">
-          ✅ Rasio kelembaban dihitung <strong>otomatis</strong>
-        </div>
-      </div>
-
-      <!-- Properti Psikrometrik -->
-      <div class="card" style="padding:12px">
-        <div class="section-title" style="margin-bottom:7px;font-size:12px"><div class="dot"></div>Properti Psikrometrik</div>
-        <table class="psy-table" style="font-size:10.5px;width:100%">
-          <thead><tr>
-            <th style="font-size:9px;padding:4px 7px">Properti</th>
-            <th style="text-align:right;font-size:9px;padding:4px 7px">RH=100%</th>
-            <th style="text-align:right;font-size:9px;padding:4px 7px">Aktual</th>
-            <th style="text-align:right;font-size:9px;padding:4px 7px">Satuan</th>
-          </tr></thead>
-          <tbody id="tbl-allpsy"></tbody>
-        </table>
-      </div>
-
-      <!-- STEP 1 -->
-      <div class="card" style="padding:12px">
-        <div class="section-title" style="margin-bottom:7px;font-size:12px"><div class="dot" style="background:#e67e22"></div>① Antoine — Tek. Uap Jenuh</div>
-        <table class="psy-table" style="font-size:10.5px;width:100%">
-          <thead><tr><th style="padding:4px 7px">Parameter</th><th style="text-align:right;padding:4px 7px">Nilai</th><th style="font-size:9px;padding:4px 7px">Satuan</th></tr></thead>
-          <tbody id="tbl-antoine"></tbody>
-        </table>
-      </div>
-
-      <!-- STEP 2 -->
-      <div class="card" style="padding:12px">
-        <div class="section-title" style="margin-bottom:7px;font-size:12px"><div class="dot" style="background:#2bb8f0"></div>② Psikrometrik — Pv &amp; Pp</div>
-        <table class="psy-table" style="font-size:10.5px;width:100%">
-          <thead><tr><th style="padding:4px 7px">Parameter</th><th style="text-align:right;padding:4px 7px">Nilai</th><th style="font-size:9px;padding:4px 7px">Satuan</th></tr></thead>
-          <tbody id="tbl-psycro"></tbody>
-        </table>
-      </div>
-
-      <!-- STEP 3 -->
-      <div class="card" style="padding:12px">
-        <div class="section-title" style="margin-bottom:7px;font-size:12px"><div class="dot" style="background:#27ae60"></div>③ Irving Langmuir — Hasil</div>
-        <table class="psy-table" style="font-size:10.5px;width:100%">
-          <thead><tr><th style="padding:4px 7px">Parameter</th><th style="text-align:right;padding:4px 7px">Nilai</th><th style="font-size:9px;padding:4px 7px">Satuan</th></tr></thead>
-          <tbody id="tbl-langmuir"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ═══ KOLOM KANAN: Chart + Sensitivitas Bar + Sensitivitas Tabel ═══ -->
-    <div style="display:flex;flex-direction:column;gap:12px;min-width:0;position:sticky;top:14px">
-
-      <!-- Psychrometric Chart — mengisi lebar penuh kolom kanan -->
-      <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:11px 16px 9px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-          <div>
-            <div class="section-title" style="margin-bottom:1px">
-              <div class="dot" style="background:#e67e22"></div>Psychrometric Chart — SI
-            </div>
-            <div style="font-size:11px;color:var(--muted)" id="psy-patm-label">P = 101325 Pa</div>
-          </div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           <div style="display:flex;gap:12px;flex-wrap:wrap">
             <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><span style="width:18px;height:2px;background:#2bb8f0;display:inline-block;border-radius:1px"></span>RH lines</div>
             <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><span style="width:18px;height:0;display:inline-block;border-top:1.5px dashed #a78bfa"></span>Wet-bulb</div>
@@ -3533,157 +3705,160 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
             <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><span style="width:10px;height:10px;border-radius:50%;background:#e74c3c;display:inline-block"></span>State</div>
             <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><span style="width:10px;height:10px;border-radius:50%;background:#f39c12;display:inline-block"></span>RH=100%</div>
           </div>
-        </div>
-        <div style="position:relative;padding:10px;background:#ffffff;min-height:340px">
-          <canvas id="psy-canvas"
-            style="display:block;width:100%;cursor:crosshair;border-radius:6px"
-            onmousemove="psyMouseMove(event)" onmouseleave="psyMouseLeave()"></canvas>
-          <div class="psy-tooltip" id="psy-tooltip"></div>
+          <button onclick="psyDownloadChart()" title="Download grafik sebagai PNG" style="display:flex;align-items:center;gap:6px;font-size:11px;padding:6px 12px;background:var(--blue-grad);border:none;border-radius:7px;color:white;cursor:pointer;font-family:var(--sans);font-weight:600;box-shadow:0 2px 8px rgba(26,127,212,0.3);flex-shrink:0">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Grafik
+          </button>
         </div>
       </div>
-
-      <!-- Sensitivitas RH — Bar Chart BESAR -->
-      <div class="card" style="padding:16px">
-        <div class="section-title" style="margin-bottom:12px"><div class="dot" style="background:#9b59b6"></div>Grafik Sensitivitas RH → Laju Aktual</div>
-        <div style="position:relative;width:100%;height:280px">
-          <canvas id="eva-sensitivity-chart"></canvas>
-        </div>
-        <div style="margin-top:10px;font-size:11px;color:var(--muted);background:var(--blue-soft);border-radius:6px;padding:8px 12px;line-height:1.6">
-          <strong style="color:#9b59b6">💡 Interpretasi:</strong> Semakin rendah RH → perbedaan Pv−Pp makin besar → laju evaporasi makin tinggi.
-        </div>
+      <div style="position:relative;padding:10px;background:#ffffff;min-height:340px">
+        <canvas id="psy-canvas"
+          style="display:block;width:100%;cursor:crosshair;border-radius:6px"
+          onmousemove="psyMouseMove(event)" onmouseleave="psyMouseLeave()"></canvas>
+        <div class="psy-tooltip" id="psy-tooltip"></div>
       </div>
-
-      <!-- Sensitivitas tabel BESAR — full width, semua baris tampil -->
-      <div class="card" style="padding:16px">
-        <div class="section-title" style="margin-bottom:12px"><div class="dot" style="background:#9b59b6"></div>Tabel Sensitivitas RH — Semua Kondisi</div>
-        <table style="width:100%;font-size:12px;border-collapse:collapse">
-          <thead>
-            <tr style="background:var(--blue-soft)">
-              <th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;border-bottom:2px solid var(--border)">RH %</th>
-              <th style="padding:8px 14px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;border-bottom:2px solid var(--border)">Pp (Pa)</th>
-              <th style="padding:8px 14px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;border-bottom:2px solid var(--border)">dM/dt (kg/m²/s)</th>
-              <th style="padding:8px 14px;text-align:right;font-size:10px;font-weight:700;color:#1a7fd4;text-transform:uppercase;letter-spacing:0.6px;border-bottom:2px solid var(--border)">Laju Aktual (m³/m²/hr)</th>
-            </tr>
-          </thead>
-          <tbody id="eva-sensitivity"></tbody>
-        </table>
-      </div>
-
-    </div><!-- /kolom kanan -->
-
-  </div><!-- /main 2-col layout -->
-
-  <!-- ══════════════════════════════════════════════════
-       VOLUME PENGUAPAN PER CATCHMENT — Full Width
-  ══════════════════════════════════════════════════ -->
-  <div id="eva-catchment-card" style="margin-top:4px">
-
-    <!-- Section header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div>
-        <div style="font-size:17px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:10px">
-          <span style="width:12px;height:12px;border-radius:50%;background:#a78bfa;display:inline-block;box-shadow:0 0 8px rgba(167,139,250,0.5)"></span>
-          Volume Penguapan per Catchment Area
-        </div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;margin-left:22px">
-          Laju aktual evaporasi × luas tiap daerah tangkapan → volume air yang berkurang per hari
-        </div>
-      </div>
-      <button onclick="evaCalc()" style="display:flex;align-items:center;gap:6px;font-size:12px;padding:7px 14px;background:var(--blue-grad);border:none;border-radius:8px;color:white;cursor:pointer;font-family:var(--sans);font-weight:600;box-shadow:0 3px 10px rgba(26,127,212,0.25)">
-        ↻ Refresh dari Runoff
-      </button>
     </div>
 
-    <!-- Empty state -->
-    <div id="eva-catchment-empty" class="card" style="text-align:center;padding:36px 20px">
-      <div style="font-size:32px;margin-bottom:10px;opacity:0.35">🌿</div>
-      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">Belum ada data catchment</div>
-      <div style="font-size:12px;color:var(--muted)">Tambahkan area dan luas (ha) di menu <strong>Runoff Contact Water</strong>, lalu kembali ke halaman ini.</div>
+    <div class="card" style="padding:16px;margin-bottom:14px">
+      <div class="section-title" style="margin-bottom:12px"><div class="dot" style="background:#9b59b6"></div>Grafik Sensitivitas RH → Laju Aktual</div>
+      <div style="position:relative;width:100%;height:260px">
+        <canvas id="eva-sensitivity-chart"></canvas>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);background:var(--blue-soft);border-radius:6px;padding:8px 12px;line-height:1.6">
+        <strong style="color:#9b59b6">💡 Interpretasi:</strong> Semakin rendah RH → perbedaan Pv−Pp makin besar → laju evaporasi makin tinggi.
+      </div>
     </div>
 
-    <!-- Filled state -->
-    <div id="eva-catchment-table-wrap" style="display:none">
+    <div class="card" style="padding:16px">
+      <div class="section-title" style="margin-bottom:12px"><div class="dot" style="background:#9b59b6"></div>Tabel Sensitivitas RH — Semua Kondisi</div>
+      <table style="width:100%;font-size:12px;border-collapse:collapse">
+        <thead>
+          <tr style="background:var(--blue-soft)">
+            <th style="text-align:left">RH %</th>
+            <th style="text-align:right">Pp (Pa)</th>
+            <th style="text-align:right">dM/dt (kg/m²/s)</th>
+            <th style="text-align:right;color:#1a7fd4">Laju Aktual (m³/m²/hr)</th>
+          </tr>
+        </thead>
+        <tbody id="eva-sensitivity"></tbody>
+      </table>
+    </div>
 
-      <!-- Laju rate info bar -->
-      <div style="background:var(--blue-soft);border:1px solid var(--border);border-radius:10px;padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+    <div class="eva-wiz-nav">
+      <button class="eva-wiz-btn-back" onclick="evaWizGoto(2)">← Kembali: Proses</button>
+      <button class="eva-wiz-btn-next" onclick="evaWizGoto(4)">Lanjut: Hasil Akhir →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       STEP 4 — HASIL (Volume Penguapan per Catchment Area)
+  ══════════════════════════════════════════ -->
+  <div class="eva-wiz-step" id="eva-step-4">
+
+    <div id="eva-catchment-card" style="margin-top:0">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
         <div>
-          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Laju Aktual digunakan</div>
-          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--blue);margin-top:2px" id="eva-rate-display">—</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:1px">m³/m²/hari</div>
+          <div style="font-size:17px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:10px">
+            <span style="width:12px;height:12px;border-radius:50%;background:#a78bfa;display:inline-block;box-shadow:0 0 8px rgba(167,139,250,0.5)"></span>
+            Volume Penguapan per Catchment Area
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;margin-left:22px">
+            Laju aktual evaporasi × luas tiap daerah tangkapan → volume air yang berkurang per hari
+          </div>
         </div>
-        <div style="width:1px;height:36px;background:var(--border);flex-shrink:0"></div>
-        <div>
-          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Konversi ke mm/hari</div>
-          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--orange);margin-top:2px" id="eva-rate-mm">—</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:1px">mm/hari (× 1.000)</div>
-        </div>
-        <div style="width:1px;height:36px;background:var(--border);flex-shrink:0"></div>
-        <div>
-          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Rumus per area</div>
-          <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text);margin-top:3px">V = Laju × A (ha) × 10.000</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:1px">m³/hari = m³/m²/hari × m²</div>
-        </div>
+        <button onclick="evaCalc()" style="display:flex;align-items:center;gap:6px;font-size:12px;padding:7px 14px;background:var(--blue-grad);border:none;border-radius:8px;color:white;cursor:pointer;font-family:var(--sans);font-weight:600;box-shadow:0 3px 10px rgba(26,127,212,0.25)">
+          ↻ Refresh dari Runoff
+        </button>
       </div>
 
-      <!-- Cards grid -->
-      <div id="eva-catchment-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:16px"></div>
-
-      <div class="card" style="border-top:3px solid #a78bfa">
-        <div class="section-title" style="margin-bottom:14px">
-          <div class="dot" style="background:#a78bfa"></div>
-          Tabel Ringkasan Semua Catchment
-        </div>
-        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-        <table style="min-width:700px">
-          <thead>
-            <tr style="background:var(--blue-soft)">
-              <th>#</th>
-              <th>Nama Catchment</th>
-              <th style="text-align:center">Status</th>
-              <th style="text-align:right">Luas (ha)</th>
-              <th style="text-align:right">Luas (m²)</th>
-              <th>Lokasi Pengolahan</th>
-              <th style="text-align:right">Vol. Penguapan (m³/hari)</th>
-              <th style="text-align:right">% Total</th>
-            </tr>
-          </thead>
-          <tbody id="eva-catchment-tbody"></tbody>
-          <tfoot id="eva-catchment-tfoot"></tfoot>
-        </table>
-        </div>
+      <div id="eva-catchment-empty" class="card" style="text-align:center;padding:36px 20px">
+        <div style="font-size:32px;margin-bottom:10px;opacity:0.35">🌿</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">Belum ada data catchment</div>
+        <div style="font-size:12px;color:var(--muted)">Tambahkan area dan luas (ha) di menu <strong>Runoff Contact Water</strong>, lalu kembali ke halaman ini.</div>
       </div>
 
-      <!-- WTP Grouping -->
-      <div id="eva-wtp-group-wrap" style="display:none">
-        <div style="font-size:15px;font-weight:800;color:var(--text);margin:18px 0 12px;display:flex;align-items:center;gap:10px">
-          <span style="width:12px;height:12px;border-radius:50%;background:#27ae60;display:inline-block;box-shadow:0 0 8px rgba(39,174,96,0.5)"></span>
-          Pengelompokan Evaporasi per Lokasi Pengolahan Air Limbah
-        </div>
-        <div id="eva-wtp-group-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px"></div>
-      </div>
+      <div id="eva-catchment-table-wrap" style="display:none">
 
-      <!-- Grand total banner -->
-      <div style="background:linear-gradient(135deg,#4c1d95,#7c3aed,#a78bfa);border-radius:14px;padding:20px 28px;margin-top:4px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 24px rgba(124,58,237,0.3)">
-        <div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px">Total Volume Air yang Menguap</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Seluruh catchment area dalam satu hari</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.5)" id="eva-total-note"></div>
+        <div style="background:var(--blue-soft);border:1px solid var(--border);border-radius:10px;padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Laju Aktual digunakan</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--blue);margin-top:2px" id="eva-rate-display">—</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:1px">m³/m²/hari</div>
+          </div>
+          <div style="width:1px;height:36px;background:var(--border);flex-shrink:0"></div>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Konversi ke mm/hari</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--orange);margin-top:2px" id="eva-rate-mm">—</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:1px">mm/hari (× 1.000)</div>
+          </div>
+          <div style="width:1px;height:36px;background:var(--border);flex-shrink:0"></div>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Rumus per area</div>
+            <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text);margin-top:3px">V = Laju × A (ha) × 10.000</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:1px">m³/hari = m³/m²/hari × m²</div>
+          </div>
         </div>
-        <div style="text-align:right">
-          <div style="font-family:var(--mono);font-size:36px;font-weight:800;color:white;line-height:1" id="eva-catchment-total">—</div>
-          <div style="font-size:13px;color:rgba(255,255,255,0.7);margin-top:6px">m³ / hari</div>
-          <div style="font-family:var(--mono);font-size:12px;color:rgba(255,255,255,0.55);margin-top:2px" id="eva-total-liter">—</div>
-        </div>
-      </div>
 
-    </div><!-- /filled -->
-  </div><!-- /catchment section -->
+        <div id="eva-catchment-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:16px"></div>
+
+        <div class="card" style="border-top:3px solid #a78bfa;margin-bottom:16px">
+          <div class="section-title" style="margin-bottom:14px">
+            <div class="dot" style="background:#a78bfa"></div>
+            Tabel Ringkasan Semua Catchment
+          </div>
+          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+          <table style="min-width:700px">
+            <thead>
+              <tr style="background:var(--blue-soft)">
+                <th>#</th>
+                <th>Nama Catchment</th>
+                <th style="text-align:center">Status</th>
+                <th style="text-align:right">Luas (ha)</th>
+                <th style="text-align:right">Luas (m²)</th>
+                <th>Lokasi Pengolahan</th>
+                <th style="text-align:right">Vol. Penguapan (m³/hari)</th>
+                <th style="text-align:right">% Total</th>
+              </tr>
+            </thead>
+            <tbody id="eva-catchment-tbody"></tbody>
+            <tfoot id="eva-catchment-tfoot"></tfoot>
+          </table>
+          </div>
+        </div>
+
+        <div id="eva-wtp-group-wrap" style="display:none;margin-bottom:4px">
+          <div style="font-size:15px;font-weight:800;color:var(--text);margin:0 0 12px;display:flex;align-items:center;gap:10px">
+            <span style="width:12px;height:12px;border-radius:50%;background:#27ae60;display:inline-block;box-shadow:0 0 8px rgba(39,174,96,0.5)"></span>
+            Pengelompokan Evaporasi per Lokasi Pengolahan Air Limbah
+          </div>
+          <div id="eva-wtp-group-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px"></div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,#4c1d95,#7c3aed,#a78bfa);border-radius:14px;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 24px rgba(124,58,237,0.3);flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px">Total Volume Air yang Menguap</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Seluruh catchment area dalam satu hari</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.5)" id="eva-total-note"></div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:var(--mono);font-size:36px;font-weight:800;color:white;line-height:1" id="eva-catchment-total">—</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.7);margin-top:6px">m³ / hari</div>
+            <div style="font-family:var(--mono);font-size:12px;color:rgba(255,255,255,0.55);margin-top:2px" id="eva-total-liter">—</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="eva-wiz-nav">
+      <button class="eva-wiz-btn-back" onclick="evaWizGoto(3)">← Kembali: Grafik</button>
+      <span></span>
+    </div>
+  </div>
 
 </div><!-- /page-evaporation -->
 
-<!-- ╔══════════════════════════════════════════════╗
-     ║   PAGE — GROUNDWATER                        ║
-     ╚══════════════════════════════════════════════╝ -->
 <div class="page" id="page-groundwater">
   <div class="page-header">
     <div>
@@ -4698,14 +4873,11 @@ function toggleDarkMode() {
   const lbl = document.getElementById('dm-label');
 
   if (isDark) {
-    sw.style.background   = '#2c3e6b';
-    sw.style.boxShadow    = '0 2px 8px rgba(0,0,0,0.4)';
-    sw.style.cssText     += '; --sw-offset: left';
-    lbl.textContent       = '🌙 Dark Mode';
+    if (sw)  { sw.style.background = '#2c3e6b'; sw.style.boxShadow = '0 2px 8px rgba(0,0,0,0.4)'; sw.style.cssText += '; --sw-offset: left'; }
+    if (lbl) lbl.textContent = '🌙 Dark Mode';
   } else {
-    sw.style.background   = '';
-    sw.style.boxShadow    = '';
-    lbl.textContent       = '☀️ Light Mode';
+    if (sw)  { sw.style.background = ''; sw.style.boxShadow = ''; }
+    if (lbl) lbl.textContent = '☀️ Light Mode';
   }
 
   // Update topbar theme button
@@ -5014,6 +5186,44 @@ let raCalcMode = 'all';
 let raZeroCount  = 0;
 let raBlankCount = 0;
 let raStatsAmax  = null; // statistik dari CH harian maks per tahun
+
+/* ═══════════════════════════════════
+   RAINFALL WIZARD — 3-step navigation
+═══════════════════════════════════ */
+function raWizGoto(step) {
+  for (let i = 1; i <= 3; i++) {
+    const stepEl = document.getElementById('ra-step-' + i);
+    const tabEl  = document.getElementById('ra-wt-' + i);
+    if (stepEl) stepEl.classList.toggle('active', i === step);
+    if (tabEl) {
+      tabEl.classList.toggle('active', i === step);
+      tabEl.classList.toggle('done', i < step);
+    }
+  }
+  const page = document.getElementById('page-rainfall');
+  if (page) page.scrollIntoView({ behavior: 'instant', block: 'start' });
+
+  // Charts need visible dimensions to draw correctly — redraw once step is shown
+  if (step === 2) {
+    setTimeout(() => { if (typeof raUpdateChart === 'function' && raData && raData.length) raUpdateChart(); }, 30);
+  }
+  if (step === 3) {
+    setTimeout(() => { if (typeof raRenderExtraCharts === 'function' && raData && raData.length) raRenderExtraCharts(); }, 30);
+  }
+}
+
+function raWizReset() {
+  raWizGoto(1);
+}
+
+// Enable "Lanjut" button on Step 1 once analysis succeeds, then auto-advance
+function raWizAfterAnalyze() {
+  const nextBtn = document.getElementById('ra-wiz-next-1');
+  if (raData && raData.length) {
+    if (nextBtn) { nextBtn.disabled = false; nextBtn.style.opacity = '1'; nextBtn.style.cursor = 'pointer'; }
+    setTimeout(() => raWizGoto(2), 250);
+  }
+}
 
 function raAnalyze() {
   const raw = document.getElementById('ra-input').value;
@@ -5331,6 +5541,36 @@ function raUpdateChart() {
     }];
     infoText = `Rata-rata dari ${nYears} tahun data`;
 
+  } else if (type === 'monthly_max') {
+    // CH harian tertinggi dalam tiap bulan (per tahun) — untuk identifikasi bulan basah ekstrem
+    const maxM = {};
+    raData.forEach(d => {
+      const k = `${d.date.getFullYear()}-${String(d.date.getMonth()+1).padStart(2,'0')}`;
+      if (maxM[k] === undefined || d.value > maxM[k]) maxM[k] = d.value;
+    });
+    const keys = Object.keys(maxM).sort();
+    const mNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    labels = keys.map(k => {
+      const [y, m] = k.split('-');
+      return `${mNames[parseInt(m)-1]} ${y}`;
+    });
+    const vals = keys.map(k => maxM[k]);
+    const overallMax = Math.max(...vals);
+    datasets = [{
+      label: 'CH Harian Tertinggi (mm)',
+      data: vals,
+      backgroundColor: vals.map(v => v === overallMax
+        ? 'rgba(231,76,60,0.88)' : 'rgba(243,156,18,0.62)'),
+      borderColor: '#e67e22',
+      borderWidth: 1.5,
+      pointRadius: style === 'line' ? 3 : 0,
+      pointBackgroundColor: '#e67e22',
+      fill: false,
+      tension: 0.25,
+      type: style === 'bar' ? 'bar' : 'line',
+    }];
+    infoText = `${keys.length} bulan · Tertinggi: ${overallMax.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})} mm`;
+
   } else if (type === 'yearly') {
     const aggY = {};
     raData.forEach(d => { const y = d.date.getFullYear(); aggY[y] = (aggY[y]||0) + d.value; });
@@ -5411,9 +5651,19 @@ function raUpdateChart() {
   if (!canvas) return;
 
   // Chart.js config optimised for large datasets
+  // Canvas now always has a solid white background for clarity — use dark-on-white colors regardless of app theme
   const isLarge = labels.length > 500;
-  const gridColor = isDark ? 'rgba(20,40,70,0.9)' : 'rgba(200,218,240,0.55)';
-  const tickColor = isDark ? '#4a7a9a' : '#6080a0';
+  const gridColor = 'rgba(170,190,215,0.45)';
+  const tickColor = '#3a5878';
+
+  // Bar styling: rounded corners for clarity, consistent border radius
+  datasets.forEach(ds => {
+    if (ds.type !== 'line') {
+      ds.borderRadius = { topLeft: 3, topRight: 3, bottomLeft: 0, bottomRight: 0 };
+      ds.borderSkipped = false;
+      ds.maxBarThickness = 48;
+    }
+  });
 
   // Tampilkan tombol download setelah chart berhasil dirender
   const dlBtn = document.getElementById('ra-chart-dl-btn');
@@ -5427,29 +5677,30 @@ function raUpdateChart() {
       maintainAspectRatio: false,
       animation: { duration: isLarge ? 0 : 350 },
       interaction: { mode: 'index', intersect: false },
-      layout: { padding: { top: 10, right: 16, bottom: 4, left: 4 } },
+      layout: { padding: { top: 14, right: 20, bottom: 6, left: 6 } },
       plugins: {
         legend: {
           display: datasets.length > 1,
           position: 'top',
           align: 'end',
           labels: {
-            color: isDark ? '#a0c8e8' : '#1e3a5f',
-            font: { family: 'Inter', size: 10, weight: '500' },
-            boxWidth: 12, boxHeight: 12,
-            padding: 16, usePointStyle: true, pointStyleWidth: 14,
+            color: '#1e3a5f',
+            font: { family: 'Inter', size: 11.5, weight: '600' },
+            boxWidth: 13, boxHeight: 13,
+            padding: 18, usePointStyle: true, pointStyleWidth: 15,
           }
         },
         tooltip: {
-          backgroundColor: isDark ? '#0a1628' : '#1a3050',
-          borderColor: isDark ? '#2a4870' : 'rgba(26,127,212,0.3)',
-          borderWidth: 1,
+          backgroundColor: '#1a3050',
+          borderColor: 'rgba(26,127,212,0.4)',
+          borderWidth: 1.5,
           titleColor: '#7dd3fc',
-          bodyColor: isDark ? '#c0d8f0' : '#ddeeff',
-          padding: 10,
-          cornerRadius: 8,
-          titleFont: { family: 'Inter', size: 10, weight: '700' },
-          bodyFont:  { family: 'Inter', size: 11 },
+          bodyColor: '#eef6ff',
+          padding: 12,
+          cornerRadius: 9,
+          titleFont: { family: 'Inter', size: 11.5, weight: '700' },
+          bodyFont:  { family: 'Inter', size: 12 },
+          displayColors: true,
           callbacks: {
             label: c => ` ${c.dataset.label}: ${c.parsed.y.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})} mm`
           }
@@ -5457,22 +5708,22 @@ function raUpdateChart() {
       },
       scales: {
         x: {
-          grid: { color: gridColor, lineWidth: 0.5 },
+          grid: { color: gridColor, lineWidth: 0.6 },
           border: { display: false },
           ticks: {
             color: tickColor,
-            font: { family: 'Inter', size: type==='yearly'||type==='annual_max' ? 10 : 8.5 },
+            font: { family: 'Inter', size: type==='yearly'||type==='annual_max'||type==='monthly_max' ? 11.5 : 10, weight: '500' },
             maxTicksLimit: isLarge ? 16 : (nYears > 15 ? 20 : nYears > 5 ? 30 : labels.length),
             maxRotation: nYears > 5 ? 45 : 0,
             minRotation: 0,
             autoSkip: true,
-            autoSkipPadding: 10,
-            padding: 4,
+            autoSkipPadding: 12,
+            padding: 6,
           },
         },
         y: {
-          grid: { color: gridColor, lineWidth: 0.5 },
-          border: { display: false, dash: [3,3] },
+          grid: { color: gridColor, lineWidth: 0.6 },
+          border: { display: false, dash: [4,4] },
           beginAtZero: true,
           suggestedMax: (() => {
             const allVals = datasets.flatMap(ds => ds.data.filter(v => typeof v === 'number'));
@@ -5483,19 +5734,21 @@ function raUpdateChart() {
           })(),
           ticks: {
             color: tickColor,
-            font: { family: 'Inter', size: 9 },
+            font: { family: 'Inter', size: 10.5, weight: '500' },
             count: 7,
-            padding: 8,
+            padding: 10,
             callback: v => v % 1 === 0
               ? v.toLocaleString('id-ID')
               : v.toLocaleString('id-ID', { maximumFractionDigits: 1 }),
           },
           title: {
             display: true,
-            text: type==='monthly_avg' ? 'CH Rerata (mm/hari)' : 'Curah Hujan (mm)',
+            text: type==='monthly_avg' ? 'CH Rerata (mm/hari)'
+                : (type==='monthly_max'||type==='annual_max') ? 'CH Harian Tertinggi (mm)'
+                : 'Curah Hujan (mm)',
             color: tickColor,
-            font: { family: 'Inter', size: 10, weight: '600' },
-            padding: { bottom: 6 },
+            font: { family: 'Inter', size: 11.5, weight: '700' },
+            padding: { bottom: 8 },
           }
         }
       }
@@ -5523,8 +5776,8 @@ function raDownloadChart() {
   offCanvas.height = srcCanvas.height * scale;
   const ctx = offCanvas.getContext('2d');
 
-  // Isi background sesuai tema (putih untuk light, gelap untuk dark)
-  ctx.fillStyle = isDark ? '#0d1b2a' : '#ffffff';
+  // Isi background putih — chart sekarang selalu menggunakan latar putih untuk kejelasan
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, offCanvas.width, offCanvas.height);
 
   // Skala lalu salin canvas asli
@@ -5772,6 +6025,7 @@ function raSample() {
   }
   document.getElementById('ra-input').value = lines.join('\n');
   raAnalyze();
+  raWizAfterAnalyze();
 }
 
 function raClear() {
@@ -5786,6 +6040,10 @@ function raClear() {
   if (raChartInst) { raChartInst.destroy(); raChartInst = null; }
   const dlBtnC = document.getElementById('ra-chart-dl-btn');
   if (dlBtnC) dlBtnC.style.display = 'none';
+  // Reset wizard back to step 1 and disable "Lanjut" until new data is analyzed
+  if (typeof raWizGoto === 'function') raWizGoto(1);
+  const nextBtn = document.getElementById('ra-wiz-next-1');
+  if (nextBtn) { nextBtn.disabled = true; nextBtn.style.opacity = '0.4'; nextBtn.style.cursor = 'not-allowed'; }
 }
 
 /* ═══════════════════════════════════
@@ -8358,6 +8616,34 @@ function fRow(label, val, unit, note, highlight) {
 }
 
 // ── MAIN CALCULATION ─────────────────────────────
+/* ═══════════════════════════════════
+   EVAPORATION WIZARD — 4-step navigation
+═══════════════════════════════════ */
+function evaWizGoto(step) {
+  for (let i = 1; i <= 4; i++) {
+    const stepEl = document.getElementById('eva-step-' + i);
+    const tabEl  = document.getElementById('eva-wt-' + i);
+    if (stepEl) stepEl.classList.toggle('active', i === step);
+    if (tabEl) {
+      tabEl.classList.toggle('active', i === step);
+      tabEl.classList.toggle('done', i < step);
+    }
+  }
+  // Scroll to top of evaporation page content on step change
+  const page = document.getElementById('page-evaporation');
+  if (page) page.scrollIntoView({ behavior: 'instant', block: 'start' });
+
+  // Canvases (psychrometric chart, sensitivity chart) need visible dimensions
+  // to draw correctly — re-run full calc once their step becomes visible
+  if (step === 3) {
+    setTimeout(() => { if (typeof evaCalc === 'function') evaCalc(); }, 30);
+  }
+}
+
+function evaWizReset() {
+  evaWizGoto(1);
+}
+
 function evaCalc() {
   // ── Parse inputs ──
   const Tc     = parseID(document.getElementById('eva-temp')?.value)   || 25.35;
@@ -8790,6 +9076,24 @@ function evaCatchmentTable(aktualM3perM2perHari) {
 // ══════════════════════════════════════════════
 let _psyState = { Tc:25.35, RH:89.81, Patm:101325, Pv:0, Pp:0 };
 
+/* ── Download psychrometric chart as PNG ───────────────── */
+function psyDownloadChart() {
+  const canvas = document.getElementById('psy-canvas');
+  if (!canvas) { showToast?.('❌ Grafik belum tersedia', 'error'); return; }
+  try {
+    const link = document.createElement('a');
+    const Tc   = parseID(document.getElementById('eva-temp')?.value)?.toString().replace(/[^\d.]/g,'') || 'data';
+    const d    = new Date();
+    const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
+    link.download = `Psychrometric_Chart_${stamp}.png`;
+    link.href = canvas.toDataURL('image/png', 1.0);
+    link.click();
+    if (typeof showToast === 'function') showToast('📥 Grafik berhasil diunduh', 'success');
+  } catch(e) {
+    if (typeof showToast === 'function') showToast('❌ Gagal mengunduh grafik: ' + e.message, 'error');
+  }
+}
+
 function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
   _psyState = { Tc, RH, Patm, Pv, Pp };
   const canvas = document.getElementById('psy-canvas');
@@ -9115,22 +9419,22 @@ function psyDrawChart(Tc, RH, Patm, Pv, Pp, x100_gkg, xAkt_gkg) {
   ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
 
   // ── INFO BUBBLES ─────────────────────────────────────────
-  const BW = 190, BH = 72, BR = 6;
+  const BW = 222, BH = 88, BR = 7;
   function drawBubble(bxRaw, byRaw, color, lines) {
     const bx = Math.max(ml + 4, Math.min(bxRaw, W - BW - 4));
     const by = Math.max(mt + 4, Math.min(byRaw, H - mb - BH - 4));
-    ctx.shadowColor = 'rgba(0,0,0,0.12)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 2;
-    ctx.fillStyle = 'rgba(255,255,255,0.97)';
-    ctx.strokeStyle = color; ctx.lineWidth = 1.4;
+    ctx.shadowColor = 'rgba(0,0,0,0.14)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 3;
+    ctx.fillStyle = 'rgba(255,255,255,0.98)';
+    ctx.strokeStyle = color; ctx.lineWidth = 1.6;
     ctx.beginPath(); ctx.roundRect(bx, by, BW, BH, BR); ctx.fill(); ctx.stroke();
     ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
     ctx.fillStyle = color;
-    ctx.beginPath(); ctx.roundRect(bx, by, 3.5, BH, BR); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(bx, by, 4, BH, BR); ctx.fill();
     ctx.textAlign = 'left';
     lines.forEach((l, i) => {
-      ctx.fillStyle = i === 0 ? color : '#2a4060';
-      ctx.font = i === 0 ? `bold 9px 'Inter',monospace` : `8.5px 'Inter',monospace`;
-      ctx.fillText(l, bx + 10, by + 15 + i * 14);
+      ctx.fillStyle = i === 0 ? color : '#1a2e42';
+      ctx.font = i === 0 ? `bold 12px Arial, sans-serif` : `bold 11.5px Arial, sans-serif`;
+      ctx.fillText(l, bx + 13, by + 20 + i * 18);
     });
   }
 
@@ -9207,12 +9511,25 @@ const _nav_orig = nav;
 nav = function(page) {
   _nav_orig(page);
   if (page === 'evaporation') {
+    // Always start the wizard at Step 1 when entering this page
+    if (typeof evaWizGoto === 'function') evaWizGoto(1);
     // Use rAF so the page is visible & laid out before measuring canvas container
     requestAnimationFrame(() => {
       if (!evaInitDone) { evaInitDone = true; evaCalc(); }
       else {
         // Redraw chart with correct container dimensions
         evaCalc();
+      }
+    });
+  }
+  if (page === 'rainfall') {
+    // Always start the wizard at Step 1 when entering this page
+    if (typeof raWizGoto === 'function') raWizGoto(1);
+    // Re-enable "Lanjut" on step 1 if data already exists from a previous session
+    requestAnimationFrame(() => {
+      const nextBtn = document.getElementById('ra-wiz-next-1');
+      if (nextBtn && raData && raData.length) {
+        nextBtn.disabled = false; nextBtn.style.opacity = '1'; nextBtn.style.cursor = 'pointer';
       }
     });
   }
