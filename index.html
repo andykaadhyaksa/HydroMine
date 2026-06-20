@@ -6520,16 +6520,20 @@ function roUseFromRA() {
 }
 
 function roPasteC(val) {
+  // Always store the value in Indonesian format (comma decimal) so it matches
+  // what parseID() expects — storing "0.9" (dot) would be misread by parseID
+  // as "09" (thousands separator stripped) → C=9 instead of C=0.9
+  const cStrID = val.toString().replace('.', ',');
   // Find the last row with empty C, or add a new row
   const target = [...roRows].reverse().find(r => !r.c || r.c === '');
   if (target) {
-    target.c = val.toString();
+    target.c = cStrID;
     const inp = document.getElementById(`cr-c-${target.id}`);
-    if (inp) inp.value = parseFloat(val).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2});
+    if (inp) inp.value = cStrID;
     roUpdateQCell(target.id);
     roRecalcAll();
   } else {
-    roAddRow('', val.toString(), '');
+    roAddRow('', cStrID, '');
   }
 }
 
