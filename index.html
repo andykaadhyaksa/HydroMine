@@ -9678,6 +9678,12 @@ function collectState() {
     rainfall: {
       rawInput: getV('ra-input')
     },
+    evaporation: {
+      temp:   getV('eva-temp'),
+      rh:     getV('eva-rh'),
+      press:  getV('eva-press'),
+      factor: getV('eva-factor')
+    },
     runoff: {
       ch:        getV('ro-ch'),
       wtpList:   wtpList.map(w => ({ id: w.id, name: w.name })),
@@ -9719,6 +9725,17 @@ function restoreState(state) {
   if (state.rainfall && state.rainfall.rawInput) {
     document.getElementById('ra-input').value = state.rainfall.rawInput;
     if (state.rainfall.rawInput.trim()) raAnalyze();
+  }
+
+  // Evaporation
+  if (state.evaporation) {
+    const ev = state.evaporation;
+    const setV = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined && v !== '') el.value = v; };
+    setV('eva-temp',   ev.temp);
+    setV('eva-rh',     ev.rh);
+    setV('eva-press',  ev.press);
+    setV('eva-factor', ev.factor);
+    if (typeof evaCalc === 'function') evaCalc();
   }
 
   // Runoff
