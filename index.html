@@ -13367,7 +13367,7 @@ function spCriteriaGetQ(wtpId) {
   if (cr.qMode === 'manual') return parseID(cr.qManual) || 0;
   const { groups } = _getWTPData();
   const g = groups.find(x => x.id === wtpId);
-  return g ? g.totalNeto : 0;
+  return g ? g.totalAkhir : 0;
 }
 
 /* ── Sync & update ───────────────────────────────────────── */
@@ -13392,7 +13392,7 @@ function spCriteriaUpdateQLabel(wtpId) {
   if (cr.qMode === 'auto') {
     const { groups } = _getWTPData();
     const g = groups.find(x => x.id === wtpId);
-    labelEl.textContent = spFmt(g ? g.totalNeto : 0, 2) + ' m³/hari';
+    labelEl.textContent = spFmt(g ? g.totalAkhir : 0, 2) + ' m³/hari';
   }
 }
 
@@ -13444,7 +13444,7 @@ function spCriteriaParamHTML(wtpId) {
   const muO = SP_MU_TABLE.map(r=>`<option value="${r[0]}">${r[0]} °C — μ = ${fmtInput(r[1],10)} m²/s</option>`).join('');
   const { groups } = _getWTPData();
   const g_ = groups.find(x => x.id === wtpId);
-  const qAuto = g_ ? g_.totalNeto : 0;
+  const qAuto = g_ ? g_.totalAkhir : 0;
   const isM = cr.qMode === 'manual';
   const bB = 'padding:5px 14px;font-size:11.5px;font-weight:700;cursor:pointer;border-radius:5px;border:1px solid';
   const bAct = `${bB} #1a7fd4;background:#1a7fd4;color:#fff`;
@@ -13459,7 +13459,7 @@ function spCriteriaParamHTML(wtpId) {
       </div>
       <div id="spc-qauto-wrap-${wtpId}" style="display:${isM?'none':''}">
         <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:5px">
-          <span style="font-size:11px;color:var(--muted)">Q neto WTP ini:</span>
+          <span style="font-size:11px;color:var(--muted)">Q Akhir WTP ini:</span>
           <span id="spc-qlabel-${wtpId}" style="font-family:var(--mono);font-size:13px;font-weight:700;color:#27ae60">${spFmt(qAuto,2)} m³/hari</span>
           <span style="font-size:10px;color:var(--muted);margin-left:auto">= ${(qAuto/86400).toLocaleString('id-ID',{minimumFractionDigits:8,maximumFractionDigits:8})} m³/detik</span>
         </div>
@@ -13922,7 +13922,7 @@ function spChemHTML(wtpId) {
   // Q auto value
   const { groups } = _getWTPData();
   const g_ = groups.find(x => x.id === wtpId);
-  const qAuto = g_ ? g_.totalNeto : 0;
+  const qAuto = g_ ? g_.totalAkhir : 0;
   const isQM  = ch.qMode === 'manual';
 
   const bahanBlock = (bahan, label, satuanLabel, defaultDosis, warna) => {
@@ -13954,12 +13954,12 @@ function spChemHTML(wtpId) {
   <div style="margin-bottom:12px;padding:10px 12px;background:rgba(26,127,212,0.05);border:1px solid rgba(26,127,212,0.2);border-radius:8px">
     <div style="font-size:11px;font-weight:700;color:#1a7fd4;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Debit Air Limbah (Q)</div>
     <div style="display:flex;gap:6px;margin-bottom:8px">
-      <button id="spc-chem-q-bauto-${wtpId}"   style="${isQM?bInact:bAct.replace('#d97706','#1a7fd4').replace('#d97706','#1a7fd4')}" onclick="spChemSetQMode(${wtpId},'auto')">⟳ Q Neto dari Runoff</button>
+      <button id="spc-chem-q-bauto-${wtpId}"   style="${isQM?bInact:bAct.replace('#d97706','#1a7fd4').replace('#d97706','#1a7fd4')}" onclick="spChemSetQMode(${wtpId},'auto')">⟳ Q Akhir dari Runoff</button>
       <button id="spc-chem-q-bmanual-${wtpId}" style="${isQM?bAct.replace('#d97706','#1a7fd4').replace('#d97706','#1a7fd4'):bInact}" onclick="spChemSetQMode(${wtpId},'manual')">✎ Input Manual</button>
     </div>
     <div id="spc-chem-q-auto-${wtpId}" style="display:${isQM?'none':''}">
       <div style="display:flex;align-items:center;gap:10px;padding:6px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:5px">
-        <span style="font-size:11px;color:var(--muted)">Q neto WTP ini:</span>
+        <span style="font-size:11px;color:var(--muted)">Q Akhir WTP ini:</span>
         <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:#1a7fd4">${spFmt(qAuto,2)} m³/hari</span>
       </div>
     </div>
@@ -13989,11 +13989,11 @@ function spChemResultHTML(wtpId) {
   } else {
     const { groups } = _getWTPData();
     const g = groups.find(x => x.id === wtpId);
-    Q = g ? g.totalNeto : 0;
+    Q = g ? g.totalAkhir : 0;
   }
   const qLabel = ch.qMode === 'manual'
     ? `<span style="font-size:10px;background:rgba(231,76,60,0.1);color:#e74c3c;border-radius:3px;padding:1px 5px;margin-left:4px">Manual</span>`
-    : `<span style="font-size:10px;background:rgba(26,127,212,0.1);color:#1a7fd4;border-radius:3px;padding:1px 5px;margin-left:4px">Q Neto</span>`;
+    : `<span style="font-size:10px;background:rgba(26,127,212,0.1);color:#1a7fd4;border-radius:3px;padding:1px 5px;margin-left:4px">Q Akhir</span>`;
 
   const kapurDosis = parseID(ch.kapurMode==='manual' ? ch.kapurDosis : '0,31') || 0.31;
   const pacDosis   = parseID(ch.pacMode==='manual'   ? ch.pacDosis   : '0,2')  || 0.2;
@@ -14007,7 +14007,7 @@ function spChemResultHTML(wtpId) {
 
   if (!Q) {
     return `<div style="text-align:center;color:var(--muted);font-size:12px;padding:14px;background:var(--bg-secondary);border-radius:8px">
-      ${ch.qMode==='manual' ? 'Masukkan nilai Q manual di atas.' : 'Data Q neto belum tersedia. Lengkapi menu Runoff Contact Water terlebih dahulu.'}
+      ${ch.qMode==='manual' ? 'Masukkan nilai Q manual di atas.' : 'Data Q Akhir belum tersedia. Lengkapi menu Runoff Contact Water terlebih dahulu.'}
     </div>`;
   }
 
@@ -14168,7 +14168,7 @@ function spSludgeGetQ(wtpId) {
   if (sl.qMode === 'manual') return parseID(sl.qManual) || 0;
   const { groups } = _getWTPData();
   const g = groups.find(x => x.id === wtpId);
-  return g ? g.totalNeto : 0;
+  return g ? g.totalAkhir : 0;
 }
 
 function spSludgeUpdate(wtpId) {
@@ -14195,7 +14195,7 @@ function spSludgeHTML(wtpId) {
 
   const { groups } = _getWTPData();
   const g_ = groups.find(x => x.id === wtpId);
-  const qAuto = g_ ? g_.totalNeto : 0;
+  const qAuto = g_ ? g_.totalAkhir : 0;
   const isQM     = sl.qMode === 'manual';
   const isPct    = sl.removalMode === 'pct';
   const isRhoMan = sl.rhoMode === 'manual';
@@ -14254,12 +14254,12 @@ function spSludgeHTML(wtpId) {
   <div style="${secStyle}">
     <div style="${hdrStyle}">② Debit Air Limbah (Q)</div>
     <div style="display:flex;gap:5px;margin-bottom:8px">
-      <button id="sps-q-bauto-${wtpId}"   style="${isQM?bInact:bAct}" onclick="spSludgeSetQMode(${wtpId},'auto')">⟳ Q Neto dari Runoff</button>
+      <button id="sps-q-bauto-${wtpId}"   style="${isQM?bInact:bAct}" onclick="spSludgeSetQMode(${wtpId},'auto')">⟳ Q Akhir dari Runoff</button>
       <button id="sps-q-bmanual-${wtpId}" style="${isQM?bAct:bInact}" onclick="spSludgeSetQMode(${wtpId},'manual')">✎ Input Manual</button>
     </div>
     <div id="sps-q-auto-${wtpId}" style="display:${isQM?'none':''}">
       <div style="display:flex;align-items:center;gap:10px;padding:6px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:5px">
-        <span style="font-size:11px;color:var(--muted)">Q neto WTP ini:</span>
+        <span style="font-size:11px;color:var(--muted)">Q Akhir WTP ini:</span>
         <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:#7c3aed">${spFmt(qAuto,2)} m³/hari</span>
       </div>
     </div>
