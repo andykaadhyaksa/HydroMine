@@ -3941,9 +3941,9 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
   <div style="background:rgba(26,127,212,0.07);border:1px solid rgba(26,127,212,0.2);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:12.5px;color:var(--text);line-height:1.8">
     <strong>⚙ Konsep Perhitungan:</strong> Sediment Pond adalah kolam pengolahan kedua yang menerima aliran dari Retention Pond.
     Fungsinya mengendapkan partikel tersuspensi (TSS, sedimen) agar air yang keluar memenuhi baku mutu sebelum dibuang ke sungai/badan air penerima.
-    Volume minimum dihitung berdasarkan Q neto per WTP (Q bruto &minus; Evaporasi).
-    Data diambil otomatis dari menu <em>Runoff Contact Water</em> dan <em>Evaporation Analysis</em>. Setiap WTP dihitung secara terpisah.
-    <br>Rumus: <code style="font-family:var(--mono);background:rgba(0,0,0,0.06);padding:1px 6px;border-radius:4px">V<sub>min</sub> = Q<sub>neto</sub> &times; SF</code>
+    Volume minimum dihitung berdasarkan <strong>Q Akhir</strong> per WTP (Q Neto + Groundwater aktif), selaras dengan nilai pada <em>Rekap Akhir</em>.
+    Data diambil otomatis dari menu <em>Runoff Contact Water</em>, <em>Evaporation Analysis</em>, dan <em>Groundwater</em>. Setiap WTP dihitung secara terpisah.
+    <br>Rumus: <code style="font-family:var(--mono);background:rgba(0,0,0,0.06);padding:1px 6px;border-radius:4px">Q<sub>akhir</sub> = Q<sub>neto</sub> + Q<sub>GW</sub> &nbsp;&rarr;&nbsp; V<sub>min</sub> = Q<sub>akhir</sub> &times; SF</code>
   </div>
 
   <!-- Input tersembunyi — tetap dipakai oleh kalkulasi -->
@@ -3987,6 +3987,8 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
               <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)" rowspan="2">Q Bruto<br>(m&sup3;/hari)</th>
               <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)" rowspan="2">Evaporasi<br>(m&sup3;/hari)</th>
               <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:700;color:#1a7fd4;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)" rowspan="2">Q Neto<br>(m&sup3;/hari)</th>
+              <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:700;color:#27ae60;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)" rowspan="2">Groundwater<br>(m&sup3;/hari)</th>
+              <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:700;color:#0d6e9e;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)" rowspan="2">Q Akhir<br>(m&sup3;/hari)</th>
               <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)" rowspan="2">SF</th>
               <th colspan="2" style="padding:9px 14px;text-align:center;font-size:10px;font-weight:700;color:#e67e22;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)">Volume Min Sediment Pond</th>
               <th colspan="2" style="padding:9px 14px;text-align:center;font-size:10px;font-weight:700;color:#27ae60;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)">Estimasi Dimensi</th>
@@ -7340,18 +7342,18 @@ async function exportExcel() {
   const sfSP=parseID(document.getElementById('sp-sf')?.value)||1.5;
   const spDep=parseID(document.getElementById('sp-depth')?.value)||2.0;
   const spHrt=parseID(document.getElementById('sp-hrt')?.value)||1;
-  const sp6=[[H1('SEDIMENT POND',C.DARK_BG),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR)],
+  const sp6=[[H1('SEDIMENT POND',C.DARK_BG),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR)],
     [LB('SF'),{v:sfSP,s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,bold:true,sz:11,border:true})},LB('Kedalaman'),{v:spDep,s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,bold:true,sz:11,border:true})},LB('m · HRT'),{v:spHrt,s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,bold:true,sz:11,border:true})},LB('hari')],
-    [{v:'V_min = Q_neto × SF',s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,sz:10,italic:true,border:true})},EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT)],
+    [{v:'Q_akhir = Q_neto + GW  ·  V_min = Q_akhir × SF',s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,sz:10,italic:true,border:true})},EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT),EM(C.PURPLE_SOFT)],
     null,
-    [H3('Lokasi WTP',C.PURPLE_SOFT),H3('Q Bruto',C.PURPLE_SOFT),H3('Evaporasi',C.PURPLE_SOFT),H3('Q Neto',C.PURPLE_SOFT),H3('SF',C.PURPLE_SOFT),H3('V Min (m³)',C.PURPLE_SOFT),H3('Luas (m²)',C.PURPLE_SOFT)],
+    [H3('Lokasi WTP',C.PURPLE_SOFT),H3('Q Bruto',C.PURPLE_SOFT),H3('Evaporasi',C.PURPLE_SOFT),H3('Q Neto',C.PURPLE_SOFT),H3('Groundwater',C.PURPLE_SOFT),H3('Q Akhir',C.PURPLE_SOFT),H3('SF',C.PURPLE_SOFT),H3('V Min (m³)',C.PURPLE_SOFT),H3('Luas (m²)',C.PURPLE_SOFT)],
     ...spG.map((g,i)=>{
-      const vMin=g.totalNeto*sfSP,luas=spDep>0?vMin/spDep:0,bg=i%2===0?C.WHITE:C.GRAY_SOFT;
-      return [{v:g.name,s:cs({bg,fc:C.PURPLE_HDR,bold:true,sz:10,border:true})},{v:+g.totalQ.toFixed(4),s:cs({bg,sz:10,halign:'right',border:true})},{v:+g.totalEva.toFixed(4),s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:10,halign:'right',border:true})},{v:+g.totalNeto.toFixed(4),s:cs({bg:C.BLUE_SOFT,fc:C.BLUE_HDR,bold:true,sz:10,halign:'right',border:true})},{v:sfSP,s:cs({bg,sz:10,halign:'center',border:true})},{v:+vMin.toFixed(4),s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,bold:true,sz:12,halign:'right',border:true})},{v:+luas.toFixed(4),s:cs({bg,fc:C.GREEN_HDR,sz:10,halign:'right',border:true})}];
+      const vMin=g.totalAkhir*sfSP,luas=spDep>0?vMin/spDep:0,bg=i%2===0?C.WHITE:C.GRAY_SOFT;
+      return [{v:g.name,s:cs({bg,fc:C.PURPLE_HDR,bold:true,sz:10,border:true})},{v:+g.totalQ.toFixed(4),s:cs({bg,sz:10,halign:'right',border:true})},{v:+g.totalEva.toFixed(4),s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:10,halign:'right',border:true})},{v:+g.totalNeto.toFixed(4),s:cs({bg:C.BLUE_SOFT,fc:C.BLUE_HDR,bold:true,sz:10,halign:'right',border:true})},{v:+g.totalGW.toFixed(4),s:cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,sz:10,halign:'right',border:true})},{v:+g.totalAkhir.toFixed(4),s:cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,bold:true,sz:10,halign:'right',border:true})},{v:sfSP,s:cs({bg,sz:10,halign:'center',border:true})},{v:+vMin.toFixed(4),s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,bold:true,sz:12,halign:'right',border:true})},{v:+luas.toFixed(4),s:cs({bg,fc:C.GREEN_HDR,sz:10,halign:'right',border:true})}];
     }),
-    [TL('TOTAL',C.PURPLE_SOFT,C.PURPLE_HDR),TT(+spG.reduce((s,g)=>s+g.totalQ,0).toFixed(4),C.PURPLE_SOFT,C.PURPLE_HDR),TT(+spG.reduce((s,g)=>s+g.totalEva,0).toFixed(4),C.PURPLE_SOFT,C.PURPLE_HDR),TT(+spG.reduce((s,g)=>s+g.totalNeto,0).toFixed(4),C.PURPLE_SOFT,C.PURPLE_HDR),EM(C.PURPLE_SOFT),{v:+spG.reduce((s,g)=>s+g.totalNeto*sfSP,0).toFixed(4),s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,bold:true,sz:13,halign:'right',border:true})},EM(C.PURPLE_SOFT)],
+    [TL('TOTAL',C.PURPLE_SOFT,C.PURPLE_HDR),TT(+spG.reduce((s,g)=>s+g.totalQ,0).toFixed(4),C.PURPLE_SOFT,C.PURPLE_HDR),TT(+spG.reduce((s,g)=>s+g.totalEva,0).toFixed(4),C.PURPLE_SOFT,C.PURPLE_HDR),TT(+spG.reduce((s,g)=>s+g.totalNeto,0).toFixed(4),C.PURPLE_SOFT,C.PURPLE_HDR),TT(+spG.reduce((s,g)=>s+g.totalGW,0).toFixed(4),C.PURPLE_SOFT,C.PURPLE_HDR),TT(+spG.reduce((s,g)=>s+g.totalAkhir,0).toFixed(4),C.PURPLE_SOFT,C.PURPLE_HDR),EM(C.PURPLE_SOFT),{v:+spG.reduce((s,g)=>s+g.totalAkhir*sfSP,0).toFixed(4),s:cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,bold:true,sz:13,halign:'right',border:true})},EM(C.PURPLE_SOFT)],
   ];
-  addSS('Sediment Pond',sp6.filter(Boolean),[28,20,20,20,10,22,20]);
+  addSS('Sediment Pond',sp6.filter(Boolean),[28,18,18,18,18,18,10,20,18]);
 
   // ═══ SHEET 7: RETENTION POND ════════════════════════════
   const sfRet=parseID(document.getElementById('rp-sf-val')?.value)||1.5;
@@ -9843,9 +9845,9 @@ function _getWTPData() {
   const aktual = evaCurrAktual()     || 0;
   const wtpData = {};
   wtpList.forEach(w => {
-    wtpData[w.id] = { id: w.id, name: w.name, rows: [], totalQ: 0, totalEva: 0, totalNeto: 0 };
+    wtpData[w.id] = { id: w.id, name: w.name, rows: [], totalQ: 0, totalEva: 0, totalNeto: 0, totalGW: 0, totalAkhir: 0 };
   });
-  wtpData['none'] = { id: 'none', name: '(Tidak Dialokasikan)', rows: [], totalQ: 0, totalEva: 0, totalNeto: 0 };
+  wtpData['none'] = { id: 'none', name: '(Tidak Dialokasikan)', rows: [], totalQ: 0, totalEva: 0, totalNeto: 0, totalGW: 0, totalAkhir: 0 };
   roRows.forEach(r => {
     const c   = parseID(r.c) || 0;
     const aHa = parseID(r.a) || 0;
@@ -9853,11 +9855,16 @@ function _getWTPData() {
     const q   = c * ch * aHa * 10;
     const eva = (r.evaActive !== false) ? aktual * aM2 : 0;
     const neto= Math.max(0, q - eva);
+    // Groundwater — sama persis dengan logika di buildRekap() agar selaras dengan Rekap Akhir
+    const gw    = (gwData[r.id]?.active) ? (parseID(gwData[r.id]?.q) || 0) : 0;
+    const akhir = neto + gw;
     const key = r.wtpId && wtpData[r.wtpId] ? r.wtpId : 'none';
-    wtpData[key].rows.push({ name: r.name || `Area ${r.id}`, q, eva, neto, aHa });
-    wtpData[key].totalQ    += q;
-    wtpData[key].totalEva  += eva;
-    wtpData[key].totalNeto += neto;
+    wtpData[key].rows.push({ name: r.name || `Area ${r.id}`, q, eva, neto, gw, akhir, aHa });
+    wtpData[key].totalQ      += q;
+    wtpData[key].totalEva    += eva;
+    wtpData[key].totalNeto   += neto;
+    wtpData[key].totalGW     += gw;
+    wtpData[key].totalAkhir  += akhir;
   });
   return { wtpData, ch, aktual, groups: Object.values(wtpData).filter(g => g.rows.length > 0) };
 }
@@ -9890,9 +9897,9 @@ function calcSedPond() {
     });
 
     tbody.innerHTML = groups.map(g => {
-    const volMin  = g.totalNeto * sf;
+    const volMin  = g.totalAkhir * sf;
     const luasSP  = depth > 0 ? volMin / depth : 0;
-    const luasHRT = hrt > 0 && g.totalNeto > 0 ? (g.totalNeto * hrt) / depth : 0;
+    const luasHRT = hrt > 0 && g.totalAkhir > 0 ? (g.totalAkhir * hrt) / depth : 0;
     const checked = spNeedRetPond[g.id] ? 'checked' : '';
     const d = spDesign[g.id];
     const res = d ? spCalcUnit(g.id) : null;
@@ -9907,6 +9914,8 @@ function calcSedPond() {
       <td class="td-num">${spFmt(g.totalQ)}</td>
       <td class="td-num" style="color:#e67e22">${spFmt(g.totalEva)}</td>
       <td class="td-num" style="color:#1a7fd4;font-weight:700">${spFmt(g.totalNeto)}</td>
+      <td class="td-num" style="color:#27ae60">${g.totalGW > 0 ? spFmt(g.totalGW) : '<span style="color:var(--muted)">—</span>'}</td>
+      <td class="td-num" style="color:#0d6e9e;font-weight:700">${spFmt(g.totalAkhir)}</td>
       <td class="td-num">${sf}</td>
       <td class="td-num" style="color:#e67e22;font-weight:700;font-size:13px">${spFmt(volMin)}</td>
       <td class="td-num" style="color:#e67e22">${spFmt(luasSP)}</td>
@@ -9920,7 +9929,7 @@ function calcSedPond() {
       </td>
     </tr>
     <tr id="spd-panel-row-${g.id}" style="display:none">
-      <td colspan="10" style="padding:0;border-top:2px solid rgba(155,89,182,0.3)">
+      <td colspan="12" style="padding:0;border-top:2px solid rgba(155,89,182,0.3)">
         <div id="spd-panel-${g.id}"></div>
       </td>
     </tr>`;
@@ -9940,20 +9949,22 @@ function calcSedPond() {
 
   const detailEl = document.getElementById('sp-catchment-detail');
   if (detailEl) detailEl.innerHTML = groups.map(g => {
-    const volMin = g.totalNeto * sf;
+    const volMin = g.totalAkhir * sf;
     const rows = g.rows.map((r,i) => `<tr>
       <td style="padding-left:24px;color:var(--muted);font-size:11.5px">${i+1}</td>
       <td style="font-weight:500">${r.name}</td>
       <td class="td-num">${spFmt(r.q)}</td>
       <td class="td-num" style="color:#e67e22">${spFmt(r.eva)}</td>
       <td class="td-num" style="color:#1a7fd4;font-weight:700">${spFmt(r.neto)}</td>
+      <td class="td-num" style="color:#27ae60">${r.gw > 0 ? spFmt(r.gw) : '<span style="color:var(--muted)">—</span>'}</td>
+      <td class="td-num" style="color:#0d6e9e;font-weight:700">${spFmt(r.akhir)}</td>
       <td class="td-num">${spFmt(r.aHa,4)} ha</td>
-      <td class="td-num" style="color:var(--muted)">${g.totalNeto>0?spFmt(r.neto/g.totalNeto*100,1)+'%':'—'}</td>
+      <td class="td-num" style="color:var(--muted)">${g.totalAkhir>0?spFmt(r.akhir/g.totalAkhir*100,1)+'%':'—'}</td>
     </tr>`).join('');
     return `<div class="card" style="margin-bottom:12px;overflow:hidden">
       <div style="padding:10px 18px;background:rgba(26,127,212,0.06);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
         <div style="font-weight:700;font-size:13px">🏢 ${g.name}</div>
-        <div style="font-family:var(--mono);font-size:12px;color:#27ae60;font-weight:700">V<sub>min</sub> = ${spFmt(volMin)} m³</div>
+        <div style="font-family:var(--mono);font-size:12px;color:#27ae60;font-weight:700">V<sub>min</sub> = ${spFmt(volMin)} m³ <span style="color:var(--muted);font-weight:500">(Q Akhir × SF)</span></div>
       </div>
       <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead><tr style="background:var(--bg-secondary)">
@@ -9962,6 +9973,8 @@ function calcSedPond() {
           <th style="padding:7px 14px;text-align:right;font-size:9.5px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">Q Bruto (m³/hari)</th>
           <th style="padding:7px 14px;text-align:right;font-size:9.5px;font-weight:700;color:#e67e22;border-bottom:1px solid var(--border)">Evaporasi</th>
           <th style="padding:7px 14px;text-align:right;font-size:9.5px;font-weight:700;color:#1a7fd4;border-bottom:1px solid var(--border)">Q Neto</th>
+          <th style="padding:7px 14px;text-align:right;font-size:9.5px;font-weight:700;color:#27ae60;border-bottom:1px solid var(--border)">Groundwater</th>
+          <th style="padding:7px 14px;text-align:right;font-size:9.5px;font-weight:700;color:#0d6e9e;border-bottom:1px solid var(--border)">Q Akhir</th>
           <th style="padding:7px 14px;text-align:right;font-size:9.5px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">Luas</th>
           <th style="padding:7px 14px;text-align:right;font-size:9.5px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)">% WTP</th>
         </tr></thead>
@@ -12560,7 +12573,7 @@ function spUpdateTblBadge(wtpId) {
   const { groups } = _getWTPData();
   const g = groups.find(x => x.id === wtpId);
   if (!g) return;
-  const volMin = g.totalNeto * sf;
+  const volMin = g.totalAkhir * sf;
   const { totalVol } = spCalcUnit(wtpId);
   const badgeEl = document.getElementById(`spd-tbl-badge-${wtpId}`);
   if (!badgeEl) return;
@@ -12582,7 +12595,7 @@ function spUpdateDesignPanel(wtpId) {
   const sf = parseID(document.getElementById('sp-sf')?.value) || 1.5;
   const { groups } = _getWTPData();
   const g = groups.find(x => x.id === wtpId);
-  const vMin = g ? g.totalNeto * sf : 0;
+  const vMin = g ? g.totalAkhir * sf : 0;
   const { totalVol, totalArea, compsRes } = spCalcUnit(wtpId);
 
   // Update badge V aktual
@@ -12829,8 +12842,6 @@ function spCombinedSVG(wtpId, compsRes) {
   const d = spDesign[wtpId];
   if (!d || !d.comps.length) return '';
   const n = d.comps.length;
-  const W = 680, compW = 160, gap = 10;
-  const totalW = n * compW + (n-1)*gap + 80;
   const H = 180;
   const dark = isDark;
   const wallStroke = dark ? '#00d4aa' : '#2a6496';
@@ -12846,16 +12857,27 @@ function spCombinedSVG(wtpId, compsRes) {
   const lerp = (a, b, t) => ({ x: a.x+(b.x-a.x)*t, y: a.y+(b.y-a.y)*t });
   const pts  = (arr) => arr.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
 
-  // Dimensi box per kompartemen (isometrik kecil)
-  const bW = 52, bD = 16, tH = 90;
+  // Dimensi box DASAR (untuk kompartemen dgn volume/luas terbesar — yg lain diskalakan relatif)
+  const bW0 = 52, bD0 = 16, tH0 = 90, topHalf0 = 76;
   const wfrac = 0.75, sfrac = 0.15;
+  const MIN_SCALE = 0.6;   // batas bawah agar kolam terkecil tetap terbaca, tidak hilang
+  const ARROW_GAP = 46;    // jarak aman antar kolam (tempat simbol panah)
+  const MARGIN    = 38;    // margin kiri/kanan utk label IN/OUT
 
-  let shapes = '';
-  const svgW = Math.max(totalW, W);
+  // ── Skala ukuran gambar tiap kompartemen mengikuti volume/luas aktualnya ──
+  // (cbrt utk volume karena box 3D ~ panjang³; sqrt utk luas tampak-atas karena ~ panjang²)
+  const vols = d.comps.map((c,i) => (compsRes[i]||{}).vol || 0);
+  const areas= d.comps.map((c,i) => (compsRes[i]||{}).area || 0);
+  const maxVol  = Math.max(...vols, 1e-9);
+  const maxArea = Math.max(...areas, 1e-9);
+  const scale3D  = vols.map(v  => v  > 0 ? Math.max(MIN_SCALE, Math.min(1, Math.cbrt(v / maxVol)))  : 1);
+  const scaleTop = areas.map(a => a  > 0 ? Math.max(MIN_SCALE, Math.min(1, Math.sqrt(a / maxArea))) : 1);
 
-  d.comps.forEach((c, i) => {
+  // ── Pass 1: hitung geometri & kebutuhan lebar tiap kompartemen ──
+  // (lebar slot mengikuti ukuran terbesar yg dibutuhkan: badan 3D ATAU denah,
+  //  sehingga TIDAK PERNAH tumpang-tindih berapapun rasio/ukuran/jumlah kolamnya)
+  const geo = d.comps.map((c, i) => {
     const r = compsRes[i] || { vol:0, area:0 };
-    // Rasio atas vs bawah
     let ratP = 1, ratL = 1;
     if (c.shape === 'frustum') {
       if (c.inputMode === 'dims') {
@@ -12869,10 +12891,28 @@ function spCombinedSVG(wtpId, compsRes) {
         ratL = ratP;
       }
     }
+    const sk = scale3D[i], skTop = scaleTop[i];
+    const bW = bW0*sk, bD = bD0*sk, tH = tH0*sk, topHalf = topHalf0*skTop;
     const tWi = bW * Math.min(ratP, 2.5);
     const tDi = bD * Math.min(ratL, 2.5);
+    const halfL = Math.max(bW, tWi, topHalf);
+    const halfR = Math.max(bW + bD, tWi + tDi, topHalf);
+    return { c, r, ratP, ratL, bW, bD, tH, topHalf, tWi, tDi, halfL, halfR };
+  });
 
-    const cx = 40 + i*(compW+gap) + compW/2;
+  // ── Pass 2: tentukan posisi-x (cx) tiap kompartemen agar tidak bertabrakan ──
+  const cxList = [];
+  let cursor = MARGIN;
+  geo.forEach((g, i) => {
+    cursor += (i === 0) ? g.halfL : (geo[i-1].halfR + ARROW_GAP + g.halfL);
+    cxList.push(cursor);
+  });
+  const svgW = Math.max(680, cxList[n-1] + geo[n-1].halfR + MARGIN);
+
+  let shapes = '';
+  geo.forEach((g, i) => {
+    const { r, bW, bD, tH, tWi, tDi, halfR } = g;
+    const cx = cxList[i];
     const cy = H * 0.85;
 
     const bLF = { x: cx-bW,     y: cy };
@@ -12901,59 +12941,47 @@ function spCombinedSVG(wtpId, compsRes) {
     <text x="${cx.toFixed(1)}" y="${(tLF.y-10).toFixed(1)}" fill="${textColor}" font-size="11" font-family="monospace" font-weight="700" text-anchor="middle">K-${i+1}</text>
     ${r.vol>0 ? `<text x="${cx.toFixed(1)}" y="${((wwLF.y+swLF.y)/2+2).toFixed(1)}" fill="${wallStroke}" font-size="9.5" font-family="monospace" font-weight="700" text-anchor="middle" dominant-baseline="middle">${fv(r.vol)} m³</text>` : ''}`;
 
-    // Panah aliran antara kompartemen
+    // Panah aliran antara kompartemen — selalu tepat di tengah jarak aman antar kolam
     if (i < n-1) {
-      const ax = cx + bW + bD + 4 + gap/2;
-      const ay = cy - tH/2;
+      const ax = cx + halfR + ARROW_GAP/2;
+      const ay = cy - tH0/2;
       shapes += `<text x="${ax.toFixed(1)}" y="${ay.toFixed(1)}" fill="${arrowColor}" font-size="16" text-anchor="middle" dominant-baseline="middle">▶</text>`;
     }
   });
 
   // Label IN / OUT
-  const firstCx = 40 + compW/2;
-  const lastCx  = 40 + (n-1)*(compW+gap) + compW/2;
   const midY = H * 0.45;
-  shapes += `<text x="${(firstCx - bW - 14).toFixed(1)}" y="${midY.toFixed(1)}" fill="#27ae60" font-size="11" font-weight="700" text-anchor="end" dominant-baseline="middle">IN</text>`;
-  shapes += `<text x="${(lastCx + bW + bD + 14).toFixed(1)}" y="${midY.toFixed(1)}" fill="#e74c3c" font-size="11" font-weight="700" text-anchor="start" dominant-baseline="middle">OUT</text>`;
+  shapes += `<text x="${(cxList[0] - geo[0].halfL - 12).toFixed(1)}" y="${midY.toFixed(1)}" fill="#27ae60" font-size="11" font-weight="700" text-anchor="end" dominant-baseline="middle">IN</text>`;
+  shapes += `<text x="${(cxList[n-1] + geo[n-1].halfR + 12).toFixed(1)}" y="${midY.toFixed(1)}" fill="#e74c3c" font-size="11" font-weight="700" text-anchor="start" dominant-baseline="middle">OUT</text>`;
 
-  // ── Tampak atas (denah) ─────────────────────────────────────
+  // ── Tampak atas (denah) — pakai cx yang sama agar selalu sejajar & rapi ──
   const topSectionH = 80;
   const topPad = 14;
   const topBoxH = topSectionH - topPad*2;
   let topShapes = '';
-  d.comps.forEach((c, i) => {
-    const r = compsRes[i] || { vol:0, area:0 };
-    let ratP = 1;
-    if (c.shape === 'frustum') {
-      if (c.inputMode==='dims') {
-        const Pb=parseID(c.P)||1, Pt=parseID(c.Patas)||Pb;
-        ratP = Pt/Math.max(Pb,0.01);
-      } else {
-        const Ab=parseID(c.Abawah)||1, At=parseID(c.Aatas)||Ab;
-        ratP = Math.sqrt(At/Math.max(Ab,0.01));
-      }
-    }
-    const cx  = 40 + i*(compW+gap) + compW/2;
-    const xL  = cx - compW/2 + 4;
-    const xR  = cx + compW/2 - 4;
+  geo.forEach((g, i) => {
+    const { r, ratP, topHalf } = g;
+    const cx  = cxList[i];
+    const xL  = cx - topHalf;
+    const xR  = cx + topHalf;
     const yT  = topPad;
     const yB  = topPad + topBoxH;
-    const yTi = topPad + topBoxH*(1-Math.min(ratP,2)/2.5); // trapesoid tampak atas
-    // Trapesoid: bawah penuh, atas lebih sempit (frustum)
-    const xLi = xL + (compW-8)*(1-1/Math.max(ratP,1))*0.3;
-    const xRi = xR - (compW-8)*(1-1/Math.max(ratP,1))*0.3;
+    const slotW = topHalf*2;
+    // Trapesoid: bawah penuh, atas menyempit/melebar mengikuti rasio frustum
+    const xLi = xL + slotW*(1-1/Math.max(ratP,1))*0.3;
+    const xRi = xR - slotW*(1-1/Math.max(ratP,1))*0.3;
     topShapes += `<polygon points="${xLi.toFixed(1)},${yT} ${xRi.toFixed(1)},${yT} ${xR.toFixed(1)},${yB} ${xL.toFixed(1)},${yB}"
       fill="${wallFill}" stroke="${wallStroke}" stroke-width="1.2"/>
       <text x="${cx.toFixed(1)}" y="${(yT+topBoxH/2-4).toFixed(1)}" fill="${textColor}" font-size="10" font-family="monospace" font-weight="700" text-anchor="middle" dominant-baseline="middle">K-${i+1}</text>
       ${r.area>0 ? `<text x="${cx.toFixed(1)}" y="${(yT+topBoxH/2+8).toFixed(1)}" fill="${dark?'#64748b':'#90a8c0'}" font-size="8.5" font-family="monospace" text-anchor="middle" dominant-baseline="middle">${fv(r.area)} m²</text>` : ''}`;
-    // Panah aliran tampak atas
+    // Panah aliran tampak atas — tengah antar pusat kolam
     if (i < n-1) {
-      const ax = cx + compW/2 - 4 + gap/2 + 3;
+      const ax = (cx + cxList[i+1]) / 2;
       topShapes += `<text x="${ax.toFixed(1)}" y="${(yT+topBoxH/2).toFixed(1)}" fill="${arrowColor}" font-size="13" text-anchor="middle" dominant-baseline="middle">▶</text>`;
     }
   });
-  topShapes += `<text x="28" y="${(topPad+topBoxH/2).toFixed(1)}" fill="#27ae60" font-size="10" font-weight="700" text-anchor="end" dominant-baseline="middle">IN</text>`;
-  topShapes += `<text x="${(40+(n-1)*(compW+gap)+compW-2).toFixed(1)}" y="${(topPad+topBoxH/2).toFixed(1)}" fill="#e74c3c" font-size="10" font-weight="700" text-anchor="start" dominant-baseline="middle">OUT</text>`;
+  topShapes += `<text x="${(cxList[0]-geo[0].topHalf-6).toFixed(1)}" y="${(topPad+topBoxH/2).toFixed(1)}" fill="#27ae60" font-size="10" font-weight="700" text-anchor="end" dominant-baseline="middle">IN</text>`;
+  topShapes += `<text x="${(cxList[n-1]+geo[n-1].topHalf+6).toFixed(1)}" y="${(topPad+topBoxH/2).toFixed(1)}" fill="#e74c3c" font-size="10" font-weight="700" text-anchor="start" dominant-baseline="middle">OUT</text>`;
 
   const totalSvgH = H + 28 + topSectionH;
   return `<svg viewBox="0 0 ${svgW} ${totalSvgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${svgW}px">
@@ -13015,7 +13043,7 @@ function renderSpDesignPanel(wtpId) {
   const sf = parseID(document.getElementById('sp-sf')?.value) || 1.5;
   const { groups } = _getWTPData();
   const g = groups.find(x => x.id === wtpId);
-  const vMin = g ? g.totalNeto * sf : 0;
+  const vMin = g ? g.totalAkhir * sf : 0;
   const d = spDesign[wtpId] || { open: true, comps: [] };
   spSyncDesign(wtpId); // sync DOM → state sebelum hitung
   const { totalVol, totalArea, compsRes } = spCalcUnit(wtpId);
@@ -13735,7 +13763,7 @@ function spDesignSummaryHTML(wtpId, totalVol, totalArea, compsRes) {
   const sf    = parseID(document.getElementById('sp-sf')?.value) || 1.5;
   const { groups } = _getWTPData();
   const g_ = groups.find(x => x.id === wtpId);
-  const qNeto = g_ ? g_.totalNeto : 0;
+  const qNeto = g_ ? g_.totalAkhir : 0;
   const vMin  = qNeto * sf;
   const vOk   = tVol >= vMin && vMin > 0;
   const tdOk  = td_hr >= 10;
@@ -14931,30 +14959,50 @@ function rpDesignSummaryHTML(uid,compsRes,totalVol,totalArea) {
 
 function rpCombinedSVG(uid,comps,compsRes) {
   if(!comps.length) return '';
-  const n=comps.length,W=680,compW=160,gap=10;
+  const n=comps.length,H=180;
   const dark=isDark,fv=v=>spFmt(v,2);
   const wallStroke=dark?'#00d4aa':'#27ae60',wallFill=dark?'rgba(39,174,96,0.3)':'rgba(180,240,200,0.5)';
   const wallShade=dark?'rgba(20,80,40,0.7)':'rgba(140,200,160,0.6)',topFill=dark?'rgba(60,140,100,0.4)':'rgba(200,240,215,0.7)';
   const waterFill=dark?'rgba(39,174,96,0.15)':'rgba(39,174,96,0.2)',sedFill='rgba(245,166,35,0.5)';
   const textColor=dark?'#a0c8e8':'#1a3a5c',arrowColor='#27ae60';
   const lerp=(a,b,t)=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t}),pts=arr=>arr.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-  const bW=52,bD=16,tH=90,wfrac=0.75,sfrac=0.15;
-  let shapes='';const svgW=Math.max(n*compW+(n-1)*gap+80,W);
-  comps.forEach((c,i)=>{
+  const bW0=52,bD0=16,tH0=90,wfrac=0.75,sfrac=0.15;
+  const ARROW_GAP=46, MARGIN=38, MIN_SCALE=0.6;
+
+  // Skala ukuran gambar tiap kompartemen mengikuti volume aktualnya (cbrt ~ panjang³)
+  const vols = comps.map((c,i)=>(compsRes[i]||{}).vol||0);
+  const maxVol = Math.max(...vols, 1e-9);
+  const scale3D = vols.map(v=> v>0 ? Math.max(MIN_SCALE, Math.min(1, Math.cbrt(v/maxVol))) : 1);
+
+  // Pass 1: geometri & kebutuhan lebar per kompartemen (agar tidak tumpang-tindih)
+  const geo = comps.map((c,i)=>{
     const r=compsRes[i]||{vol:0,area:0};
     let ratP=1,ratL=1;
     if(c.shape==='frustum'){if(c.inputMode==='dims'){const Pb=parseID(c.P)||1,Pt=parseID(c.Patas)||Pb,Lb=parseID(c.L)||Pb,Lt=parseID(c.Latas)||Lb;ratP=Pt/Math.max(Pb,.01);ratL=Lt/Math.max(Lb,.01);}else{const Ab=parseID(c.Abawah)||1,At=parseID(c.Aatas)||Ab;ratP=Math.sqrt(At/Math.max(Ab,.01));ratL=ratP;}}
-    const tWi=bW*Math.min(ratP,2.5),tDi=bD*Math.min(ratL,2.5),cx=40+i*(compW+gap)+compW/2,cy=160*.85;
+    const sk=scale3D[i], bW=bW0*sk, bD=bD0*sk, tH=tH0*sk;
+    const tWi=bW*Math.min(ratP,2.5), tDi=bD*Math.min(ratL,2.5);
+    const halfL=Math.max(bW,tWi), halfR=Math.max(bW+bD,tWi+tDi);
+    return {c,r,bW,bD,tH,tWi,tDi,halfL,halfR};
+  });
+
+  // Pass 2: posisi-x tiap kompartemen
+  const cxList=[]; let cursor=MARGIN;
+  geo.forEach((g,i)=>{ cursor += (i===0)?g.halfL:(geo[i-1].halfR+ARROW_GAP+g.halfL); cxList.push(cursor); });
+  const svgW = Math.max(680, cxList[n-1]+geo[n-1].halfR+MARGIN);
+
+  let shapes='';
+  geo.forEach((g,i)=>{
+    const {r,bW,bD,tH,tWi,tDi,halfR}=g, cx=cxList[i], cy=H*.85;
     const bLF={x:cx-bW,y:cy},bRF={x:cx+bW,y:cy},bRB={x:cx+bW+bD,y:cy-bD},bLB={x:cx-bW+bD,y:cy-bD};
     const tLF={x:cx-tWi,y:cy-tH},tRF={x:cx+tWi,y:cy-tH},tRB={x:cx+tWi+tDi,y:cy-tH-tDi},tLB={x:cx-tWi+tDi,y:cy-tH-tDi};
     const swLF=lerp(bLF,tLF,sfrac),swRF=lerp(bRF,tRF,sfrac),swRB=lerp(bRB,tRB,sfrac),wwLF=lerp(bLF,tLF,wfrac),wwRF=lerp(bRF,tRF,wfrac);
     shapes+=`<polygon points="${pts([bLF,bRF,bRB,bLB])}" fill="${wallShade}" stroke="${wallStroke}" stroke-width="1"/><polygon points="${pts([bLF,bRF,swRF,swLF])}" fill="${sedFill}"/><polygon points="${pts([bRF,bRB,swRB,swRF])}" fill="${sedFill}" opacity="0.7"/><polygon points="${pts([swLF,swRF,wwRF,wwLF])}" fill="${waterFill}"/><polygon points="${pts([bLF,bRF,tRF,tLF])}" fill="${wallFill}" stroke="${wallStroke}" stroke-width="1.3"/><polygon points="${pts([bRF,bRB,tRB,tRF])}" fill="${wallShade}" stroke="${wallStroke}" stroke-width="1"/><polygon points="${pts([bLF,bLB,tLB,tLF])}" fill="${wallShade}" stroke="${wallStroke}" stroke-width="1" opacity="0.6"/><polygon points="${pts([tLF,tRF,tRB,tLB])}" fill="${topFill}" stroke="${wallStroke}" stroke-width="1.3"/>
     <text x="${cx.toFixed(1)}" y="${(tLF.y-10).toFixed(1)}" fill="${textColor}" font-size="11" font-family="monospace" font-weight="700" text-anchor="middle">K-${i+1}</text>
     ${r.vol>0?`<text x="${cx.toFixed(1)}" y="${((wwLF.y+swLF.y)/2+2).toFixed(1)}" fill="${wallStroke}" font-size="9.5" font-family="monospace" font-weight="700" text-anchor="middle">${fv(r.vol)} m³</text>`:''}`;
-    if(i<n-1) shapes+=`<text x="${(cx+bW+bD+gap/2+3).toFixed(1)}" y="${(cy-tH/2).toFixed(1)}" fill="${arrowColor}" font-size="16" text-anchor="middle">▶</text>`;
+    if(i<n-1) shapes+=`<text x="${(cx+halfR+ARROW_GAP/2).toFixed(1)}" y="${(cy-tH0/2).toFixed(1)}" fill="${arrowColor}" font-size="16" text-anchor="middle">▶</text>`;
   });
-  const fc=40+compW/2,lc=40+(n-1)*(compW+gap)+compW/2,my=160*.45;
-  shapes+=`<text x="${(fc-bW-14).toFixed(1)}" y="${my.toFixed(1)}" fill="#27ae60" font-size="11" font-weight="700" text-anchor="end">IN</text><text x="${(lc+bW+bD+14).toFixed(1)}" y="${my.toFixed(1)}" fill="#e74c3c" font-size="11" font-weight="700" text-anchor="start">OUT</text>`;
+  const my=H*.45;
+  shapes+=`<text x="${(cxList[0]-geo[0].halfL-12).toFixed(1)}" y="${my.toFixed(1)}" fill="#27ae60" font-size="11" font-weight="700" text-anchor="end">IN</text><text x="${(cxList[n-1]+geo[n-1].halfR+12).toFixed(1)}" y="${my.toFixed(1)}" fill="#e74c3c" font-size="11" font-weight="700" text-anchor="start">OUT</text>`;
   return `<svg viewBox="0 0 ${svgW} 190" xmlns="http://www.w3.org/2000/svg" style="width:100%"><text x="${(svgW/2).toFixed(1)}" y="14" fill="${textColor}" font-size="11" font-weight="700" text-anchor="middle">Penampang 3D Gabungan</text>${shapes}</svg>`;
 }
 
