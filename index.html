@@ -5035,7 +5035,7 @@ function nav(page) {
     if (gb) gb.classList.add('has-active');
   }
 
-  if (page === 'flow')   { _flowFilter = 'all'; buildFlow(); }
+  if (page === 'flow')   { buildFlow(); }
   if (page === 'groundwater') gwRefresh();
   if (page === 'sedpond') calcSedPond();
   if (page === 'retpond') rpRender();
@@ -6133,7 +6133,7 @@ function roGroupAdd() {
   roGroupRender();
   // Update group selects in all rows
   roRows.forEach(r => roGroupUpdateSelect(r.id));
-  hydroSave();
+  scheduleAutoSave();
 }
 
 function roGroupDelete(id) {
@@ -6142,7 +6142,7 @@ function roGroupDelete(id) {
   roGroupRender();
   roRows.forEach(r => roGroupUpdateSelect(r.id));
   roRecalcAll();
-  hydroSave();
+  scheduleAutoSave();
 }
 
 function roGroupRender() {
@@ -9650,14 +9650,14 @@ function gwToggle(rowId, checked) {
   if (!gwData[rowId]) gwData[rowId] = { active: false, q: '', note: '' };
   gwData[rowId].active = checked;
   gwRefresh();
-  autoSave();
+  scheduleAutoSave();
 }
 
 function gwChange(rowId, field, val) {
   if (!gwData[rowId]) gwData[rowId] = { active: false, q: '', note: '' };
   gwData[rowId][field] = val;
   gwUpdateKPI();
-  autoSave();
+  scheduleAutoSave();
 }
 
 function gwUpdateKPI() {
@@ -9677,6 +9677,13 @@ function collectState() {
     dark: isDark,
     rainfall: {
       rawInput: getV('ra-input')
+    },
+    bmkg: {
+      source:   (typeof chSource !== 'undefined') ? chSource : 'openmeteo',
+      selected: (typeof chSelected !== 'undefined') ? chSelected : null,
+      data:     (typeof chData !== 'undefined') ? chData : null,
+      dateStart: getV('ch-date-start'),
+      dateEnd:   getV('ch-date-end')
     },
     evaporation: {
       temp:   getV('eva-temp'),
@@ -9725,6 +9732,22 @@ function restoreState(state) {
   if (state.rainfall && state.rainfall.rawInput) {
     document.getElementById('ra-input').value = state.rainfall.rawInput;
     if (state.rainfall.rawInput.trim()) raAnalyze();
+  }
+
+  // BMKG / Multi-source rainfall fetch
+  if (state.bmkg) {
+    const bm = state.bmkg;
+    if (typeof chSource !== 'undefined' && bm.source) {
+      if (typeof chSetSource === 'function') chSetSource(bm.source); else chSource = bm.source;
+    }
+    if (typeof chSelected !== 'undefined') chSelected = bm.selected || null;
+    if (typeof chData     !== 'undefined') chData     = bm.data     || null;
+    const dsEl = document.getElementById('ch-date-start');
+    const deEl = document.getElementById('ch-date-end');
+    if (dsEl && bm.dateStart) dsEl.value = bm.dateStart;
+    if (deEl && bm.dateEnd)   deEl.value = bm.dateEnd;
+    if (typeof chUIBuilt !== 'undefined') chUIBuilt = true; // cegah chBuildUI menimpa dgn default saat halaman BMKG pertama dibuka
+    if (typeof chRestorePending !== 'undefined' && chSelected) chRestorePending = true;
   }
 
   // Evaporation
@@ -10773,6 +10796,19 @@ wtpDelete = function(id) { _wtpDelete_orig(id); scheduleAutoSave(); };
 // Patch CH input
 document.getElementById('ro-ch').addEventListener('change', scheduleAutoSave);
 
+// ── PENGAMAN GLOBAL: auto-save dipicu oleh SETIAP interaksi di manapun ──
+// Pendekatan whitelist per-fungsi di atas ternyata mudah terlewat (banyak halaman
+// seperti Sediment Pond, Retention Pond, dan Evaporation tidak ikut ter-cover).
+// Dengan delegasi event di level document, perubahan apa pun — termasuk pada
+// elemen yang baru dibuat secara dinamis (innerHTML) — akan selalu memicu
+// auto-save, tanpa perlu mengingat untuk "mengkabel" setiap fungsi baru.
+document.addEventListener('input',  scheduleAutoSave, true);
+document.addEventListener('change', scheduleAutoSave, true);
+document.addEventListener('click',  (e) => {
+  // Hanya tombol/elemen yang punya onclick (kemungkinan besar mengubah state)
+  if (e.target.closest('button, [onclick]')) scheduleAutoSave();
+}, true);
+
 // ── Inisialisasi: muat dari localStorage atau buat baris default ──
 document.addEventListener('DOMContentLoaded', function() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -11608,6 +11644,8 @@ var chSource      = 'openmeteo';   // current source
 var chSelected    = null;          // selected station [id,name,prov,kab,lat,lng,type]
 var chData        = null;          // fetched daily data [{date,value}]
 var chMapInited   = false;
+var chUIBuilt     = false;   // true setelah build pertama — cegah reset source/tanggal saat revisit halaman
+var chRestorePending = false; // true jika ada data BMKG dari save file yang perlu ditampilkan ulang
 var chLeafletMap  = null;
 var chMarkers     = {};
 var chCharts      = {};            // keyed chart instances
@@ -11673,8 +11711,13 @@ function chInit() {
 function chBuildUI() {
   chPopulateProvince();
   chFilterStations();
-  chSetSource('openmeteo');
-  chSetDefaultDates();
+  if (!chUIBuilt) {
+    // Hanya set default SEKALI di awal — agar sumber data & rentang tanggal
+    // yang sudah dipilih user tidak ter-reset setiap kali halaman ini dibuka ulang.
+    chSetSource('openmeteo');
+    chSetDefaultDates();
+    chUIBuilt = true;
+  }
   setTimeout(chInitMap, 120);
 }
 
@@ -11847,6 +11890,18 @@ function chInitMap() {
   });
 
   setTimeout(function(){ chLeafletMap.invalidateSize(); }, 200);
+
+  // Jika ada data BMKG yang dipulihkan dari save file, tampilkan ulang
+  // (tanpa fetch ulang ke server) sekarang setelah peta & marker siap.
+  if (chRestorePending && chSelected) {
+    chRestorePending = false;
+    chSelectStation(chSelected[0]);
+    if (chData && chData.length) {
+      var sd = document.getElementById('ch-date-start')?.value;
+      var ed = document.getElementById('ch-date-end')?.value;
+      chRenderResults(chSelected, sd, ed);
+    }
+  }
 }
 
 /* ── Select station ──────────────────────────────────────── */
