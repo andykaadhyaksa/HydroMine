@@ -12702,6 +12702,7 @@ function spCompResultHTML(c, r) {
   return `<div style="font-family:var(--mono);font-size:11.5px;color:var(--text);line-height:1.7;padding:6px 0">
     <div>V = ${formula} = <strong style="color:#1a7fd4">${fv(r.vol)} m³</strong></div>
     <div>A = <strong style="color:#27ae60">${(c.inputMode==='manual' && !r.area) ? '— (tidak diisi)' : fv(r.area)+' m²'}</strong></div>
+    ${c.inputMode==='manual' ? `<div>T = ${T>0 ? `<strong style="color:#9333ea">${fv(T)} m</strong>` : `<strong style="color:#e74c3c">belum diisi — wajib utk Uji Kriteria Desain!</strong>`}</div>` : ''}
   </div>`;
 }
 
@@ -12725,13 +12726,14 @@ function spCompSVG(c, r) {
 
   // Ukuran relatif (normalisasi)
   let Pbot, Lbot, Ptop, Ltop;
+  let TisEstimate = false;
   if (c.inputMode === 'manual') {
     // Tidak ada bentuk geometris pasti (kolam asimetris) — gambarkan sbg kotak sederhana
     // berbasis luas (jika diisi) atau estimasi dari volume, tanpa tapering atas/bawah.
     const A = parseID(c.Amanual) || 0;
     const side = A > 0 ? Math.sqrt(A) : Math.cbrt(Math.max(V,0.01));
     Pbot = Lbot = Ptop = Ltop = Math.max(side, 0.01);
-    if (!T) T = A > 0 ? Math.max(V / A, 0.3) : Math.max(Math.cbrt(V), 0.3); // tinggi estimasi hanya utk ilustrasi
+    if (!T) { T = A > 0 ? Math.max(V / A, 0.3) : Math.max(Math.cbrt(V), 0.3); TisEstimate = true; } // tinggi estimasi hanya utk ilustrasi jika T belum diisi
   } else if (c.shape === 'cube') {
     if (c.inputMode === 'area') {
       const A = Math.max(parseID(c.Amanual)||1, 0.01);
@@ -12825,7 +12827,7 @@ function spCompSVG(c, r) {
     <line x1="${(tRB.x+10).toFixed(1)}" y1="${tRB.y.toFixed(1)}" x2="${(bRB.x+10).toFixed(1)}" y2="${bRB.y.toFixed(1)}" stroke="${dimColor}" stroke-width="1"/>
     <line x1="${(tRB.x+7).toFixed(1)}" y1="${tRB.y.toFixed(1)}" x2="${(tRB.x+13).toFixed(1)}" y2="${tRB.y.toFixed(1)}" stroke="${dimColor}" stroke-width="1"/>
     <line x1="${(bRB.x+7).toFixed(1)}" y1="${bRB.y.toFixed(1)}" x2="${(bRB.x+13).toFixed(1)}" y2="${bRB.y.toFixed(1)}" stroke="${dimColor}" stroke-width="1"/>
-    <text x="${(bRB.x+16).toFixed(1)}" y="${((tRB.y+bRB.y)/2).toFixed(1)}" fill="${textColor}" font-size="9" font-family="monospace" dominant-baseline="middle">${c.inputMode==='manual'?'T≈'+fv(T)+'m (estimasi)':'T='+fv(T)+'m'}</text>
+    <text x="${(bRB.x+16).toFixed(1)}" y="${((tRB.y+bRB.y)/2).toFixed(1)}" fill="${textColor}" font-size="9" font-family="monospace" dominant-baseline="middle">${(c.inputMode==='manual'&&TisEstimate)?'T≈'+fv(T)+'m (estimasi)':'T='+fv(T)+'m'}</text>
     <!-- Label P atas (frustum) dan P bawah -->
     ${c.inputMode==='manual' ? `
     <text x="${((bLF.x+bRF.x)/2).toFixed(1)}" y="${(bLF.y+11).toFixed(1)}" fill="${dimColor}" font-size="8.5" font-family="monospace" text-anchor="middle">A≈${fv(Pbot*Lbot)}m² (estimasi, bentuk asimetris)</text>
@@ -13043,10 +13045,11 @@ function spCompFieldsHTML(wtpId, c) {
   if (c.inputMode === 'manual') {
     fields = `<div style="display:flex;flex-wrap:wrap;gap:8px">
       ${inp('Vmanual','Volume / V (m³)', c.Vmanual)}
+      ${inp('T','Tinggi / Kedalaman / T (m)', c.T)}
       ${inp('Amanual','Luas / A (m²) — opsional', c.Amanual)}
     </div>
     <div style="font-size:10.5px;color:var(--muted);margin-top:6px;line-height:1.5">
-      ℹ️ Volume diinput langsung (misal hasil hitungan manual/AutoCAD untuk bentuk kolam asimetris). Luas bersifat opsional — hanya dipakai untuk label pada diagram & estimasi tampak atas.
+      ℹ️ Volume diinput langsung (misal hasil hitungan manual/AutoCAD untuk bentuk kolam asimetris). <strong>Tinggi/Kedalaman (T) wajib diisi</strong> — dipakai sebagai H efektif pada Uji Kriteria Desain (Stokes). Luas bersifat opsional, hanya untuk label diagram & estimasi tampak atas.
     </div>`;
   } else if (c.shape === 'cube' && c.inputMode === 'dims') {
     fields = `<div style="display:flex;flex-wrap:wrap;gap:8px">
@@ -13276,11 +13279,12 @@ function spGetCompDims(c) {
   if (c.inputMode === 'manual') {
     const V = parseID(getv('Vmanual')) || 0;
     const A = parseID(getv('Amanual')) || 0;
-    area_top = A > 0 ? A : (V > 0 ? Math.pow(V, 2/3) : 0); // estimasi jika luas tak diisi
-    const Hest = T > 0 ? T : (area_top > 0 && V > 0 ? V/area_top : (V>0?Math.cbrt(V):0));
+    area_top = A > 0 ? A : (V > 0 ? Math.pow(V, 2/3) : 0); // estimasi luas hanya jika tak diisi (utk diagram/label)
+    // H WAJIB dari input T asli — tidak diestimasi diam-diam, agar Uji Kriteria Desain akurat.
+    // Jika T belum diisi, H=0 → ditandai "Dimensi tidak lengkap" oleh spStokesCalcComp.
     p = area_top > 0 ? Math.sqrt(area_top) : 0;
     b = p;
-    return { H: Hest, p, b, area_top };
+    return { H: T, p, b, area_top };
   }
   if (c.inputMode === 'dims') {
     const Pb = parseID(getv('P')) || 0;
@@ -13313,7 +13317,8 @@ function spStokesCalcComp(c, Vt, Q, vol_comp, idx) {
   if (!H || !p || !b) return {
     label, valid: false,
     H, p, b, vol: vol_comp,
-    tv_s:0, vh:0, th_s:0, ok_th_tv:false, note:'Dimensi tidak lengkap'
+    tv_s:0, vh:0, th_s:0, ok_th_tv:false,
+    note: (c.inputMode==='manual' && !H) ? 'Tinggi/Kedalaman (T) belum diisi' : 'Dimensi tidak lengkap'
   };
 
   const tv_s = Vt > 0 ? H / Vt : 0;
