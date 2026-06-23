@@ -12444,6 +12444,11 @@ setTimeout(() => { updateHeroDiagramTheme(isDark); }, 300);
 // ── Kalkulasi satu kompartemen ──────────────────────────────────
 function spCalcComp(c) {
   const T = parseID(c.T) || 0;
+  if (c.inputMode === 'manual') {
+    const V = parseID(c.Vmanual) || 0;
+    const A = parseID(c.Amanual) || 0;
+    return { vol: V, area: A };
+  }
   if (c.inputMode === 'area') {
     if (c.shape === 'frustum') {
       const A1 = parseID(c.Aatas) || 0;
@@ -12479,7 +12484,7 @@ function spSyncDesign(wtpId) {
   const d = spDesign[wtpId];
   if (!d) return;
   d.comps.forEach(c => {
-    ['P','L','T','Patas','Latas','Amanual','Aatas','Abawah'].forEach(f => {
+    ['P','L','T','Patas','Latas','Amanual','Aatas','Abawah','Vmanual'].forEach(f => {
       const el = document.getElementById(`spd-${f}-${c.id}`);
       if (el) c[f] = el.value;
     });
@@ -12533,7 +12538,8 @@ function spAddComp(wtpId) {
     inputMode: 'dims',
     P:'', L:'', T:'',
     Patas:'', Latas:'',
-    Amanual:'', Aatas:'', Abawah:''
+    Amanual:'', Aatas:'', Abawah:'',
+    Vmanual:''
   });
   renderSpDesignPanel(wtpId);
 }
@@ -12673,7 +12679,9 @@ function spCompResultHTML(c, r) {
   const fv = v => spFmt(v, 2);
   let formula = '';
   const T = parseID(c.T)||0;
-  if (c.inputMode === 'area') {
+  if (c.inputMode === 'manual') {
+    formula = `Input manual`;
+  } else if (c.inputMode === 'area') {
     if (c.shape === 'frustum') {
       const A1 = parseID(c.Aatas)||0, A2 = parseID(c.Abawah)||A1;
       formula = `(${fv(T)}/3) × (${fv(A1)} + ${fv(A2)} + √(${fv(A1)}×${fv(A2)}))`;
@@ -12693,7 +12701,7 @@ function spCompResultHTML(c, r) {
   }
   return `<div style="font-family:var(--mono);font-size:11.5px;color:var(--text);line-height:1.7;padding:6px 0">
     <div>V = ${formula} = <strong style="color:#1a7fd4">${fv(r.vol)} m³</strong></div>
-    <div>A = <strong style="color:#27ae60">${fv(r.area)} m²</strong></div>
+    <div>A = <strong style="color:#27ae60">${(c.inputMode==='manual' && !r.area) ? '— (tidak diisi)' : fv(r.area)+' m²'}</strong></div>
   </div>`;
 }
 
@@ -12710,12 +12718,21 @@ function spCompSVG(c, r) {
   const textColor  = dark ? '#a0c8e8' : '#1a3a5c';
   const dimColor   = dark ? '#6a8aaa' : '#7090b0';
 
-  const T = parseID(c.T) || 0;
-  if (!T) return `<div style="color:var(--muted);font-size:11px;padding:14px;text-align:center">Isi dimensi untuk melihat diagram</div>`;
+  const V = parseID(c.Vmanual) || 0; // hanya relevan utk mode manual
+  let T = parseID(c.T) || 0;
+  if (c.inputMode !== 'manual' && !T) return `<div style="color:var(--muted);font-size:11px;padding:14px;text-align:center">Isi dimensi untuk melihat diagram</div>`;
+  if (c.inputMode === 'manual' && !V) return `<div style="color:var(--muted);font-size:11px;padding:14px;text-align:center">Isi Volume untuk melihat diagram</div>`;
 
   // Ukuran relatif (normalisasi)
   let Pbot, Lbot, Ptop, Ltop;
-  if (c.shape === 'cube') {
+  if (c.inputMode === 'manual') {
+    // Tidak ada bentuk geometris pasti (kolam asimetris) — gambarkan sbg kotak sederhana
+    // berbasis luas (jika diisi) atau estimasi dari volume, tanpa tapering atas/bawah.
+    const A = parseID(c.Amanual) || 0;
+    const side = A > 0 ? Math.sqrt(A) : Math.cbrt(Math.max(V,0.01));
+    Pbot = Lbot = Ptop = Ltop = Math.max(side, 0.01);
+    if (!T) T = A > 0 ? Math.max(V / A, 0.3) : Math.max(Math.cbrt(V), 0.3); // tinggi estimasi hanya utk ilustrasi
+  } else if (c.shape === 'cube') {
     if (c.inputMode === 'area') {
       const A = Math.max(parseID(c.Amanual)||1, 0.01);
       Pbot = Lbot = Math.sqrt(A); Ptop = Pbot; Ltop = Lbot;
@@ -12808,9 +12825,11 @@ function spCompSVG(c, r) {
     <line x1="${(tRB.x+10).toFixed(1)}" y1="${tRB.y.toFixed(1)}" x2="${(bRB.x+10).toFixed(1)}" y2="${bRB.y.toFixed(1)}" stroke="${dimColor}" stroke-width="1"/>
     <line x1="${(tRB.x+7).toFixed(1)}" y1="${tRB.y.toFixed(1)}" x2="${(tRB.x+13).toFixed(1)}" y2="${tRB.y.toFixed(1)}" stroke="${dimColor}" stroke-width="1"/>
     <line x1="${(bRB.x+7).toFixed(1)}" y1="${bRB.y.toFixed(1)}" x2="${(bRB.x+13).toFixed(1)}" y2="${bRB.y.toFixed(1)}" stroke="${dimColor}" stroke-width="1"/>
-    <text x="${(bRB.x+16).toFixed(1)}" y="${((tRB.y+bRB.y)/2).toFixed(1)}" fill="${textColor}" font-size="9" font-family="monospace" dominant-baseline="middle">T=${fv(T)}m</text>
+    <text x="${(bRB.x+16).toFixed(1)}" y="${((tRB.y+bRB.y)/2).toFixed(1)}" fill="${textColor}" font-size="9" font-family="monospace" dominant-baseline="middle">${c.inputMode==='manual'?'T≈'+fv(T)+'m (estimasi)':'T='+fv(T)+'m'}</text>
     <!-- Label P atas (frustum) dan P bawah -->
-    ${c.shape==='frustum' ? `
+    ${c.inputMode==='manual' ? `
+    <text x="${((bLF.x+bRF.x)/2).toFixed(1)}" y="${(bLF.y+11).toFixed(1)}" fill="${dimColor}" font-size="8.5" font-family="monospace" text-anchor="middle">A≈${fv(Pbot*Lbot)}m² (estimasi, bentuk asimetris)</text>
+    ` : c.shape==='frustum' ? `
     <text x="${((tLF.x+tRF.x)/2).toFixed(1)}" y="${(tLF.y-8).toFixed(1)}" fill="${dimColor}" font-size="8.5" font-family="monospace" text-anchor="middle">P_atas≈${fv(Ptop)}m · L_atas≈${fv(Ltop)}m</text>
     <text x="${((bLF.x+bRF.x)/2).toFixed(1)}" y="${(bLF.y+11).toFixed(1)}" fill="${dimColor}" font-size="8.5" font-family="monospace" text-anchor="middle">P_bawah≈${fv(Pbot)}m · L_bawah≈${fv(Lbot)}m</text>
     ` : `
@@ -12832,7 +12851,7 @@ function spSummaryHTML(wtpId, compsRes, totalVol, totalArea) {
     return `<tr>
       <td style="padding:5px 10px;text-align:center;color:var(--muted);font-size:11.5px">${i+1}</td>
       <td style="padding:5px 10px;font-size:11.5px">Kompartemen ${i+1}</td>
-      <td style="padding:5px 10px;font-size:11px;color:var(--muted)">${c.shape==='frustum'?'Frustum':'Kubus'} / ${c.inputMode==='dims'?'Dimensi':'Luas'}</td>
+      <td style="padding:5px 10px;font-size:11px;color:var(--muted)">${c.inputMode==='manual' ? 'Volume Manual' : (c.shape==='frustum'?'Frustum':'Kubus') + ' / ' + (c.inputMode==='dims'?'Dimensi':'Luas')}</td>
       <td style="padding:5px 10px;text-align:right;font-family:var(--mono);font-size:11.5px;color:#1a7fd4">${spFmt(r.vol,2)}</td>
       <td style="padding:5px 10px;text-align:right;font-family:var(--mono);font-size:11.5px;color:#27ae60">${spFmt(r.area,2)}</td>
     </tr>`;
@@ -13021,7 +13040,15 @@ function spCompFieldsHTML(wtpId, c) {
   </div>`;
 
   let fields = '';
-  if (c.shape === 'cube' && c.inputMode === 'dims') {
+  if (c.inputMode === 'manual') {
+    fields = `<div style="display:flex;flex-wrap:wrap;gap:8px">
+      ${inp('Vmanual','Volume / V (m³)', c.Vmanual)}
+      ${inp('Amanual','Luas / A (m²) — opsional', c.Amanual)}
+    </div>
+    <div style="font-size:10.5px;color:var(--muted);margin-top:6px;line-height:1.5">
+      ℹ️ Volume diinput langsung (misal hasil hitungan manual/AutoCAD untuk bentuk kolam asimetris). Luas bersifat opsional — hanya dipakai untuk label pada diagram & estimasi tampak atas.
+    </div>`;
+  } else if (c.shape === 'cube' && c.inputMode === 'dims') {
     fields = `<div style="display:flex;flex-wrap:wrap;gap:8px">
       ${inp('P','Panjang / P (m)', c.P)}
       ${inp('L','Lebar / L (m)', c.L)}
@@ -13081,13 +13108,16 @@ function renderSpDesignPanel(wtpId) {
         <button onclick="spRemoveComp(${wtpId},${c.id})" style="padding:2px 8px;font-size:11px;cursor:pointer;background:rgba(231,76,60,0.1);color:#e74c3c;border:1px solid #e74c3c;border-radius:4px;flex-shrink:0">✕ Hapus</button>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+        ${c.inputMode !== 'manual' ? `
         <div style="display:flex;gap:4px">
           <button onclick="spSetCompShape(${wtpId},${c.id},'frustum')" ${btnGroupStyle(c.shape==='frustum')}>Frustum</button>
           <button onclick="spSetCompShape(${wtpId},${c.id},'cube')" ${btnGroupStyle(c.shape==='cube')}>Kubus</button>
         </div>
-        <div style="display:flex;gap:4px;margin-left:12px">
+        ` : ''}
+        <div style="display:flex;gap:4px;margin-left:${c.inputMode!=='manual'?'12px':'0'}">
           <button onclick="spSetCompMode(${wtpId},${c.id},'dims')" ${btnGroupStyle(c.inputMode==='dims')}>Dimensi</button>
           <button onclick="spSetCompMode(${wtpId},${c.id},'area')" ${btnGroupStyle(c.inputMode==='area')}>Luas</button>
+          <button onclick="spSetCompMode(${wtpId},${c.id},'manual')" ${btnGroupStyle(c.inputMode==='manual')} title="Untuk kolam berbentuk asimetris — volume diinput langsung (mis. hasil hitungan AutoCAD)">✎ Volume Manual</button>
         </div>
       </div>
       ${spCompFieldsHTML(wtpId, c)}
@@ -13243,6 +13273,15 @@ function spGetCompDims(c) {
   };
   const T = parseID(getv('T')) || 0;
   let p = 0, b = 0, area_top = 0;
+  if (c.inputMode === 'manual') {
+    const V = parseID(getv('Vmanual')) || 0;
+    const A = parseID(getv('Amanual')) || 0;
+    area_top = A > 0 ? A : (V > 0 ? Math.pow(V, 2/3) : 0); // estimasi jika luas tak diisi
+    const Hest = T > 0 ? T : (area_top > 0 && V > 0 ? V/area_top : (V>0?Math.cbrt(V):0));
+    p = area_top > 0 ? Math.sqrt(area_top) : 0;
+    b = p;
+    return { H: Hest, p, b, area_top };
+  }
   if (c.inputMode === 'dims') {
     const Pb = parseID(getv('P')) || 0;
     const Lb = parseID(getv('L')) || 0;
@@ -13709,7 +13748,11 @@ function spDesignSummaryHTML(wtpId, totalVol, totalArea, compsRes) {
 
     // Dimensi bawah & atas
     let Pb = 0, Lb = 0, Pt = 0, Lt = 0, Ab = 0, At = 0;
-    if (c.inputMode === 'dims') {
+    if (c.inputMode === 'manual') {
+      const Vman = parseID(c.Vmanual) || 0;
+      Ab = At = parseID(c.Amanual) || (Vman > 0 ? Math.pow(Vman, 2/3) : 0);
+      Pb = Lb = Pt = Lt = Ab > 0 ? Math.sqrt(Ab) : 0;
+    } else if (c.inputMode === 'dims') {
       Pb = parseID(c.P) || 0; Lb = parseID(c.L) || 0;
       Pt = parseID(c.Patas) || Pb; Lt = parseID(c.Latas) || Lb;
       Ab = Pb * Lb; At = Pt * Lt;
@@ -13722,9 +13765,9 @@ function spDesignSummaryHTML(wtpId, totalVol, totalArea, compsRes) {
       Pb = Lb = Pt = Lt = Ab > 0 ? Math.sqrt(Ab) : 0;
     }
 
-    const isFrustum = c.shape === 'frustum' && c.inputMode !== 'area';
+    const isFrustum = c.inputMode !== 'manual' && c.shape === 'frustum' && c.inputMode !== 'area';
     const isDims    = c.inputMode === 'dims';
-    const shapeLabel = c.shape === 'cube' ? 'Kubus' : 'Frustum';
+    const shapeLabel = c.inputMode === 'manual' ? 'Manual' : (c.shape === 'cube' ? 'Kubus' : 'Frustum');
 
     // Slope angle jika frustum + dims
     let slopeHTML = '—';
