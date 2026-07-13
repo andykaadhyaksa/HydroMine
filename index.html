@@ -3066,6 +3066,7 @@ body:not(.dark) .hm-hero-bg-scrim {
             <option value="monthly_total" selected>Total Bulanan</option>
             <option value="monthly_avg">Rerata Bulanan</option>
             <option value="monthly_max">CH Harian Tertinggi / Bulan</option>
+            <option value="monthly_by_year">Maks Bulanan per Tahun (Grouped)</option>
             <option value="yearly">Total Tahunan</option>
             <option value="annual_max">CH Harian Tertinggi / Tahun</option>
           </select>
@@ -5705,7 +5706,9 @@ function updateHeroDiagramTheme(dark) {
 function nav(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item, .nav-dd-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
+  const pageEl = document.getElementById('page-' + page);
+  if (!pageEl) { console.warn('nav(): halaman tidak ditemukan:', 'page-' + page); return; }
+  pageEl.classList.add('active');
   const navEl = document.getElementById('nav-' + page);
   if (navEl) navEl.classList.add('active');
 
@@ -7579,14 +7582,14 @@ function raRenderIDFChart(selR24, selT) {
               if (!m) return '';
               if (m >= 60) {
                 const h = m / 60;
-                return `Durasi: ${Number.isInteger(h) ? h : h.toFixed(1)} jam (${m >= 1440 ? Math.round(m/1440)+'h ' : ''}${m} menit)`;
+                return `Durasi: ${Number.isInteger(h) ? h : fmtID(h,1)} jam (${m >= 1440 ? Math.round(m/1440)+'h ' : ''}${m.toLocaleString('id-ID')} menit)`;
               }
-              return `Durasi: ${m} menit`;
+              return `Durasi: ${m.toLocaleString('id-ID')} menit`;
             },
             label(ctx) {
               const I = ctx.parsed.y;
               const isSel = ctx.dataset.label.includes(`${selT} tahun`);
-              return ` ${ctx.dataset.label}: ${I.toFixed(3)} mm/jam${isSel ? ' ★' : ''}`;
+              return ` ${ctx.dataset.label}: ${fmtID(I,3)} mm/jam${isSel ? ' ★' : ''}`;
             },
             afterBody(items) {
               const m = items[0]?.parsed?.x;
@@ -8213,6 +8216,10 @@ function raUpdateChart() {
 
   let labels = [], datasets = [], infoText = '';
 
+  // Helper: gaya "Bar+Max" (mixed) berperilaku sebagai bar chart dengan garis referensi
+  // nilai maksimum ditambahkan setelah dataset utama dibangun (lihat blok di bawah).
+  const baseChartType = style === 'line' ? 'line' : 'bar'; // 'bar' & 'mixed' start as bar
+
   // Show zoom hint for large datasets
   if (hintEl) hintEl.style.display = nYears > 20 ? 'block' : 'none';
 
@@ -8234,7 +8241,7 @@ function raUpdateChart() {
       pointRadius: 0,
       fill: style === 'line',
       tension: 0.2,
-      type: style === 'bar' ? 'bar' : 'line',
+      type: baseChartType,
     }];
     infoText = `${raData.length.toLocaleString('id-ID')} titik data · ${nYears} tahun`;
     if (nYears > 15) infoText += ' — gunakan "Total Bulanan" untuk tampilan lebih bersih';
@@ -8265,7 +8272,7 @@ function raUpdateChart() {
       pointRadius: 0,
       fill: style === 'line',
       tension: 0.3,
-      type: style === 'bar' ? 'bar' : 'line',
+      type: baseChartType,
     }];
     infoText = `${keys.length} bulan · ${nYears} tahun`;
 
@@ -8284,7 +8291,7 @@ function raUpdateChart() {
       pointBackgroundColor: '#27ae60',
       fill: style === 'line',
       tension: 0.4,
-      type: style === 'bar' ? 'bar' : 'line',
+      type: baseChartType,
     }];
     infoText = `Rata-rata dari ${nYears} tahun data`;
 
@@ -8314,9 +8321,46 @@ function raUpdateChart() {
       pointBackgroundColor: '#e67e22',
       fill: false,
       tension: 0.25,
-      type: style === 'bar' ? 'bar' : 'line',
+      type: baseChartType,
     }];
     infoText = `${keys.length} bulan · Tertinggi: ${overallMax.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})} mm`;
+
+  } else if (type === 'monthly_by_year') {
+    // Grouped bar: sumbu-X = bulan (Jan-Des), setiap tahun = 1 seri warna berbeda
+    // (format serupa PivotChart Excel "Max of Rainfall" per Months x Years)
+    const mNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    labels = mNames;
+    const years = [...new Set(raData.map(d => d.date.getFullYear()))].sort((a,b)=>a-b);
+    // Palette siklikal — cukup untuk banyak tahun, mengikuti gaya kategori Excel
+    const palette = [
+      '#4472C4','#ED7D31','#A5A5A5','#FFC000','#5B9BD5','#70AD47',
+      '#264478','#9E480E','#636363','#997300','#255E91','#43682B',
+      '#7CAFDD','#B44C43','#C00000','#8064A2','#00B0B0','#D9603B',
+    ];
+    const maxM = {}; // maxM[year][month] = max value
+    raData.forEach(d => {
+      const y = d.date.getFullYear(), m = d.date.getMonth();
+      if (!maxM[y]) maxM[y] = new Array(12).fill(null);
+      if (maxM[y][m] === null || d.value > maxM[y][m]) maxM[y][m] = d.value;
+    });
+    datasets = years.map((y, idx) => {
+      const color = palette[idx % palette.length];
+      return {
+        label: String(y),
+        data: maxM[y].map(v => v === null ? null : v),
+        backgroundColor: color,
+        borderColor: color,
+        borderWidth: 0,
+        pointRadius: style === 'line' ? 3 : 0,
+        pointBackgroundColor: color,
+        fill: false,
+        tension: 0.25,
+        type: baseChartType,
+        spanGaps: true,
+      };
+    });
+    const allVals = raData.map(d => d.value);
+    infoText = `${years.length} tahun (${years[0]}–${years[years.length-1]}) · Maks: ${Math.max(...allVals).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})} mm`;
 
   } else if (type === 'yearly') {
     const aggY = {};
@@ -8335,7 +8379,7 @@ function raUpdateChart() {
         pointRadius: style === 'line' ? 4 : 0,
         fill: false,
         tension: 0.3,
-        type: style === 'bar' ? 'bar' : 'line',
+        type: baseChartType,
       },
       {
         label: 'Rerata (mm)',
@@ -8373,7 +8417,7 @@ function raUpdateChart() {
         pointRadius: style === 'line' ? 4 : 0,
         fill: false,
         tension: 0.3,
-        type: style === 'bar' ? 'bar' : 'line',
+        type: baseChartType,
       },
       {
         label: `Rerata Maks: ${mean.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})} mm`,
@@ -8390,7 +8434,31 @@ function raUpdateChart() {
     infoText = `CH Maks ${nYears} tahun · Tertinggi: ${Math.max(...vals).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})} mm`;
   }
 
+  // ── GAYA "Bar+Max": tambahkan garis referensi nilai maksimum ──────
+  // Hanya untuk mode dengan 1 dataset bar tunggal (yearly & annual_max sudah
+  // punya garis rerata sendiri; monthly_by_year & daily dikecualikan karena
+  // multi-seri / terlalu padat untuk garis referensi tunggal yang bermakna).
+  if (style === 'mixed' && datasets.length === 1 && datasets[0].type === 'bar'
+      && type !== 'daily' && type !== 'monthly_by_year') {
+    const vals = datasets[0].data.filter(v => typeof v === 'number');
+    if (vals.length) {
+      const maxVal = Math.max(...vals);
+      datasets.push({
+        label: `Maks: ${maxVal.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})} mm`,
+        data: labels.map(() => maxVal),
+        borderColor: '#e74c3c',
+        borderWidth: 1.5,
+        borderDash: [6,3],
+        pointRadius: 0,
+        fill: false,
+        type: 'line',
+        tension: 0,
+      });
+    }
+  }
+
   if (infoEl) infoEl.textContent = infoText;
+
 
   if (raChartInst) { raChartInst.destroy(); raChartInst = null; }
 
@@ -8460,8 +8528,8 @@ function raUpdateChart() {
           ticks: {
             color: tickColor,
             font: { family: 'Inter', size: type==='yearly'||type==='annual_max'||type==='monthly_max' ? 11.5 : 10, weight: '500' },
-            maxTicksLimit: isLarge ? 16 : (nYears > 15 ? 20 : nYears > 5 ? 30 : labels.length),
-            maxRotation: nYears > 5 ? 45 : 0,
+            maxTicksLimit: type==='monthly_by_year' ? 12 : (isLarge ? 16 : (nYears > 15 ? 20 : nYears > 5 ? 30 : labels.length)),
+            maxRotation: type==='monthly_by_year' ? 0 : (nYears > 5 ? 45 : 0),
             minRotation: 0,
             autoSkip: true,
             autoSkipPadding: 12,
@@ -8491,7 +8559,7 @@ function raUpdateChart() {
           title: {
             display: true,
             text: type==='monthly_avg' ? 'CH Rerata (mm/hari)'
-                : (type==='monthly_max'||type==='annual_max') ? 'CH Harian Tertinggi (mm)'
+                : (type==='monthly_max'||type==='annual_max'||type==='monthly_by_year') ? 'CH Harian Tertinggi (mm)'
                 : 'Curah Hujan (mm)',
             color: tickColor,
             font: { family: 'Inter', size: 11.5, weight: '700' },
@@ -13324,10 +13392,12 @@ function scheduleAutoSave() {
 }
 
 function showSaveIndicator() {
-  const ss = document.getElementById('save-status');
-  const t  = new Date();
-  ss.innerHTML = `<span class="autosave-dot"></span>Tersimpan ${t.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`;
-  ss.style.display = 'block';
+  const wrap = document.getElementById('hm-tb-saved');
+  const timeEl = document.getElementById('hm-tb-saved-time');
+  if (!wrap || !timeEl) return;
+  const t = new Date();
+  timeEl.textContent = `Tersimpan ${t.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`;
+  wrap.style.display = 'flex';
 }
 
 
@@ -13637,6 +13707,7 @@ function loadProjectFile(input) {
 let toastTimer = null;
 function showToast(msg, type) {
   const el   = document.getElementById('toast');
+  if (!el) { console.warn('Toast:', msg); return; }
   el.textContent = msg;
   el.className   = 'toast' + (type ? ' ' + type : '');
   void el.offsetWidth; // reflow
@@ -13691,9 +13762,12 @@ document.addEventListener('DOMContentLoaded', function() {
       const state = JSON.parse(saved);
       restoreState(state);
       const d  = new Date(state.savedAt);
-      const ss = document.getElementById('save-status');
-      ss.innerHTML = `<span class="autosave-dot"></span>${d.toLocaleDateString('id-ID',{day:'2-digit',month:'short'})} ${d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`;
-      ss.style.display = 'block';
+      const wrap = document.getElementById('hm-tb-saved');
+      const timeEl = document.getElementById('hm-tb-saved-time');
+      if (wrap && timeEl) {
+        timeEl.textContent = `${d.toLocaleDateString('id-ID',{day:'2-digit',month:'short'})} ${d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`;
+        wrap.style.display = 'flex';
+      }
       showToast('📂 Data terakhir berhasil dimuat otomatis', 'success');
     } catch(e) {
       localStorage.removeItem(STORAGE_KEY);
@@ -17297,6 +17371,7 @@ function spSludgeResultHTML(wtpId) {
     '</div>';
 }
 
+let rpUnits = [];          // [{id, name, catchments, sf, rt, design}] — daftar unit Retention Pond
 let rpUnitCid = 0;
 let rpCompCid = 0;
 let rpManual = [];         // [{id, name, q}]  — RP tanpa data curah hujan
