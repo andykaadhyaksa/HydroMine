@@ -10920,6 +10920,8 @@ async function exportExcel() {
     STRIPE_A:'FFFFFFFF',STRIPE_B:'FFF0F4FC',
     // Accent line
     GOLD:'FFF5A623',CYAN:'FF00B5CC',
+    // Mineral gray (inactive block header)
+    MINERAL2:'FF3C4148',
   };
 
   // ── Cell style factory — Premium Edition ─────────────────
@@ -11208,323 +11210,576 @@ async function exportExcel() {
   // (addSS untuk sheet Evaporation dipanggil di bawah, setelah WTP Summary, agar urutan tab sesuai UI)
   // ═══ SHEET 3: RUNOFF ══════════════════════════════════════
   {
-    // Sheet Runoff selalu menampilkan DUA metode penuh (CH dan I),
-    // terlepas dari mode yang dipilih di app.
-    // Sehingga auditor/reviewer dapat melihat & memverifikasi kedua perhitungan sekaligus.
+    // DUA metode ditampilkan. Blok AKTIF diberi ★.
+    // Warna baris per Grup + separator baris tebal antar grup.
+    // Blok I: sumber t ikut pilihan di app (manual/tc).
 
-    // ─── Shared params ───
-    // Untuk blok CH: selalu baca langsung dari input 'ro-ch', bukan getCH()
-    // getCH() mengembalikan CH ekuivalen I×Tc jika mode='i', bukan nilai CH input
-    const roChGlobR  = parseFloat(
-      String(document.getElementById('ro-ch')?.value || '0').replace(/\./g,'').replace(',','.')
-    ) || 0;
-    const aktRO      = evaCurrAktual() || 0;
-    const idfKalaR   = parseInt(document.getElementById('ra-ih-kala')?.value) || 25;
-    const r24ByTR    = raIntensityGetR24ByT ? raIntensityGetR24ByT() : null;
-    const R24R       = r24ByTR ? (r24ByTR[idfKalaR] || 0) : 0;
-    const tcGlobR    = raTcLastResult && !isNaN(raTcLastResult?.tcHour) ? raTcLastResult.tcHour : NaN;
-    const IglobR     = (R24R > 0 && !isNaN(tcGlobR) && tcGlobR > 0 && typeof raMononobeI === 'function')
-                       ? raMononobeI(R24R, tcGlobR) : NaN;
+    // ─── Params ─────────────────────────────────────────────
+    const roChGlobR = parseFloat(
+      String(document.getElementById('ro-ch')?.value||'0').replace(/\./g,'').replace(',','.')
+    )||0;
+    const aktRO    = evaCurrAktual()||0;
+    const idfKalaR = parseInt(document.getElementById('ra-ih-kala')?.value)||25;
+    const r24ByTR  = raIntensityGetR24ByT ? raIntensityGetR24ByT() : null;
+    const R24R     = r24ByTR ? (r24ByTR[idfKalaR]||0) : 0;
+    const roN      = roRows.length;
 
-    // helper
-    const roN = roRows.length;
+    // ─── Mode aktif ─────────────────────────────────────────
+    const _mode   = (typeof roCalcMode  !=='undefined') ? roCalcMode  : 'ch';
+    const _durSrc = (typeof roDurSource !=='undefined') ? roDurSource : 'manual';
+    const _isSep  = _mode==='i' && _durSrc==='tc';
+    const _isManI = _mode==='i' && _durSrc==='manual';
+    const _chAktif= _mode==='ch';
+    const _iAktif = _mode==='i';
 
-    // ─── Baris parameter — posisi row di Excel (1-based, setelah filter null) ───
-    // Struktur sheet:
-    //  Row 1 : H1 judul
-    //  -- Blok CH --
-    //  Row 2 : H2 "METODE CH"
-    //  Row 3 : param CH  ← rCHparam
-    //  Row 4 : header kolom
-    //  Row 5..5+N-1 : data catchment
-    //  Row 5+N : TOTAL CH
-    //  Row 5+N+1 : null/spacer
-    //  -- Blok I --
-    //  Row 5+N+2 : H2 "METODE I"
-    //  Row 5+N+3 : param I  ← rIparam
-    //  Row 5+N+4 : header kolom
-    //  Row 5+N+5..5+N+5+N-1 : data catchment
-    //  Row 5+N+5+N : TOTAL I
-    // Row numbers Excel (1-based), setelah filter(Boolean) — null spacer TIDAK menambah baris:
-    // Row 1  = H1 judul
-    // Row 2  = H2 METODE 1 CH
-    // Row 3  = param CH (B3=CH, D3=Evap)
-    // Row 4  = header kolom CH
-    // Row 5..5+N-1 = data catchment CH
-    // Row 5+N = TOTAL CH
-    // [null spacer → dihapus, tidak ada baris]
-    // Row 5+N+1 = H2 METODE 2 I
-    // Row 5+N+2 = param I (B=R24, D=Tc, F=I_formula, H=Evap)
-    // Row 5+N+3 = header kolom I
-    // Row 5+N+4..5+N+4+N-1 = data catchment I
-    // Row 5+N+4+N = TOTAL I
-    const rCHparam = 3;
-    const rCHdataS = 5;
-    const rCHdataE = rCHdataS + roN - 1;   // = 5+N-1
-    const rCHTot   = rCHdataE + 1;          // = 5+N
-    // Blok I — null spacer tidak menambah baris Excel
-    const rIH2row  = rCHTot + 1;            // = 6+N  (langsung setelah Total CH)
-    const rIparam  = rIH2row + 1;           // = 7+N
-    const rIhdr    = rIparam + 1;           // = 8+N
-    const rIdataS  = rIhdr + 1;             // = 9+N
-    const rIdataE  = rIdataS + roN - 1;     // = 9+N+N-1 = 8+2N
+    // ─── t jam untuk blok I ─────────────────────────────────
+    const _manualEl = document.getElementById('ro-i-dur-manual');
+    const _tManMin  = _manualEl ? parseID(_manualEl.value) : NaN;
+    const _tManHour = (!isNaN(_tManMin)&&_tManMin>0) ? _tManMin/60 : NaN;
 
-    const ro3 = [];
+    // Ambil [tcHour, IVal] untuk satu baris sesuai mode
+    function _rowTI(r){
+      let tH=NaN;
+      if(_isManI){ tH=_tManHour; }
+      else if(_isSep&&typeof roCalcTcForRow==='function'){ tH=roCalcTcForRow(r); }
+      if(isNaN(tH)||tH<=0){
+        tH=(raTcLastResult&&!isNaN(raTcLastResult.tcHour))?raTcLastResult.tcHour:NaN;
+      }
+      const IV=(!isNaN(tH)&&tH>0&&R24R>0&&typeof raMononobeI==='function')?raMononobeI(R24R,tH):NaN;
+      return [isNaN(tH)?0:tH, isNaN(IV)?0:IV];
+    }
 
-    // ── Row 1: Judul ──
-    ro3.push([
-      H1('RUNOFF CONTACT WATER — METODE CH & INTENSITAS',C.DARK_BG),
-      EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG),
-      EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG),
-      EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG)
-    ]);
+    // Label sumber t
+    const _tSrcLbl = _isManI
+      ? `Sumber durasi: INPUT MANUAL  t = ${!isNaN(_tManMin)?_tManMin+' menit ('+(_tManHour||0).toFixed(3)+' jam)':'belum diisi'}  |  I=(R24/24)×(24/t)^(2/3)  |  Q=C×(I×t)×A×10`
+      : _isSep
+        ? 'Sumber durasi: Tc kritis per catchment (Separasi)  |  I=(R24/24)×(24/Tc)^(2/3)  |  Q=C×(I×Tc)×A×10'
+        : 'Sumber durasi: Tc global dari Step 7  |  I=(R24/24)×(24/Tc)^(2/3)  |  Q=C×(I×Tc)×A×10';
 
-    // ════════════════════════════════════════
-    // BLOK A — METODE CURAH HUJAN (CH)
-    // ════════════════════════════════════════
-    ro3.push([
-      H2('METODE 1 — CURAH HUJAN (CH)',C.TEAL_HDR),
-      EM(C.TEAL_HDR),EM(C.TEAL_HDR),EM(C.TEAL_HDR),EM(C.TEAL_HDR),
-      EM(C.TEAL_HDR),EM(C.TEAL_HDR),EM(C.TEAL_HDR),EM(C.TEAL_HDR),
-      EM(C.TEAL_HDR),EM(C.TEAL_HDR),EM(C.TEAL_HDR)
-    ]);
+    // ─── Palet grup ──────────────────────────────────────────
+    const _GPAL=[
+      ['FFE3F2FD','FF0D3A7A'],
+      ['FFFCE4EC','FF8B0000'],
+      ['FFF3E5F5','FF3A006F'],
+      ['FFE8F5E9','FF1B4D20'],
+      ['FFFFF3E0','FF7A3200'],
+      ['FFE0F7FA','FF003E44'],
+      ['FFFFFDE7','FF5A4000'],
+      ['FFEDE7F6','FF1A0050'],
+    ];
+    const _gMap={};let _gIdx=0;
+    (roGroupList||[]).forEach(g=>{if(!(g.id in _gMap)){_gMap[g.id]=_GPAL[_gIdx%_GPAL.length];_gIdx++;}});
 
-    // Row 3 — param CH: B3=CH, D3=Evap
-    ro3.push([
+    function _rb(gid,i){ // row bg
+      if(gid&&_gMap[gid]) return _gMap[gid];
+      return i%2===0?[C.WHITE,'FF111111']:[C.GRAY_SOFT,'FF222222'];
+    }
+
+    // Hitung jumlah separator yang akan muncul di antara baris data
+    function _nSep(){
+      let s=0,prev=undefined;
+      roRows.forEach(r=>{
+        if(prev!==undefined&&r.groupId!==prev&&r.groupId) s++;
+        prev=r.groupId;
+      });
+      return s;
+    }
+    const NS=_nSep(); // jumlah baris separator (sama untuk blok CH dan I)
+
+    // ─── Bangun sheet dengan row counter real-time ────────────
+    // Kita push ke ro3[] dan catat nomor row Excel setiap push.
+    // xlsxAddSheet memfilter null, jadi null spacer tidak dihitung.
+    const ro3=[];
+    let _er=0; // Excel row counter (increment setiap non-null push)
+    function _push(row){ ro3.push(row); if(row!==null) _er++; return _er; }
+
+    // ── Judul (row 1)
+    const _mH1=_chAktif?'RUNOFF CONTACT WATER — METODE AKTIF: CURAH HUJAN (CH)'
+      :_isManI?`RUNOFF CONTACT WATER — METODE AKTIF: INTENSITAS MONONOBE [t Manual ${!isNaN(_tManMin)?_tManMin+' mnt':'—'}]`
+      :`RUNOFF CONTACT WATER — METODE AKTIF: INTENSITAS MONONOBE [Tc${_isSep?' per Catchment':' Global'}]`;
+    _push([H1(_mH1,C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG),
+           EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG),
+           EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG)]);
+
+    // ── Legenda grup (row 2, hanya jika ada grup)
+    const _hasLeg=(roGroupList&&roGroupList.length>0);
+    if(_hasLeg){
+      const leg=[{v:'◆ Legenda Grup:',s:cs({bg:C.DARK_BG,fc:C.GOLD,bold:true,sz:9,border:true})}];
+      (roGroupList||[]).forEach(g=>{
+        const [lb,lf]=_gMap[g.id]||[C.WHITE,C.BLACK];
+        leg.push({v:g.label,s:cs({bg:lb,fc:lf,bold:true,sz:9,border:true})});
+      });
+      while(leg.length<14) leg.push(EM(C.DARK_BG));
+      _push(leg);
+    }
+
+    // ══════════ BLOK CH ══════════
+    const _chBg=_chAktif?C.TEAL_HDR:C.MINERAL2;
+    const _chLbl=_chAktif?'METODE 1 — CURAH HUJAN (CH)  ★ AKTIF':'METODE 1 — CURAH HUJAN (CH)';
+    _push([H2(_chLbl,_chBg),EM(_chBg),EM(_chBg),EM(_chBg),EM(_chBg),EM(_chBg),
+           EM(_chBg),EM(_chBg),EM(_chBg),EM(_chBg),EM(_chBg),EM(_chBg),EM(_chBg),EM(_chBg)]);
+
+    const rCHparam=_push([
       LB('CH Harian Maks (mm/hari)'),
-      {v:roChGlobR, s:cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,bold:true,sz:12,halign:'right',border:true})},
+      {v:roChGlobR,s:cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,bold:true,sz:12,halign:'right',border:true})},
       LB('mm/hari'),
-      FMSx(`Evaporation!B${rAktual}`, aktRO, cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:11,border:true})),
+      FMSx(`Evaporation!B${rAktual}`,aktRO,cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:11,border:true})),
       LB('m³/m²/hr (Evap)'),
-      {v:'Q=C×CH×A×10  |  Evap=A×10000×E  |  Neto=MAX(0,Q-Evap)  |  Akhir=Neto+GW',
+      {v:'Q=C×CH×A×10 | Evap=A×10000×E | Neto=MAX(0,Q-Evap) | Akhir=Neto+GW',
        s:cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,sz:9,italic:true,border:true})},
-      EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT)
+      EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT)
     ]);
+    _push([H3('No',C.TEAL_SOFT),H3('Nama Catchment',C.TEAL_SOFT),H3('C',C.TEAL_SOFT),
+           H3('A (ha)',C.TEAL_SOFT),H3('WTP',C.TEAL_SOFT),H3('Grup',C.TEAL_SOFT),
+           H3('CH ekv (mm)',C.TEAL_SOFT),H3('Q Bruto (m³/hr)',C.TEAL_SOFT),
+           H3('Evap (m³/hr)',C.TEAL_SOFT),H3('Q Neto (m³/hr)',C.TEAL_SOFT),
+           H3('GW (m³/hr)',C.TEAL_SOFT),H3('Q Akhir (m³/hr)',C.TEAL_SOFT),
+           EM(C.TEAL_SOFT),EM(C.TEAL_SOFT)]);
 
-    // Row 4 — header CH (12 kolom)
-    ro3.push([
-      H3('No',C.TEAL_SOFT),H3('Nama Catchment',C.TEAL_SOFT),H3('C',C.TEAL_SOFT),
-      H3('A (ha)',C.TEAL_SOFT),H3('WTP',C.TEAL_SOFT),H3('Grup',C.TEAL_SOFT),
-      H3('CH ekv (mm)',C.TEAL_SOFT),H3('Q Bruto (m³/hr)',C.TEAL_SOFT),
-      H3('Evap (m³/hr)',C.TEAL_SOFT),H3('Q Neto (m³/hr)',C.TEAL_SOFT),
-      H3('GW (m³/hr)',C.TEAL_SOFT),H3('Q Akhir (m³/hr)',C.TEAL_SOFT)
-    ]);
-
-    // Rows 5..5+N-1 — data CH
-    roRows.forEach((r, i) => {
-      const c   = parseID(r.c) || 0;
-      const a   = parseID(r.a) || 0;
-      const evaOn = r.evaActive !== false;
-      const bg  = i%2===0 ? C.WHITE : C.GRAY_SOFT;
-      const rn  = rCHdataS + i;
-      const wtp = r.wtpId ? (wtpList.find(w=>w.id===r.wtpId)?.name||'—') : '—';
-      const grp = r.groupId ? (roGroupList.find(g=>g.id===r.groupId)?.label||'—') : '—';
-      // G = CH ekv = $B$3
-      // H = Q Bruto = C*G*D*10
-      // I = Evap
-      // J = Q Neto
-      // K = GW
-      // L = Q Akhir = J+K
-      const fChEkv = `$B$${rCHparam}`;
-      const fQ     = `C${rn}*G${rn}*D${rn}*10`;
-      const fEvap  = evaOn ? `D${rn}*$D$${rCHparam}*10000` : '0';
-      const fNeto  = `MAX(0,H${rn}-I${rn})`;
-      const fAkhir = `J${rn}+K${rn}`;
-      const chEkv  = roChGlobR;
-      const q      = c * chEkv * a * 10;
-      const eva    = evaOn ? aktRO * a * 10000 : 0;
-      const neto   = Math.max(0, q - eva);
-      const gw     = (gwData[r.id]?.active) ? (parseID(gwData[r.id]?.q)||0) : 0;
-      ro3.push([
-        {v:i+1,   s:cs({bg,sz:10,halign:'center',border:true})},
-        {v:r.name||'', s:cs({bg,sz:10,border:true})},
-        {v:c,     s:cs({bg,fc:C.GRAY_LBL,sz:10,halign:'right',border:true})},
-        {v:a,     s:cs({bg,sz:10,halign:'right',border:true})},
-        {v:wtp,   s:cs({bg,fc:C.TEAL_HDR,sz:10,border:true})},
-        {v:grp,   s:cs({bg,fc:C.GRAY_LBL,sz:10,border:true})},
-        FMSx(fChEkv,  roundSmart(chEkv), cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,bold:true,sz:10,halign:'right',border:true})),
-        FMS(fQ,       roundSmart(q),     cs({bg:q>0?C.TEAL_SOFT:bg,fc:C.TEAL_HDR,bold:q>0,sz:10,halign:'right',border:true})),
-        FMS(fEvap,    roundSmart(eva),   cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:10,halign:'right',border:true})),
-        FMS(fNeto,    roundSmart(neto),  cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:10,halign:'right',border:true})),
-        {v:roundSmart(gw),               s:cs({bg,fc:'#059669',sz:10,halign:'right',border:true})},
-        FMS(fAkhir,   roundSmart(neto+gw), cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,bold:true,sz:10,halign:'right',border:true}))
+    // ─── Helper subtotal row dengan SUMIF formula ────────────
+    // rDataS/rDataE = range baris data (termasuk separator, SUMIF akan skip teks)
+    // grpLbl = nama grup sebagai kriteria SUMIF di kolom F
+    // stfc = warna latar subtotal (fc dari palet grup = gelap)
+    // Blok CH: A=No,B=Nama,C=C,D=A(ha),E=WTP,F=Grup,G=CHekv,H=QBruto,I=Evap,J=QNeto,K=GW,L=QAkhir,M=EM,N=EM
+    //   SUMIF(F:F, grpLbl, D:D) = total A(ha)
+    //   SUMIF(F:F, grpLbl, H:H) = Q Bruto, dll.
+    function _stRowCH(lbl, stfc, rDS, rDE, stA, stQ, stEv, stNt, stGW) {
+      const sc = (f,v) => ({v:roundSmart(v), f,
+        s:cs({bg:stfc,fc:'FFFFFFFF',bold:true,sz:9,halign:'right',border:true})});
+      const em = EM(stfc);
+      const lc = `"${lbl}"`;
+      const rng = `${rDS}:${rDE}`;
+      return [
+        em,                                                                                     // col A = No (kosong)
+        {v:`Σ ${lbl}`,s:cs({bg:stfc,fc:'FFFFFFFF',bold:true,sz:9,border:true,italic:true})}, // col B = Nama
+        em,                                                                                     // col C = C
+        sc(`SUMIF(F${rDS}:F${rDE},${lc},D${rDS}:D${rDE})`, stA),                             // col D = A(ha)
+        em,                                                                                     // col E = WTP
+        em,                                                                                     // col F = Grup
+        em,                                                                                     // col G = CHekv
+        sc(`SUMIF(F${rDS}:F${rDE},${lc},H${rDS}:H${rDE})`, stQ),                             // col H = Q Bruto
+        sc(`SUMIF(F${rDS}:F${rDE},${lc},I${rDS}:I${rDE})`, stEv),                            // col I = Evap
+        sc(`SUMIF(F${rDS}:F${rDE},${lc},J${rDS}:J${rDE})`, stNt),                            // col J = Q Neto
+        sc(`SUMIF(F${rDS}:F${rDE},${lc},K${rDS}:K${rDE})`, stGW),                            // col K = GW
+        sc(`SUMIF(F${rDS}:F${rDE},${lc},L${rDS}:L${rDE})`, stNt+stGW),                       // col L = Q Akhir
+        em,                                                                                     // col M
+        em                                                                                      // col N
+      ];
+    }
+    // Blok I: A=No,B=Nama,C=C,D=A(ha),E=WTP,F=Grup,G=t,H=I(mm/jam),I=CHekv,J=QBruto,K=Evap,L=QNeto,M=GW,N=QAkhir
+    function _stRowI(lbl, stfc, rDS, rDE, stA, stQI, stEvI, stNtI, stGWI) {
+      const sc = (f,v) => ({v:roundSmart(v), f,
+        s:cs({bg:stfc,fc:'FFFFFFFF',bold:true,sz:9,halign:'right',border:true})});
+      const em = EM(stfc);
+      const lc = `"${lbl}"`;
+      return [
+        em,                                                                                     // col A = No (kosong)
+        {v:`Σ ${lbl}`,s:cs({bg:stfc,fc:'FFFFFFFF',bold:true,sz:9,border:true,italic:true})}, // col B = Nama
+        em,                                                                                     // col C = C
+        sc(`SUMIF(F${rDS}:F${rDE},${lc},D${rDS}:D${rDE})`, stA),                             // col D = A(ha)
+        em,                                                                                     // col E = WTP
+        em,                                                                                     // col F = Grup
+        em,                                                                                     // col G = t
+        em,                                                                                     // col H = I(mm/jam)
+        em,                                                                                     // col I = CHekv
+        sc(`SUMIF(F${rDS}:F${rDE},${lc},J${rDS}:J${rDE})`, stQI),                            // col J = Q Bruto
+        sc(`SUMIF(F${rDS}:F${rDE},${lc},K${rDS}:K${rDE})`, stEvI),                           // col K = Evap
+        sc(`SUMIF(F${rDS}:F${rDE},${lc},L${rDS}:L${rDE})`, stNtI),                           // col L = Q Neto
+        sc(`SUMIF(F${rDS}:F${rDE},${lc},M${rDS}:M${rDE})`, stGWI),                           // col M = GW
+        sc(`SUMIF(F${rDS}:F${rDE},${lc},N${rDS}:N${rDE})`, stNtI+stGWI)                      // col N = Q Akhir
+      ];
+    }
+    const rCHdataS=_er+1; // row pertama data CH (dihitung setelah semua header)
+    let _prevGrpCH=undefined;
+    let _grpRowStartCH=_er+1; // row awal grup saat ini
+    roRows.forEach((r,i)=>{
+      const grpLbl=r.groupId?(roGroupList.find(g=>g.id===r.groupId)?.label||'—'):null;
+      // Jika grup berubah dan ada grup sebelumnya: push subtotal grup lama dulu, lalu separator grup baru
+      if(i>0&&r.groupId!==_prevGrpCH){
+        // Subtotal grup sebelumnya
+        if(_prevGrpCH){
+          const grpRowEnd=_er;
+          const [stbg,stfc]=_gMap[_prevGrpCH]||[C.GRAY_MED,C.BLACK];
+          const prevLbl=roGroupList.find(g=>g.id===_prevGrpCH)?.label||'Grup';
+          const grpRowsA=roRows.filter(rx=>rx.groupId===_prevGrpCH);
+          const stA=grpRowsA.reduce((s,rx)=>s+(parseID(rx.a)||0),0);
+          const stQ=grpRowsA.reduce((s,rx)=>s+(parseID(rx.c)||0)*roChGlobR*(parseID(rx.a)||0)*10,0);
+          const stEv=grpRowsA.reduce((s,rx)=>{const a=parseID(rx.a)||0;return s+(rx.evaActive!==false?aktRO*a*10000:0);},0);
+          const stNt=grpRowsA.reduce((s,rx)=>{const c=parseID(rx.c)||0,a=parseID(rx.a)||0,q=c*roChGlobR*a*10,e=rx.evaActive!==false?aktRO*a*10000:0;return s+Math.max(0,q-e);},0);
+          const stGW=grpRowsA.reduce((s,rx)=>s+((gwData[rx.id]?.active)?(parseID(gwData[rx.id]?.q)||0):0),0);
+          _push(_stRowCH(prevLbl,stfc,rCHdataS,_er,stA,stQ,stEv,stNt,stGW));
+        }
+        // Separator grup baru (jika grup baru punya groupId)
+        if(r.groupId){
+          const [sb]=_gMap[r.groupId]||[C.MINERAL2];
+          const seprow=[{v:`◆ ${grpLbl||'Grup'}`,s:cs({bg:sb,fc:'FF000000',bold:true,sz:10,border:true})}];
+          while(seprow.length<14) seprow.push(EM(sb));
+          _push(seprow);
+        }
+        _grpRowStartCH=_er+1;
+      }
+      // Separator grup pertama (i===0 dan ada grup)
+      if(i===0&&r.groupId){
+        const [sb]=_gMap[r.groupId]||[C.MINERAL2];
+        const seprow=[{v:`◆ ${grpLbl||'Grup'}`,s:cs({bg:sb,fc:'FF000000',bold:true,sz:10,border:true})}];
+        while(seprow.length<14) seprow.push(EM(sb));
+        _push(seprow);
+        _grpRowStartCH=_er+1;
+      }
+      _prevGrpCH=r.groupId;
+      const c=parseID(r.c)||0,a=parseID(r.a)||0,evaOn=r.evaActive!==false;
+      const [gbg,gfc]=_rb(r.groupId,i);
+      const wtp=r.wtpId?(wtpList.find(w=>w.id===r.wtpId)?.name||'—'):'—';
+      const grp=grpLbl||'—';
+      const _rn=_er+1;
+      const fChEkv=`$B$${rCHparam}`;
+      const fQ=`C${_rn}*G${_rn}*D${_rn}*10`;
+      const fEvap=evaOn?`D${_rn}*$D$${rCHparam}*10000`:'0';
+      const fNeto=`MAX(0,H${_rn}-I${_rn})`;
+      const fAkhir=`J${_rn}+K${_rn}`;
+      const chEkv=roChGlobR,q=c*chEkv*a*10,eva=evaOn?aktRO*a*10000:0;
+      const neto=Math.max(0,q-eva),gw=(gwData[r.id]?.active)?(parseID(gwData[r.id]?.q)||0):0;
+      _push([
+        {v:i+1,       s:cs({bg:gbg,fc:gfc,sz:10,halign:'center',border:true,bold:!!r.groupId})},
+        {v:r.name||'',s:cs({bg:gbg,fc:gfc,sz:10,border:true,bold:!!r.groupId})},
+        {v:c,         s:cs({bg:gbg,fc:gfc,sz:10,halign:'right',border:true})},
+        {v:a,         s:cs({bg:gbg,fc:gfc,sz:10,halign:'right',border:true})},
+        {v:wtp,       s:cs({bg:gbg,fc:gfc,sz:10,border:true})},
+        {v:grp,       s:cs({bg:gbg,fc:gfc,sz:10,bold:!!r.groupId,border:true})},
+        FMSx(fChEkv,roundSmart(chEkv),cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,bold:true,sz:10,halign:'right',border:true})),
+        FMS(fQ,roundSmart(q),cs({bg:q>0?C.TEAL_SOFT:gbg,fc:C.TEAL_HDR,bold:q>0,sz:10,halign:'right',border:true})),
+        FMS(fEvap,roundSmart(eva),cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:10,halign:'right',border:true})),
+        FMS(fNeto,roundSmart(neto),cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:10,halign:'right',border:true})),
+        {v:roundSmart(gw),s:cs({bg:gbg,fc:gfc,sz:10,halign:'right',border:true})},
+        FMS(fAkhir,roundSmart(neto+gw),cs({bg:C.PURPLE_SOFT,fc:C.PURPLE_HDR,bold:true,sz:10,halign:'right',border:true})),
+        EM(gbg),EM(gbg)
       ]);
     });
-
-    // Total CH
-    const totACH  = roRows.reduce((s,r)=>s+(parseID(r.a)||0), 0);
-    const totQCH  = roRows.reduce((s,r)=>s+(parseID(r.c)||0)*roChGlobR*(parseID(r.a)||0)*10, 0);
-    const totEvCH = roRows.reduce((s,r)=>{const a=parseID(r.a)||0;return s+(r.evaActive!==false?aktRO*a*10000:0);}, 0);
-    const totNtCH = roRows.reduce((s,r)=>{const c=parseID(r.c)||0,a=parseID(r.a)||0,q=c*roChGlobR*a*10,e=r.evaActive!==false?aktRO*a*10000:0;return s+Math.max(0,q-e);}, 0);
-    const totGW   = roRows.reduce((s,r)=>s+((gwData[r.id]?.active)?(parseID(gwData[r.id]?.q)||0):0), 0);
-    ro3.push([
-      TL('TOTAL CH',C.TEAL_SOFT,C.TEAL_HDR), EM(C.TEAL_SOFT), EM(C.TEAL_SOFT),
-      FMTOTx(`SUM(D${rCHdataS}:D${rCHdataE})`, roundSmart(totACH),  C.TEAL_SOFT,C.TEAL_HDR),
-      EM(C.TEAL_SOFT), EM(C.TEAL_SOFT), EM(C.TEAL_SOFT),
-      FMTOTx(`SUM(H${rCHdataS}:H${rCHdataE})`, roundSmart(totQCH),  C.TEAL_SOFT,C.TEAL_HDR),
-      FMTOTx(`SUM(I${rCHdataS}:I${rCHdataE})`, roundSmart(totEvCH), C.AMBER_SOFT,C.AMBER_HDR),
-      FMTOTx(`SUM(J${rCHdataS}:J${rCHdataE})`, roundSmart(totNtCH), C.GREEN_SOFT,C.GREEN_HDR),
-      FMTOTx(`SUM(K${rCHdataS}:K${rCHdataE})`, roundSmart(totGW),   C.TEAL_SOFT,'#059669'),
-      FMTOTx(`SUM(L${rCHdataS}:L${rCHdataE})`, roundSmart(totNtCH+totGW), C.PURPLE_SOFT,C.PURPLE_HDR)
+    // Subtotal grup terakhir CH
+    if(_prevGrpCH){
+      const grpRowsA=roRows.filter(rx=>rx.groupId===_prevGrpCH);
+      const [stbg,stfc]=_gMap[_prevGrpCH]||[C.GRAY_MED,C.BLACK];
+      const prevLbl=roGroupList.find(g=>g.id===_prevGrpCH)?.label||'Grup';
+      const stA=grpRowsA.reduce((s,rx)=>s+(parseID(rx.a)||0),0);
+      const stQ=grpRowsA.reduce((s,rx)=>s+(parseID(rx.c)||0)*roChGlobR*(parseID(rx.a)||0)*10,0);
+      const stEv=grpRowsA.reduce((s,rx)=>{const a=parseID(rx.a)||0;return s+(rx.evaActive!==false?aktRO*a*10000:0);},0);
+      const stNt=grpRowsA.reduce((s,rx)=>{const c=parseID(rx.c)||0,a=parseID(rx.a)||0,q=c*roChGlobR*a*10,e=rx.evaActive!==false?aktRO*a*10000:0;return s+Math.max(0,q-e);},0);
+      const stGW=grpRowsA.reduce((s,rx)=>s+((gwData[rx.id]?.active)?(parseID(gwData[rx.id]?.q)||0):0),0);
+      _push(_stRowCH(prevLbl,stfc,rCHdataS,_er,stA,stQ,stEv,stNt,stGW));
+    }
+    const rCHdataE=_er;
+    const totACH=roRows.reduce((s,r)=>s+(parseID(r.a)||0),0);
+    const totQCH=roRows.reduce((s,r)=>s+(parseID(r.c)||0)*roChGlobR*(parseID(r.a)||0)*10,0);
+    const totEvCH=roRows.reduce((s,r)=>{const a=parseID(r.a)||0;return s+(r.evaActive!==false?aktRO*a*10000:0);},0);
+    const totNtCH=roRows.reduce((s,r)=>{
+      const c=parseID(r.c)||0,a=parseID(r.a)||0,q=c*roChGlobR*a*10,e=r.evaActive!==false?aktRO*a*10000:0;
+      return s+Math.max(0,q-e);},0);
+    const totGWCH=roRows.reduce((s,r)=>s+((gwData[r.id]?.active)?(parseID(gwData[r.id]?.q)||0):0),0);
+    _push([
+      TL('TOTAL CH',C.TEAL_SOFT,C.TEAL_HDR),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),
+      FMTOTx(`SUM(D${rCHdataS}:D${rCHdataE})`,roundSmart(totACH),C.TEAL_SOFT,C.TEAL_HDR),
+      EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),EM(C.TEAL_SOFT),
+      FMTOTx(`SUM(H${rCHdataS}:H${rCHdataE})`,roundSmart(totQCH),C.TEAL_SOFT,C.TEAL_HDR),
+      FMTOTx(`SUM(I${rCHdataS}:I${rCHdataE})`,roundSmart(totEvCH),C.AMBER_SOFT,C.AMBER_HDR),
+      FMTOTx(`SUM(J${rCHdataS}:J${rCHdataE})`,roundSmart(totNtCH),C.GREEN_SOFT,C.GREEN_HDR),
+      FMTOTx(`SUM(K${rCHdataS}:K${rCHdataE})`,roundSmart(totGWCH),C.TEAL_SOFT,'#059669'),
+      FMTOTx(`SUM(L${rCHdataS}:L${rCHdataE})`,roundSmart(totNtCH+totGWCH),C.PURPLE_SOFT,C.PURPLE_HDR),
+      EM(C.TEAL_SOFT),EM(C.TEAL_SOFT)
     ]);
+    _push(null); // spacer — null tidak masuk Excel
 
-    ro3.push(null); // spacer
+    // ══════════ BLOK I ══════════
+    const _iBg=_iAktif?C.AMBER_HDR:C.MINERAL2;
+    const _iLbl=_iAktif
+      ?`METODE 2 — INTENSITAS MONONOBE (I × t)  ★ AKTIF${_isManI?' [t Manual]':_isSep?' [Tc per Catchment]':' [Tc Global]'}`
+      :'METODE 2 — INTENSITAS MONONOBE (I × t)';
+    _push([H2(_iLbl,_iBg),EM(_iBg),EM(_iBg),EM(_iBg),EM(_iBg),EM(_iBg),EM(_iBg),
+           EM(_iBg),EM(_iBg),EM(_iBg),EM(_iBg),EM(_iBg),EM(_iBg),EM(_iBg)]);
 
-
-    // ════════════════════════════════════════
-    // BLOK B — METODE INTENSITAS MONONOBE (I × Tc)
-    // Tc per catchment diambil dari roCalcTcForRow (mode Separasi)
-    // atau dari raTcLastResult (mode Whole/Manual).
-    // Tc disimpan sebagai literal per baris agar formula I bisa dihitung.
-    // ════════════════════════════════════════
-
-    // Satu baris param: hanya R24 (B = R24 global, satu nilai)
-    // Per baris data: G=Tc(literal), H=I formula dari $B$param dan G
-    // Kolom layout (12 kolom A-L):
-    //   A=No, B=Nama, C=C, D=A, E=WTP, F=Grup
-    //   G=Tc(jam)[literal per baris], H=I(mm/jam)[formula], I=CH_ekv[=H*G]
-    //   J=Q_Bruto[=C*I*D*10], K=Evap, L=Q_Neto
-    // (GW dan Q_Akhir tidak termasuk agar layout konsisten 12 kolom)
-
-    ro3.push([
-      H2('METODE 2 — INTENSITAS MONONOBE (I × Tc)',C.AMBER_HDR),
-      EM(C.AMBER_HDR),EM(C.AMBER_HDR),EM(C.AMBER_HDR),EM(C.AMBER_HDR),
-      EM(C.AMBER_HDR),EM(C.AMBER_HDR),EM(C.AMBER_HDR),EM(C.AMBER_HDR),
-      EM(C.AMBER_HDR),EM(C.AMBER_HDR),EM(C.AMBER_HDR)
-    ]);
-
-    // Baris param: B=R24 (literal), D=Evap (formula)
-    // G-kolom Tc akan diisi per baris data
-    const rIparam2 = rIH2row + 1; // baris param I di Excel
-    ro3.push([
+    const rIparam=_push([
       LB('R24 rancangan (mm)'),
-      {v:R24R>0?R24R:0, s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,bold:true,sz:12,halign:'right',border:true})},
+      {v:R24R>0?R24R:0,s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,bold:true,sz:12,halign:'right',border:true})},
       LB('Evap (m³/m²/hr)'),
-      FMSx(`Evaporation!B${rAktual}`, aktRO, cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:10,border:true})),
+      FMSx(`Evaporation!B${rAktual}`,aktRO,cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:10,border:true})),
       LB('← Evap'),
-      {v:'Tc per catchment (kolom G) diisi otomatis | I=(R24/24)×(24/Tc)^(2/3) | CH_ekv=I×Tc | Q=C×CH_ekv×A×10',
-       s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:9,italic:true,border:true})},
-      EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT)
+      {v:_tSrcLbl,s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:9,italic:true,border:true})},
+      EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),
+      EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT)
     ]);
+    const _tColHdr=_isManI?'t (jam)':'Tc (jam)';
+    _push([H3('No',C.AMBER_SOFT),H3('Nama Catchment',C.AMBER_SOFT),H3('C',C.AMBER_SOFT),
+           H3('A (ha)',C.AMBER_SOFT),H3('WTP',C.AMBER_SOFT),H3('Grup',C.AMBER_SOFT),
+           H3(_tColHdr,C.AMBER_SOFT),H3('I (mm/jam)',C.AMBER_SOFT),
+           H3('CH ekv I×t (mm)',C.AMBER_SOFT),H3('Q Bruto (m³/hr)',C.AMBER_SOFT),
+           H3('Evap (m³/hr)',C.AMBER_SOFT),H3('Q Neto (m³/hr)',C.AMBER_SOFT),
+           H3('GW (m³/hr)',C.AMBER_SOFT),H3('Q Akhir (m³/hr)',C.AMBER_SOFT)]);
 
-    // Header kolom I (14 kolom)
-    ro3.push([
-      H3('No',C.AMBER_SOFT),H3('Nama Catchment',C.AMBER_SOFT),H3('C',C.AMBER_SOFT),
-      H3('A (ha)',C.AMBER_SOFT),H3('WTP',C.AMBER_SOFT),H3('Grup',C.AMBER_SOFT),
-      H3('Tc (jam)',C.AMBER_SOFT),H3('I (mm/jam)',C.AMBER_SOFT),
-      H3('CH ekv I (mm)',C.AMBER_SOFT),H3('Q Bruto (m³/hr)',C.AMBER_SOFT),
-      H3('Evap (m³/hr)',C.AMBER_SOFT),H3('Q Neto (m³/hr)',C.AMBER_SOFT),
-      H3('GW (m³/hr)',C.TEAL_SOFT),H3('Q Akhir (m³/hr)',C.AMBER_SOFT)
-    ]);
-
-    const rIdataS2 = rIdataS; // row pertama data I (sama dengan rIdataS yang sudah dihitung)
-
-    // Data rows I — Tc per baris, formula I referensi $B$param dan Tc di kolom G
-    roRows.forEach((r, i) => {
-      const c   = parseID(r.c) || 0;
-      const a   = parseID(r.a) || 0;
-      const evaOn = r.evaActive !== false;
-      const bg  = i%2===0 ? C.WHITE : C.GRAY_SOFT;
-      const rn  = rIdataS2 + i;
-      const wtp = r.wtpId ? (wtpList.find(w=>w.id===r.wtpId)?.name||'—') : '—';
-      const grp = r.groupId ? (roGroupList.find(g=>g.id===r.groupId)?.label||'—') : '—';
-
-      // Tc per baris: coba roCalcTcForRow (sep mode), fallback ke raTcLastResult (whole)
-      let tcH = NaN, IVal = NaN;
-      if (typeof roCalcTcForRow === 'function') {
-        tcH = roCalcTcForRow(r);
+    const rIdataS=_er+1;
+    let _prevGrpI=undefined;
+    let _grpRowStartI=_er+1;
+    roRows.forEach((r,i)=>{
+      const grpLbl=r.groupId?(roGroupList.find(g=>g.id===r.groupId)?.label||'—'):null;
+      if(i>0&&r.groupId!==_prevGrpI){
+        // Subtotal grup I sebelumnya
+        if(_prevGrpI){
+          const grpRowsI=roRows.filter(rx=>rx.groupId===_prevGrpI);
+          const [stbg,stfc]=_gMap[_prevGrpI]||[C.GRAY_MED,C.BLACK];
+          const prevLbl=roGroupList.find(g=>g.id===_prevGrpI)?.label||'Grup';
+          const stA=grpRowsI.reduce((s,rx)=>s+(parseID(rx.a)||0),0);
+          const stQI=grpRowsI.reduce((s,rx)=>{
+            const c=parseID(rx.c)||0,a=parseID(rx.a)||0,[tH,IV]=_rowTI(rx);
+            return s+c*(tH>0&&IV>0?IV*tH:0)*a*10;},0);
+          const stEvI=grpRowsI.reduce((s,rx)=>{const a=parseID(rx.a)||0;return s+(rx.evaActive!==false?aktRO*a*10000:0);},0);
+          const stNtI=grpRowsI.reduce((s,rx)=>{
+            const c=parseID(rx.c)||0,a=parseID(rx.a)||0,[tH,IV]=_rowTI(rx);
+            const q=c*(tH>0&&IV>0?IV*tH:0)*a*10,e=rx.evaActive!==false?aktRO*a*10000:0;
+            return s+Math.max(0,q-e);},0);
+          const stGWI=grpRowsI.reduce((s,rx)=>s+((gwData[rx.id]?.active)?(parseID(gwData[rx.id]?.q)||0):0),0);
+          _push(_stRowI(prevLbl,stfc,rIdataS,_er,stA,stQI,stEvI,stNtI,stGWI));
+        }
+        // Separator grup I baru
+        if(r.groupId){
+          const [sb]=_gMap[r.groupId]||[C.MINERAL2];
+          const seprow=[{v:`◆ ${grpLbl||'Grup'}`,s:cs({bg:sb,fc:'FF000000',bold:true,sz:10,border:true})}];
+          while(seprow.length<14) seprow.push(EM(sb));
+          _push(seprow);
+        }
+        _grpRowStartI=_er+1;
       }
-      if (isNaN(tcH) || tcH <= 0) {
-        tcH = (raTcLastResult && !isNaN(raTcLastResult.tcHour)) ? raTcLastResult.tcHour : NaN;
+      // Separator grup I pertama
+      if(i===0&&r.groupId){
+        const [sb]=_gMap[r.groupId]||[C.MINERAL2];
+        const seprow=[{v:`◆ ${grpLbl||'Grup'}`,s:cs({bg:sb,fc:'FF000000',bold:true,sz:10,border:true})}];
+        while(seprow.length<14) seprow.push(EM(sb));
+        _push(seprow);
+        _grpRowStartI=_er+1;
       }
-      if (!isNaN(tcH) && tcH > 0 && R24R > 0 && typeof raMononobeI === 'function') {
-        IVal = raMononobeI(R24R, tcH);
-      }
-      const tcLit  = (!isNaN(tcH) && tcH > 0) ? tcH : 0;  // full precision, no rounding
-      const ILit   = (!isNaN(IVal)) ? IVal : 0;  // full precision
-      const chEkvI = tcLit > 0 && ILit > 0 ? ILit * tcLit : 0;
-      const qI     = c * chEkvI * a * 10;
-      const evaI   = evaOn ? aktRO * a * 10000 : 0;
-      const netoI  = Math.max(0, qI - evaI);
-      const gw     = (gwData[r.id]?.active) ? (parseID(gwData[r.id]?.q)||0) : 0;
-
-      // Formulas (referensi B_param = $B$rIparam2, Tc = G_row literal)
-      // H = I Mononobe = IF(G>0, ($B$param/24)*(24/G)^(2/3), 0)
-      const fI      = tcLit>0 ? `IF(G${rn}>0,($B$${rIparam2}/24)*(24/G${rn})^(2/3),0)` : '0';
-      // I = CH_ekv = H*G
-      const fChEkvI = tcLit>0 ? `H${rn}*G${rn}` : '0';
-      // J = Q_bruto = C*I_col*D*10  (I_col = kolom I di Excel = CH_ekv)
-      const fQI     = tcLit>0 ? `C${rn}*I${rn}*D${rn}*10` : '0';
-      // K = Evap
-      const fEvapI  = evaOn ? `D${rn}*$D$${rIparam2}*10000` : '0';
-      // L = Neto
-      const fNetoI  = `MAX(0,J${rn}-K${rn})`;
-
-      ro3.push([
-        {v:i+1,   s:cs({bg,sz:10,halign:'center',border:true})},
-        {v:r.name||'', s:cs({bg,sz:10,border:true})},
-        {v:c,     s:cs({bg,fc:C.GRAY_LBL,sz:10,halign:'right',border:true})},
-        {v:a,     s:cs({bg,sz:10,halign:'right',border:true})},
-        {v:wtp,   s:cs({bg,fc:C.TEAL_HDR,sz:10,border:true})},
-        {v:grp,   s:cs({bg,fc:C.GRAY_LBL,sz:10,border:true})},
-        // G: Tc jam — literal input (dari app, dikunci sebagai referensi)
-        {v:tcLit, s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,bold:true,sz:10,halign:'right',border:true})},
-        // H: I = Mononobe(R24, Tc) — formula Excel
-        tcLit>0
-          ? FMS(fI, ILit, cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,bold:true,sz:10,halign:'right',border:true}))
-          : {v:'—',s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:10,halign:'center',border:true})},
-        // I: CH_ekv = H*G
-        tcLit>0
-          ? FMS(fChEkvI, roundSmart(chEkvI), cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,bold:true,sz:10,halign:'right',border:true}))
-          : {v:'—',s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:10,halign:'center',border:true})},
-        // J: Q Bruto
-        tcLit>0
-          ? FMS(fQI, roundSmart(qI), cs({bg:qI>0?C.TEAL_SOFT:bg,fc:C.TEAL_HDR,bold:qI>0,sz:10,halign:'right',border:true}))
-          : {v:0,s:cs({bg,sz:10,halign:'right',border:true})},
-        // K: Evap
-        FMS(fEvapI, roundSmart(evaI), cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:10,halign:'right',border:true})),
-        // L: Q Neto
-        FMS(fNetoI, roundSmart(netoI), cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:10,halign:'right',border:true})),
-        // M: GW
-        {v:roundSmart(gw), s:cs({bg,fc:'#059669',sz:10,halign:'right',border:true})},
-        // N: Q Akhir = Neto + GW
-        FMS(`L${rn}+M${rn}`, roundSmart(netoI+gw), cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,bold:true,sz:10,halign:'right',border:true}))
+      _prevGrpI=r.groupId;
+      const c=parseID(r.c)||0,a=parseID(r.a)||0,evaOn=r.evaActive!==false;
+      const [gbg,gfc]=_rb(r.groupId,i);
+      const wtp=r.wtpId?(wtpList.find(w=>w.id===r.wtpId)?.name||'—'):'—';
+      const grp=grpLbl||'—';
+      const _rn=_er+1;
+      const [tcH,IVal]=_rowTI(r);
+      const tcLit=tcH>0?tcH:0, ILit=IVal>0?IVal:0;
+      const chEkvI=tcLit>0&&ILit>0?ILit*tcLit:0;
+      const qI=c*chEkvI*a*10, evaI=evaOn?aktRO*a*10000:0;
+      const netoI=Math.max(0,qI-evaI), gw=(gwData[r.id]?.active)?(parseID(gwData[r.id]?.q)||0):0;
+      const fI=tcLit>0?`IF(G${_rn}>0,($B$${rIparam}/24)*(24/G${_rn})^(2/3),0)`:'0';
+      const fCE=tcLit>0?`H${_rn}*G${_rn}`:'0';
+      const fQI=tcLit>0?`C${_rn}*I${_rn}*D${_rn}*10`:'0';
+      const fEI=evaOn?`D${_rn}*$D$${rIparam}*10000`:'0';
+      const fNI=`MAX(0,J${_rn}-K${_rn})`;
+      _push([
+        {v:i+1,       s:cs({bg:gbg,fc:gfc,sz:10,halign:'center',border:true,bold:!!r.groupId})},
+        {v:r.name||'',s:cs({bg:gbg,fc:gfc,sz:10,border:true,bold:!!r.groupId})},
+        {v:c,         s:cs({bg:gbg,fc:gfc,sz:10,halign:'right',border:true})},
+        {v:a,         s:cs({bg:gbg,fc:gfc,sz:10,halign:'right',border:true})},
+        {v:wtp,       s:cs({bg:gbg,fc:gfc,sz:10,border:true})},
+        {v:grp,       s:cs({bg:gbg,fc:gfc,sz:10,bold:!!r.groupId,border:true})},
+        {v:+tcLit,    s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,bold:true,sz:10,halign:'right',border:true})},
+        tcLit>0?FMS(fI,ILit,cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,bold:true,sz:10,halign:'right',border:true}))
+               :{v:'—',s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:10,halign:'center',border:true})},
+        tcLit>0?FMS(fCE,roundSmart(chEkvI),cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,bold:true,sz:10,halign:'right',border:true}))
+               :{v:'—',s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:10,halign:'center',border:true})},
+        tcLit>0?FMS(fQI,roundSmart(qI),cs({bg:qI>0?C.TEAL_SOFT:gbg,fc:C.TEAL_HDR,bold:qI>0,sz:10,halign:'right',border:true}))
+               :{v:0,s:cs({bg:gbg,sz:10,halign:'right',border:true})},
+        FMS(fEI,roundSmart(evaI),cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:10,halign:'right',border:true})),
+        FMS(fNI,roundSmart(netoI),cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:10,halign:'right',border:true})),
+        {v:roundSmart(gw),s:cs({bg:gbg,fc:gfc,sz:10,halign:'right',border:true})},
+        FMS(`L${_rn}+M${_rn}`,roundSmart(netoI+gw),cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,bold:true,sz:10,halign:'right',border:true}))
       ]);
     });
-
-    const rIdataE2 = rIdataS2 + roN - 1;
-    const totQI2   = roRows.reduce((s,r)=>{
-      const c=parseID(r.c)||0,a=parseID(r.a)||0;
-      let tcH=NaN;
-      if(typeof roCalcTcForRow==='function') tcH=roCalcTcForRow(r);
-      if(isNaN(tcH)||tcH<=0) tcH=(raTcLastResult&&!isNaN(raTcLastResult.tcHour))?raTcLastResult.tcHour:NaN;
-      const IVal2=(!isNaN(tcH)&&tcH>0&&R24R>0&&typeof raMononobeI==='function')?raMononobeI(R24R,tcH):0;
-      return s+c*(IVal2*tcH)*a*10;
-    },0);
-    const totEvI2  = roRows.reduce((s,r)=>{const a=parseID(r.a)||0;return s+(r.evaActive!==false?aktRO*a*10000:0);},0);
-    const totNtI2  = roRows.reduce((s,r)=>{
-      const c=parseID(r.c)||0,a=parseID(r.a)||0;
-      let tcH=NaN;
-      if(typeof roCalcTcForRow==='function') tcH=roCalcTcForRow(r);
-      if(isNaN(tcH)||tcH<=0) tcH=(raTcLastResult&&!isNaN(raTcLastResult.tcHour))?raTcLastResult.tcHour:NaN;
-      const IVal2=(!isNaN(tcH)&&tcH>0&&R24R>0&&typeof raMononobeI==='function')?raMononobeI(R24R,tcH):0;
-      const q=c*(IVal2*(tcH||0))*a*10,e=r.evaActive!==false?aktRO*a*10000:0;
-      return s+Math.max(0,q-e);
-    },0);
-    const totGWI2  = roRows.reduce((s,r)=>s+((gwData[r.id]?.active)?(parseID(gwData[r.id]?.q)||0):0), 0);
-    const totAkhirI2 = totNtI2 + totGWI2;
-    ro3.push([
-      TL('TOTAL I',C.AMBER_SOFT,C.AMBER_HDR), EM(C.AMBER_SOFT), EM(C.AMBER_SOFT),
-      FMTOTx(`SUM(D${rIdataS2}:D${rIdataE2})`, roundSmart(roRows.reduce((s,r)=>s+(parseID(r.a)||0),0)), C.AMBER_SOFT,C.AMBER_HDR),
-      EM(C.AMBER_SOFT), EM(C.AMBER_SOFT), EM(C.AMBER_SOFT), EM(C.AMBER_SOFT), EM(C.AMBER_SOFT),
-      FMTOTx(`SUM(J${rIdataS2}:J${rIdataE2})`, roundSmart(totQI2),  C.AMBER_SOFT,C.AMBER_HDR),
-      FMTOTx(`SUM(K${rIdataS2}:K${rIdataE2})`, roundSmart(totEvI2), C.AMBER_SOFT,C.AMBER_HDR),
-      FMTOTx(`SUM(L${rIdataS2}:L${rIdataE2})`, roundSmart(totNtI2), C.GREEN_SOFT,C.GREEN_HDR),
-      FMTOTx(`SUM(M${rIdataS2}:M${rIdataE2})`, roundSmart(totGWI2),  C.TEAL_SOFT,'#059669'),
-      FMTOTx(`SUM(N${rIdataS2}:N${rIdataE2})`, roundSmart(totAkhirI2), C.PURPLE_SOFT,C.PURPLE_HDR)
+    // Subtotal grup terakhir I
+    if(_prevGrpI){
+      const grpRowsI=roRows.filter(rx=>rx.groupId===_prevGrpI);
+      const [stbg,stfc]=_gMap[_prevGrpI]||[C.GRAY_MED,C.BLACK];
+      const prevLbl=roGroupList.find(g=>g.id===_prevGrpI)?.label||'Grup';
+      const stA=grpRowsI.reduce((s,rx)=>s+(parseID(rx.a)||0),0);
+      const stQI=grpRowsI.reduce((s,rx)=>{
+        const c=parseID(rx.c)||0,a=parseID(rx.a)||0,[tH,IV]=_rowTI(rx);
+        return s+c*(tH>0&&IV>0?IV*tH:0)*a*10;},0);
+      const stEvI=grpRowsI.reduce((s,rx)=>{const a=parseID(rx.a)||0;return s+(rx.evaActive!==false?aktRO*a*10000:0);},0);
+      const stNtI=grpRowsI.reduce((s,rx)=>{
+        const c=parseID(rx.c)||0,a=parseID(rx.a)||0,[tH,IV]=_rowTI(rx);
+        const q=c*(tH>0&&IV>0?IV*tH:0)*a*10,e=rx.evaActive!==false?aktRO*a*10000:0;
+        return s+Math.max(0,q-e);},0);
+      const stGWI=grpRowsI.reduce((s,rx)=>s+((gwData[rx.id]?.active)?(parseID(gwData[rx.id]?.q)||0):0),0);
+      _push(_stRowI(prevLbl,stfc,rIdataS,_er,stA,stQI,stEvI,stNtI,stGWI));
+    }
+    const rIdataE=_er;
+    const totAI=roRows.reduce((s,r)=>s+(parseID(r.a)||0),0);
+    const totQI=roRows.reduce((s,r)=>{
+      const c=parseID(r.c)||0,a=parseID(r.a)||0,[tH,IV]=_rowTI(r);
+      const chEq=(tH>0&&IV>0)?IV*tH:0; return s+c*chEq*a*10;},0);
+    const totEvI=roRows.reduce((s,r)=>{const a=parseID(r.a)||0;return s+(r.evaActive!==false?aktRO*a*10000:0);},0);
+    const totNtI=roRows.reduce((s,r)=>{
+      const c=parseID(r.c)||0,a=parseID(r.a)||0,[tH,IV]=_rowTI(r);
+      const chEq=(tH>0&&IV>0)?IV*tH:0,q=c*chEq*a*10,e=r.evaActive!==false?aktRO*a*10000:0;
+      return s+Math.max(0,q-e);},0);
+    const totGWI=roRows.reduce((s,r)=>s+((gwData[r.id]?.active)?(parseID(gwData[r.id]?.q)||0):0),0);
+    _push([
+      TL('TOTAL I',C.AMBER_SOFT,C.AMBER_HDR),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),
+      FMTOTx(`SUM(D${rIdataS}:D${rIdataE})`,roundSmart(totAI),C.AMBER_SOFT,C.AMBER_HDR),
+      EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),
+      FMTOTx(`SUM(J${rIdataS}:J${rIdataE})`,roundSmart(totQI),C.AMBER_SOFT,C.AMBER_HDR),
+      FMTOTx(`SUM(K${rIdataS}:K${rIdataE})`,roundSmart(totEvI),C.AMBER_SOFT,C.AMBER_HDR),
+      FMTOTx(`SUM(L${rIdataS}:L${rIdataE})`,roundSmart(totNtI),C.GREEN_SOFT,C.GREEN_HDR),
+      FMTOTx(`SUM(M${rIdataS}:M${rIdataE})`,roundSmart(totGWI),C.TEAL_SOFT,'#059669'),
+      FMTOTx(`SUM(N${rIdataS}:N${rIdataE})`,roundSmart(totNtI+totGWI),C.PURPLE_SOFT,C.PURPLE_HDR)
     ]);
+    _push(null); // spacer
 
-    addSS('Runoff',ro3.filter(Boolean),[6,28,10,12,22,18,16,18,16,16,14,16,14,16]);
+    // ══════════ BLOK 3 — METODE DEBIT PUNCAK (SELALU TAMPIL) ══════════
+    // Metode Rasional: Qp = 0,00278 × C × Itc × A  (m³/dtk)
+    // Tc per catchment dari roCalcTcForRow (ARR atau Kirpich sesuai Step 7).
+    // ARR: kolom G = formula =0.76*(D/100)^0.38, Itc = formula Mononobe dari G dan $B$param.
+    {
+      const _BG3  = 'FF1E3A5F';
+      const _S3   = 'FFD0E8FF';
+      const _S3fc = 'FF0A2540';
+      const _isARR = (typeof raTcMethod !== 'undefined') ? raTcMethod === 'arr' : true;
+      const _methLbl = _isARR ? 'ARR — Pilgrim & McDermott' : 'Kirpich (1940)';
+
+      _push([
+        H2(`METODE DEBIT PUNCAK — Metode Rasional, Tc per Catchment (${_methLbl}) ★ SELALU TAMPIL`, _BG3),
+        EM(_BG3),EM(_BG3),EM(_BG3),EM(_BG3),EM(_BG3),EM(_BG3),EM(_BG3),EM(_BG3)
+      ]);
+
+      const rB3param = _push([
+        LB('R24 rancangan (mm)'),
+        {v:R24R>0?R24R:0, s:cs({bg:_S3,fc:_S3fc,bold:true,sz:12,halign:'right',border:true})},
+        LB('Kala Ulang (T)'),
+        {v:idfKalaR, s:cs({bg:_S3,fc:_S3fc,bold:true,sz:11,halign:'right',border:true})},
+        LB('tahun'),
+        {v:`Qp = 0,00278 × C × Itc × A  (m³/dtk)  |  ${_isARR?'Tc = 0,76×(A/100)^0,38':'Tc Kirpich = 0,0195×L^0,77×S^(-0,385)/60'}  [jam]  |  Itc = (R24/24)×(24/Tc)^(2/3)  [mm/jam]`,
+         s:cs({bg:_S3,fc:_S3fc,sz:9,italic:true,border:true})},
+        EM(_S3),EM(_S3),EM(_S3)
+      ]);
+
+      // Header: A=No, B=Nama, C=C, D=A(ha), E=WTP, F=Grup, G=Tc(jam), H=Itc(mm/jam), I=Qp(m³/dtk)
+      _push([
+        H3('No',_S3),H3('Nama Catchment',_S3),H3('C',_S3),
+        H3('A (ha)',_S3),H3('WTP',_S3),H3('Grup',_S3),
+        H3('Tc (jam)',_S3),H3('Itc (mm/jam)',_S3),
+        H3('Qp (m³/dtk)',_S3)
+      ]);
+
+      const rB3dataS=_er+1;
+      let _prevGrp3=undefined;
+      roRows.forEach((r,i)=>{
+        const grpLbl=r.groupId?(roGroupList.find(g=>g.id===r.groupId)?.label||'—'):null;
+        // Subtotal grup sebelumnya + separator grup baru
+        if(i>0 && r.groupId!==_prevGrp3){
+          if(_prevGrp3){
+            const [stbg,stfc]=_gMap[_prevGrp3]||[C.GRAY_MED,C.BLACK];
+            const prevLbl3=roGroupList.find(g=>g.id===_prevGrp3)?.label||'Grup';
+            const grpRows3=roRows.filter(rx=>rx.groupId===_prevGrp3);
+            const stA3=grpRows3.reduce((s,rx)=>s+(parseID(rx.a)||0),0);
+            const stQp3=grpRows3.reduce((s,rx)=>{
+              const c=parseID(rx.c)||0,a=parseID(rx.a)||0;
+              const tc=(typeof roCalcTcForRow==='function')?roCalcTcForRow(rx):NaN;
+              const I=(tc>0&&R24R>0&&typeof raMononobeI==='function')?raMononobeI(R24R,tc):0;
+              return s+0.00278*c*I*a;},0);
+            const lc3=`"${prevLbl3}"`;
+            const sc3=(f,v)=>({v:roundSmart(v),f,s:cs({bg:stfc,fc:'FFFFFFFF',bold:true,sz:9,halign:'right',border:true})});
+            _push([
+              EM(stfc),
+              {v:`Σ ${prevLbl3}`,s:cs({bg:stfc,fc:'FFFFFFFF',bold:true,sz:9,border:true,italic:true})},
+              EM(stfc),
+              sc3(`SUMIF(F${rB3dataS}:F${_er},${lc3},D${rB3dataS}:D${_er})`,stA3),
+              EM(stfc),EM(stfc),EM(stfc),EM(stfc),
+              sc3(`SUMIF(F${rB3dataS}:F${_er},${lc3},I${rB3dataS}:I${_er})`,stQp3)
+            ]);
+          }
+          if(r.groupId){
+            const [sb]=_gMap[r.groupId]||[_BG3];
+            const sr=[{v:`◆ ${grpLbl||'Grup'}`,s:cs({bg:sb,fc:'FF000000',bold:true,sz:10,border:true})}];
+            while(sr.length<9) sr.push(EM(sb));
+            _push(sr);
+          }
+        }
+        // Separator grup pertama
+        if(i===0 && r.groupId){
+          const [sb]=_gMap[r.groupId]||[_BG3];
+          const sr=[{v:`◆ ${grpLbl||'Grup'}`,s:cs({bg:sb,fc:'FF000000',bold:true,sz:10,border:true})}];
+          while(sr.length<9) sr.push(EM(sb));
+          _push(sr);
+        }
+        _prevGrp3=r.groupId;
+        const c=parseID(r.c)||0, a=parseID(r.a)||0;
+        const [gbg,gfc]=_rb(r.groupId,i);
+        const wtp=r.wtpId?(wtpList.find(w=>w.id===r.wtpId)?.name||'—'):'—';
+        const grp=grpLbl||'—';
+        const _rn=_er+1;
+
+        // Tc per baris
+        const tcH3=(typeof roCalcTcForRow==='function')?roCalcTcForRow(r):NaN;
+        const tcLit3=(!isNaN(tcH3)&&tcH3>0)?tcH3:0;
+        const I3=(tcLit3>0&&R24R>0&&typeof raMononobeI==='function')?raMononobeI(R24R,tcLit3):0;
+        // Qp = 0.00278 × C × I × A
+        const qp3 = 0.00278*c*I3*a;
+
+        const fTc = _isARR ? `0.76*(D${_rn}/100)^0.38` : null;
+        const fItc = tcLit3>0 ? `IF(G${_rn}>0,($B$${rB3param}/24)*(24/G${_rn})^(2/3),0)` : '0';
+        const fQp = `0.00278*C${_rn}*H${_rn}*D${_rn}`;
+
+        _push([
+          {v:i+1,       s:cs({bg:gbg,fc:gfc,sz:10,halign:'center',border:true,bold:!!r.groupId})},
+          {v:r.name||'',s:cs({bg:gbg,fc:gfc,sz:10,border:true,bold:!!r.groupId})},
+          {v:c,         s:cs({bg:gbg,fc:gfc,sz:10,halign:'right',border:true})},
+          {v:a,         s:cs({bg:gbg,fc:gfc,sz:10,halign:'right',border:true})},
+          {v:wtp,       s:cs({bg:gbg,fc:gfc,sz:10,border:true})},
+          {v:grp,       s:cs({bg:gbg,fc:gfc,sz:10,bold:!!r.groupId,border:true})},
+          fTc
+            ? {v:+tcLit3,f:fTc,s:cs({bg:_S3,fc:_S3fc,bold:true,sz:10,halign:'right',border:true})}
+            : {v:+tcLit3,     s:cs({bg:_S3,fc:_S3fc,bold:true,sz:10,halign:'right',border:true})},
+          tcLit3>0
+            ? FMS(fItc,I3,cs({bg:_S3,fc:_S3fc,bold:true,sz:10,halign:'right',border:true}))
+            : {v:'—',s:cs({bg:_S3,fc:_S3fc,sz:10,halign:'center',border:true})},
+          FMS(fQp,roundSmart(qp3),cs({bg:'FFD4EDDA',fc:'FF145523',bold:true,sz:10,halign:'right',border:true}))
+        ]);
+      });
+      // Subtotal grup terakhir
+      if(_prevGrp3){
+        const [stbg,stfc]=_gMap[_prevGrp3]||[C.GRAY_MED,C.BLACK];
+        const prevLbl3=roGroupList.find(g=>g.id===_prevGrp3)?.label||'Grup';
+        const grpRows3=roRows.filter(rx=>rx.groupId===_prevGrp3);
+        const stA3=grpRows3.reduce((s,rx)=>s+(parseID(rx.a)||0),0);
+        const stQp3=grpRows3.reduce((s,rx)=>{
+          const c=parseID(rx.c)||0,a=parseID(rx.a)||0;
+          const tc=(typeof roCalcTcForRow==='function')?roCalcTcForRow(rx):NaN;
+          const I=(tc>0&&R24R>0&&typeof raMononobeI==='function')?raMononobeI(R24R,tc):0;
+          return s+0.00278*c*I*a;},0);
+        const lc3=`"${prevLbl3}"`;
+        const sc3=(f,v)=>({v:roundSmart(v),f,s:cs({bg:stfc,fc:'FFFFFFFF',bold:true,sz:9,halign:'right',border:true})});
+        _push([
+          EM(stfc),
+          {v:`Σ ${prevLbl3}`,s:cs({bg:stfc,fc:'FFFFFFFF',bold:true,sz:9,border:true,italic:true})},
+          EM(stfc),
+          sc3(`SUMIF(F${rB3dataS}:F${_er},${lc3},D${rB3dataS}:D${_er})`,stA3),
+          EM(stfc),EM(stfc),EM(stfc),EM(stfc),
+          sc3(`SUMIF(F${rB3dataS}:F${_er},${lc3},I${rB3dataS}:I${_er})`,stQp3)
+        ]);
+      }
+      const rB3dataE=_er;
+
+      // Total
+      const totA3=roRows.reduce((s,r)=>s+(parseID(r.a)||0),0);
+      const totQp3=roRows.reduce((s,r)=>{
+        const c=parseID(r.c)||0,a=parseID(r.a)||0;
+        const tc=(typeof roCalcTcForRow==='function')?roCalcTcForRow(r):NaN;
+        const I=(tc>0&&R24R>0&&typeof raMononobeI==='function')?raMononobeI(R24R,tc):0;
+        return s+0.00278*c*I*a;},0);
+      _push([
+        TL('TOTAL DEBIT PUNCAK',_S3,_S3fc),EM(_S3),EM(_S3),
+        FMTOTx(`SUM(D${rB3dataS}:D${rB3dataE})`,roundSmart(totA3),_S3,_S3fc),
+        EM(_S3),EM(_S3),EM(_S3),EM(_S3),
+        FMTOTx(`SUM(I${rB3dataS}:I${rB3dataE})`,roundSmart(totQp3),cs({bg:'FFD4EDDA',fc:'FF145523',bold:true,sz:10,halign:'right',border:true}))
+      ]);
+    }
+
+    addSS('Runoff',ro3.filter(Boolean),[6,28,10,12,22,18,16,18,14]);
   }
 
   // ═══ SHEET 4: WTP SUMMARY ═════════════════════════════════
