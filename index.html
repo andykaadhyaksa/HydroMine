@@ -2969,6 +2969,79 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
         </div>
       </div>
 
+      <!-- Row 7: Faktor Erosivitas Hujan (R) -->
+      <div class="card" style="margin-top:14px" id="ra-erosivity-card">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div class="section-title" style="margin-bottom:0">
+            <div class="dot" style="background:#e67e22"></div>
+            Faktor Erosivitas Hujan (R) — Bols (1978) dalam Arsyad (2000)
+          </div>
+          <button onclick="raErosivityAutoFill()"
+            style="display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;padding:5px 14px;border-radius:6px;border:1.5px solid var(--blue);background:var(--blue-soft);color:var(--blue2);cursor:pointer;transition:all .15s"
+            onmouseover="this.style.background='var(--blue3)';this.style.color='#fff'"
+            onmouseout="this.style.background='var(--blue-soft)';this.style.color='var(--blue2)'">
+            ⚡ Isi Otomatis dari Data
+          </button>
+        </div>
+
+        <!-- Formula box -->
+        <div style="background:var(--blue-soft);border:1px solid var(--border2);border-radius:var(--rs);padding:12px 16px;margin-bottom:14px">
+          <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:8px">
+            Nilai erosivitas berpengaruh pada besar energi kinetik terhadap tanah yang mampu memecah agregat dan menghasilkan aliran permukaan.
+            Nilai indeks diasumsikan sama untuk setiap satuan peta lahan.
+          </div>
+          <div style="text-align:center;padding:8px 0;font-size:14px;font-weight:700;color:var(--blue2);letter-spacing:0.3px;font-family:var(--mono)">
+            R = 6,119 × RAIN<sup>1,21</sup> × DAYS<sup>−0,47</sup> × MAXP<sup>0,53</sup>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px">
+            <div style="font-size:10.5px;color:var(--muted);background:var(--card);border-radius:5px;padding:6px 10px;line-height:1.5">
+              <strong style="color:var(--text)">RAIN</strong> — Curah hujan rata-rata bulanan <em>(cm)</em>
+            </div>
+            <div style="font-size:10.5px;color:var(--muted);background:var(--card);border-radius:5px;padding:6px 10px;line-height:1.5">
+              <strong style="color:var(--text)">DAYS</strong> — Jumlah hari hujan rata-rata bulanan <em>(hari)</em>
+            </div>
+            <div style="font-size:10.5px;color:var(--muted);background:var(--card);border-radius:5px;padding:6px 10px;line-height:1.5">
+              <strong style="color:var(--text)">MAXP</strong> — Curah hujan maksimum 24 jam dalam bulan <em>(cm)</em>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:8px;font-style:italic">
+            ⚠️ Input dalam satuan <strong>cm</strong>. Jika data tersedia dalam mm, bagi 10 sebelum memasukkan nilai.
+          </div>
+        </div>
+
+        <!-- Tabel input + hasil -->
+        <div style="overflow-x:auto">
+          <table id="ra-erosivity-table" style="width:100%;min-width:680px;border-collapse:collapse">
+            <thead>
+              <tr style="background:var(--bg2)">
+                <th style="text-align:left;padding:8px 10px;font-size:11.5px;border-bottom:1px solid var(--border)">Bulan</th>
+                <th style="text-align:right;padding:8px 10px;font-size:11.5px;border-bottom:1px solid var(--border);color:var(--blue2)">RAIN (cm)</th>
+                <th style="text-align:right;padding:8px 10px;font-size:11.5px;border-bottom:1px solid var(--border);color:var(--blue2)">DAYS (hari)</th>
+                <th style="text-align:right;padding:8px 10px;font-size:11.5px;border-bottom:1px solid var(--border);color:var(--blue2)">MAXP (cm)</th>
+                <th style="text-align:right;padding:8px 10px;font-size:11.5px;border-bottom:1px solid var(--border);color:var(--orange);font-weight:700">R</th>
+              </tr>
+            </thead>
+            <tbody id="ra-erosivity-tbody"></tbody>
+            <tfoot>
+              <tr style="background:var(--bg2);border-top:2px solid var(--border)">
+                <td colspan="4" style="padding:9px 10px;font-size:12px;font-weight:700;color:var(--text)">Total Erosivitas Tahunan</td>
+                <td style="text-align:right;padding:9px 10px;font-size:13px;font-weight:800;color:var(--orange);font-family:var(--mono)" id="ra-erosivity-total">—</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Info + sumber -->
+        <div style="margin-top:10px;font-size:10.5px;color:var(--muted);background:var(--card);border-radius:5px;padding:7px 12px;line-height:1.6">
+          <strong style="color:var(--orange)">📌 Catatan:</strong>
+          Nilai R total merupakan indeks erosivitas hujan tahunan yang digunakan dalam persamaan USLE (<em>Universal Soil Loss Equation</em>).
+          Semakin tinggi nilai R, semakin besar potensi erosi akibat hujan pada kawasan tambang.
+          <span style="float:right;font-style:italic">Sumber: Hasil Perhitungan, <span id="ra-erosivity-year"></span></span>
+        </div>
+        <div id="ra-erosivity-source-note" style="margin-top:4px;font-size:10px;color:var(--muted);font-style:italic;display:none"></div>
+      </div>
+
     </div>
 
     <div class="eva-wiz-nav">
@@ -3853,10 +3926,17 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
       <!-- CH Maksimum (mode: CH) -->
       <div class="card" id="ro-ch-card">
         <div class="section-title"><div class="dot"></div>Curah Hujan Maks (CH)</div>
-        <button class="btn-secondary" onclick="roUseFromRA()" style="font-size:11px;padding:6px 12px;width:100%;justify-content:center;margin-bottom:10px">🔗 Dari Rainfall Analysis</button>
+        <div class="form-group" style="margin-bottom:8px">
+          <label class="form-label">Sumber Curah Hujan</label>
+          <select id="ro-ch-source" onchange="roSetChSource(this.value)">
+            <option value="aktual">Opsi 1 — Curah Hujan Maksimal Aktual</option>
+            <option value="kala">Opsi 2 — Curah Hujan Kala Ulang (R24 Terpakai)</option>
+            <option value="manual">Opsi 3 — Input Manual</option>
+          </select>
+        </div>
         <div class="form-group" style="margin-bottom:4px">
-          <label class="form-label">CH Maksimum <span>(mm/hari)</span></label>
-          <input type="text" id="ro-ch" inputmode="decimal" placeholder="contoh: 85,4" onchange="roRecalcAll()" oninput="roRecalcAll()">
+          <label class="form-label">CH <span id="ro-ch-label-sub">(mm/hari)</span></label>
+          <input type="text" id="ro-ch" inputmode="decimal" placeholder="Jalankan Rainfall Analysis dahulu"  readonly onchange="roRecalcAll()" oninput="roRecalcAll()">
         </div>
         <div class="form-hint" id="ro-ch-hint" style="margin-top:4px;font-size:11px"></div>
       </div>
@@ -5567,6 +5647,7 @@ function nav(page) {
   if (page === 'history') { historyUpdateBadge(); historyRender(); }
   if (page === 'bmkg')    { bmkgInit(); }
   if (page === 'runoff') {
+    if (typeof roChRefresh === 'function') roChRefresh();
     // sync toggle button visual state on page show
     const _bCh = document.getElementById('ro-mode-btn-ch');
     const _bI  = document.getElementById('ro-mode-btn-i');
@@ -8362,10 +8443,9 @@ function raRender() {
 
   raUpdateChart();
   raRenderExtraCharts();
+  if (typeof raErosivityRenderTable === 'function') raErosivityRenderTable();
 
-  // push CH max hint to runoff page
-  document.getElementById('ro-ch-hint').textContent =
-    `CH Maks dari Rainfall Analysis: ${f2(raCHMax)} mm/hari`;
+  // refresh CH runoff (dilakukan juga oleh wrapper roChRefresh)
 }
 
 /* ═══════════════════════════════════
@@ -8818,6 +8898,137 @@ function chartOpts(yLabel) {
     }
   };
 }
+
+// ══════════════════════════════════════════════════════════════════
+// FAKTOR EROSIVITAS HUJAN (R) — Bols (1978) dalam Arsyad (2000)
+// R = 6,119 × RAIN^1.21 × DAYS^-0.47 × MAXP^0.53
+// ══════════════════════════════════════════════════════════════════
+
+const BULAN_NAMES = ['Januari','Februari','Maret','April','Mei','Juni',
+                     'Juli','Agustus','September','Oktober','November','Desember'];
+
+// State: erosivity data per bulan (RAIN cm, DAYS, MAXP cm)
+let raErosivityData = BULAN_NAMES.map(() => ({ rain: '', days: '', maxp: '' }));
+
+function raCalcR(rain, days, maxp) {
+  if (!rain || !days || !maxp || rain <= 0 || days <= 0 || maxp <= 0) return null;
+  return 6.119 * Math.pow(rain, 1.21) * Math.pow(days, -0.47) * Math.pow(maxp, 0.53);
+}
+
+function raErosivityRenderTable() {
+  const tbody = document.getElementById('ra-erosivity-tbody');
+  if (!tbody) return;
+
+  let html = '';
+  let totalR = 0;
+  let hasAll = true;
+
+  BULAN_NAMES.forEach((bln, i) => {
+    const d = raErosivityData[i];
+    const r = raCalcR(parseFloat(d.rain), parseFloat(d.days), parseFloat(d.maxp));
+    const rStr = (r !== null) ? r.toLocaleString('id-ID', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) : '—';
+    if (r !== null) totalR += r; else hasAll = false;
+
+    const stripe = i % 2 === 0 ? 'background:var(--card2)' : '';
+    html += `<tr style="${stripe}">
+      <td style="padding:7px 10px;font-size:12px;font-weight:600;color:var(--text)">${bln}</td>
+      <td style="padding:5px 6px">
+        <input type="number" min="0" step="0.001" value="${d.rain}"
+          oninput="raErosivityData[${i}].rain=this.value;raErosivityRenderTable()"
+          style="width:90px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--mono);font-size:11.5px;text-align:right"
+          placeholder="cm">
+      </td>
+      <td style="padding:5px 6px">
+        <input type="number" min="0" step="0.1" value="${d.days}"
+          oninput="raErosivityData[${i}].days=this.value;raErosivityRenderTable()"
+          style="width:80px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--mono);font-size:11.5px;text-align:right"
+          placeholder="hari">
+      </td>
+      <td style="padding:5px 6px">
+        <input type="number" min="0" step="0.001" value="${d.maxp}"
+          oninput="raErosivityData[${i}].maxp=this.value;raErosivityRenderTable()"
+          style="width:90px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--mono);font-size:11.5px;text-align:right"
+          placeholder="cm">
+      </td>
+      <td style="text-align:right;padding:7px 10px;font-family:var(--mono);font-size:12px;font-weight:700;color:${r !== null ? 'var(--orange)' : 'var(--muted)'}">${rStr}</td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = html;
+
+  const totalEl = document.getElementById('ra-erosivity-total');
+  if (totalEl) {
+    totalEl.textContent = hasAll
+      ? totalR.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      : (totalR > 0
+          ? totalR.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' *'
+          : '—');
+  }
+}
+
+function raErosivityAutoFill() {
+  if (!raData || !raData.length) {
+    showToast('⚠ Data curah hujan belum dimuat. Upload data terlebih dahulu.', 'error');
+    return;
+  }
+
+  // Kumpulkan data per bulan per tahun
+  const byMonthYear = {};  // key: "year-month"
+  const sumM   = Array(12).fill(0);  // total mm per bulan (semua data)
+  const cntM   = Array(12).fill(0);  // jumlah hari per bulan (dengan data)
+  const wetM   = Array(12).fill(0);  // hari hujan per bulan
+  const maxByMonthYear = {};  // max harian per bulan-tahun → untuk rata-rata MAXP
+
+  raData.forEach(d => {
+    const mo = d.date.getMonth();
+    const yr = d.date.getFullYear();
+    const key = `${yr}-${mo}`;
+    sumM[mo] += d.value;
+    cntM[mo]++;
+    if (d.value > 0.5) wetM[mo]++;
+    if (!maxByMonthYear[key] || d.value > maxByMonthYear[key]) maxByMonthYear[key] = d.value;
+  });
+
+  // Hitung avg MAXP per bulan: rata-rata dari max bulanan per tahun
+  const maxSumM = Array(12).fill(0);
+  const maxCntM = Array(12).fill(0);
+  Object.entries(maxByMonthYear).forEach(([key, val]) => {
+    const mo = parseInt(key.split('-')[1]);
+    maxSumM[mo] += val;
+    maxCntM[mo]++;
+  });
+
+  // Jumlah tahun unik
+  const nYears = new Set(raData.map(d => d.date.getFullYear())).size || 1;
+
+  BULAN_NAMES.forEach((_, i) => {
+    const avgRainCm  = cntM[i] > 0 ? (sumM[i] / nYears / 10) : 0;   // mm→cm, rata tahunan
+    const avgDays    = wetM[i] / nYears;
+    const avgMaxpCm  = maxCntM[i] > 0 ? (maxSumM[i] / maxCntM[i] / 10) : 0;  // mm→cm
+
+    raErosivityData[i] = {
+      rain:  avgRainCm  > 0 ? avgRainCm.toFixed(3)  : '',
+      days:  avgDays    > 0 ? avgDays.toFixed(1)     : '',
+      maxp:  avgMaxpCm  > 0 ? avgMaxpCm.toFixed(3)   : ''
+    };
+  });
+
+  const noteEl = document.getElementById('ra-erosivity-source-note');
+  if (noteEl) {
+    noteEl.style.display = 'block';
+    noteEl.textContent = `* Nilai RAIN & MAXP dihitung dari rata-rata ${nYears} tahun data curah hujan harian yang telah dimuat (konversi mm → cm). DAYS = rata-rata hari hujan >0,5 mm per bulan.`;
+  }
+
+  raErosivityRenderTable();
+  showToast('✓ Data erosivitas diisi otomatis dari data curah hujan.', 'success');
+}
+
+// Init tabel saat halaman load
+document.addEventListener('DOMContentLoaded', function() {
+  const yearEl = document.getElementById('ra-erosivity-year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+  raErosivityRenderTable();
+});
 
 // ── Extra charts for Rainfall Analysis ─────────────
 let raMonthlyChart = null, raClsChart = null, raBoxChart = null, raAnnualMaxChart = null;
@@ -9853,7 +10064,59 @@ function roGetIntensityCalc() {
   return result;
 }
 
+let roChSource = 'aktual';
+function roSetChSource(v) {
+  roChSource = (v === 'kala' || v === 'manual') ? v : 'aktual';
+  const sel = document.getElementById('ro-ch-source');
+  if (sel && sel.value !== roChSource) sel.value = roChSource;
+  roChRefresh(true);
+  if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
+}
+function roChRefresh(force) {
+  const inp = document.getElementById('ro-ch');
+  const hint = document.getElementById('ro-ch-hint');
+  if (!inp) return;
+  let val = NaN, txt = '';
+  inp.readOnly = (roChSource !== 'manual');
+  if (roChSource === 'manual') {
+    inp.placeholder = 'contoh: 127,546708867847';
+    if (hint) hint.textContent = '✎ Input manual — nilai yang Anda ketik dipakai apa adanya (tanpa pembulatan).';
+    if (force && typeof roRecalcAll === 'function') roRecalcAll();
+    return;
+  }
+  inp.placeholder = 'Jalankan Rainfall Analysis dahulu';
+  if (roChSource === 'kala') {
+    let r24 = NaN;
+    try { r24 = (typeof raIntensityGetR24 === 'function') ? raIntensityGetR24() : NaN; } catch(e) {}
+    val = r24;
+    const T = (document.getElementById('ra-ih-kala')||{}).value;
+    const isManual = (document.getElementById('ra-ih-source')||{}).value === 'manual';
+    const dist = (document.getElementById('ra-ih-dist')||{}).value;
+    txt = isFinite(val)
+      ? `✓ CH Kala Ulang = R24 Terpakai (Rainfall Analysis → Step 6): ${f2(val)} mm/hari` + (isManual ? ' (input manual)' : ` — T = ${T} th, distribusi ${dist}`)
+      : '⚠ R24 Terpakai belum tersedia. Lakukan Rainfall Analysis & Step 6 Intensitas Hujan terlebih dahulu.';
+  } else {
+    val = (typeof raCHMax !== 'undefined' && raCHMax != null) ? raCHMax : NaN;
+    txt = isFinite(val)
+      ? `✓ CH Maksimal Aktual dari data Rainfall Analysis: ${f2(val)} mm/hari`
+      : '⚠ Belum ada data Rainfall Analysis. Lakukan analisis curah hujan terlebih dahulu.';
+  }
+  // Simpan angka RIIL (presisi penuh, tanpa pembulatan) di kolom agar semua perhitungan memakai nilai asli.
+  // Teks hint tetap menampilkan 2 desimal.
+  const newStr = isFinite(val) ? String(parseFloat(val.toPrecision(15))).replace('.', ',') : (force ? '' : inp.value);
+  const changed = inp.value !== newStr;
+  inp.value = newStr;
+  if (hint) hint.textContent = txt;
+  if ((changed || force) && typeof roRecalcAll === 'function') roRecalcAll();
+}
+(function(){
+  if (typeof raRender === 'function') { const o = raRender; raRender = function(){ const r = o.apply(this, arguments); roChRefresh(); return r; }; }
+  if (typeof raIntensityCalc === 'function') { const o2 = raIntensityCalc; raIntensityCalc = function(){ const r = o2.apply(this, arguments); roChRefresh(); return r; }; }
+})();
+
 function roUseFromRA() {
+  roSetChSource('aktual');
+  return;
   if (raCHMax == null) {
     alert('Belum ada data Rainfall Analysis. Lakukan analisis curah hujan terlebih dahulu.');
     return;
@@ -10659,8 +10922,12 @@ async function writeXlsxBlob(book) {
           // Cell dengan formula Excel — val sebagai cached value
           const numericVal = (typeof val === 'number' && isFinite(val)) ? val : null;
           const xfId = styleToXfId(style, numericVal !== null ? pickNumFmtId(numericVal) : 0);
-          const cachedV = numericVal !== null ? `<v>${numericVal}</v>` : '';
-          cellXmls.push(`<c r="${ref}" s="${xfId}"><f>${esc(formula)}</f>${cachedV}</c>`);
+          if (numericVal === null && typeof val === 'string' && val !== '') {
+            cellXmls.push(`<c r="${ref}" s="${xfId}" t="str"><f>${esc(formula)}</f><v>${esc(val)}</v></c>`);
+          } else {
+            const cachedV = numericVal !== null ? `<v>${numericVal}</v>` : '';
+            cellXmls.push(`<c r="${ref}" s="${xfId}"><f>${esc(formula)}</f>${cachedV}</c>`);
+          }
         } else if (typeof val === 'number' && isFinite(val)) {
           const xfId = styleToXfId(style, pickNumFmtId(val));
           cellXmls.push(`<c r="${ref}" s="${xfId}"><v>${val}</v></c>`);
@@ -10743,6 +11010,7 @@ ${numFmtsXml}
   const workbookXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 <sheets>${book.sheets.map((s, i) => `<sheet name="${esc(s.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('')}</sheets>
+<calcPr calcId="191029" fullCalcOnLoad="1"/>
 </workbook>`;
 
   const workbookRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -12701,6 +12969,15 @@ async function exportExcel() {
       const rStatGumU = rStatBlock + 14;
       const rStatMin  = rStatBlock + 15;
       const rStatMax  = rStatBlock + 16;
+      const rStatYn   = rStatBlock + 17;
+      const rStatSn   = rStatBlock + 18;
+      const rStatGLoc = rStatBlock + 19;   // Gumbel loc (metode Yn-Sn)
+      const rStatGScl = rStatBlock + 20;   // Gumbel scale (metode Yn-Sn)
+      const rStatP3a  = rStatBlock + 21, rStatP3b = rStatBlock + 22, rStatP3x = rStatBlock + 23;
+      const rStatLPa  = rStatBlock + 24, rStatLPb = rStatBlock + 25, rStatLPx = rStatBlock + 26;
+      const rStatLL   = rStatBlock + 27;   // GEV log-likelihood
+      const AMSR = `$C$${rAMSStart}:$C$${rAMSEnd}`;
+      const [YnFD,SnFD] = gumbelYnSn(nFD);
 
       // ── ① AMS ──
       fd8P([H2('① Data Annual Maximum Series (AMS)',C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR),EM(C.PURPLE_HDR)]);
@@ -12731,35 +13008,60 @@ async function exportExcel() {
       fd8P([LB('Koef Kemencengan (Cs)'), FMSx(`SKEW($C$${rAMSStart}:$C$${rAMSEnd})`,+csFD.toFixed(6),cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})),LB('—'),statNoteEl('Fisher skewness (SKEW)'),EM(),EM(),EM(),EM(),EM()]);
       fd8P([LB('Koef Kurtosis (Ck)'),    FMSx(`KURT($C$${rAMSStart}:$C$${rAMSEnd})`,+ckFD.toFixed(6),cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})),LB('—'),statNoteEl('Excess kurtosis Fisher (=KURT Excel)'),EM(),EM(),EM(),EM(),EM()]);
       fd8P([LB('μ Log-alam (ȳ)'),         FMSx(`SUMPRODUCT(LN($C$${rAMSStart}:$C$${rAMSEnd}))/COUNT($C$${rAMSStart}:$C$${rAMSEnd})`,+lmFD.toFixed(6),cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})),LB('—'),statNoteEl('=AVERAGE(LN(CH_maks)) — natural log'),EM(),EM(),EM(),EM(),EM()]);
-      fd8P([LB('σY pop (ddof=0)'),        {v:+lpFD.toFixed(6),s:cs({bg:C.WHITE,fc:C.GRAY_LBL,sz:10,halign:'right',border:true})},LB('—'),statNoteEl('=STDEVP(LN(CH)) — tidak dipakai'),EM(),EM(),EM(),EM(),EM()]);
+      fd8P([LB('σY pop (ddof=0)'),        FMSx(`SQRT(SUMPRODUCT((LN($C$${rAMSStart}:$C$${rAMSEnd})-$B$${rStatLm})^2)/COUNT($C$${rAMSStart}:$C$${rAMSEnd}))`,+lpFD.toFixed(6),cs({bg:C.WHITE,fc:C.GRAY_LBL,sz:10,halign:'right',border:true})),LB('—'),statNoteEl('=STDEVP(LN(CH)) — tidak dipakai'),EM(),EM(),EM(),EM(),EM()]);
       fd8P([LB('σY sampel (ddof=1)'),     FMSx(`SQRT(SUMPRODUCT((LN($C$${rAMSStart}:$C$${rAMSEnd})-$B$${rStatLm})^2)/(COUNT($C$${rAMSStart}:$C$${rAMSEnd})-1))`,+lsFD.toFixed(6),cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})),LB('—'),statNoteEl('=STDEV(LN(CH)) — dipakai Log-Normal & LP3'),EM(),EM(),EM(),EM(),EM()]);
-      fd8P([LB('Cs Log-alam'),             {v:+lcFD.toFixed(6),s:cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})},LB('—'),statNoteEl('=SKEW(LN(CH_maks)) — nilai dihitung JS'),EM(),EM(),EM(),EM(),EM()]);
-      fd8P([LB('GEV — c (shape)'),         {v:+gcFD.toFixed(6),s:cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})},LB('—'),statNoteEl('GEV MLE fit'),EM(),EM(),EM(),EM(),EM()]);
-      fd8P([LB('GEV — loc'),               {v:+glFD.toFixed(6),s:cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})},LB('—'),statNoteEl('GEV MLE fit'),EM(),EM(),EM(),EM(),EM()]);
-      fd8P([LB('GEV — scale'),             {v:+gsFD.toFixed(6),s:cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})},LB('—'),statNoteEl('GEV MLE fit'),EM(),EM(),EM(),EM(),EM()]);
-      fd8P([LB('Gumbel — α (scale)'),     FMSx(`B${rStatStd}*SQRT(6)/PI()`,+gumAlpha.toFixed(6),cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})),LB('—'),statNoteEl('σ√6/π'),EM(),EM(),EM(),EM(),EM()]);
-      fd8P([LB('Gumbel — u (mode)'),      FMSx(`B${rStatMean}-0.5772*B${rStatGumA}`,+gumU.toFixed(6),cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})),LB('—'),statNoteEl('μ - 0.5772α'),EM(),EM(),EM(),EM(),EM()]);
+      fd8P([LB('Cs Log-alam'),             FMSx(`COUNT($C$${rAMSStart}:$C$${rAMSEnd})/((COUNT($C$${rAMSStart}:$C$${rAMSEnd})-1)*(COUNT($C$${rAMSStart}:$C$${rAMSEnd})-2))*SUMPRODUCT(((LN($C$${rAMSStart}:$C$${rAMSEnd})-$B$${rStatLm})/$B$${rStatLss})^3)`,+lcFD.toFixed(6),cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})),LB('—'),statNoteEl('Skewness sampel dari LN(CH) (setara =SKEW(LN(CH)))'),EM(),EM(),EM(),EM(),EM()]);
+      fd8P([LB('GEV — c (shape)'),         {v:+gcFD.toFixed(6),s:cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})},LB('—'),statNoteEl('Hasil MLE (input; parameter dicari dgn Solver — maksimalkan log-likelihood di bawah)'),EM(),EM(),EM(),EM(),EM()]);
+      fd8P([LB('GEV — loc'),               {v:+glFD.toFixed(6),s:cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})},LB('—'),statNoteEl('Hasil MLE (input; parameter dicari dgn Solver — maksimalkan log-likelihood di bawah)'),EM(),EM(),EM(),EM(),EM()]);
+      fd8P([LB('GEV — scale'),             {v:+gsFD.toFixed(6),s:cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})},LB('—'),statNoteEl('Hasil MLE (input; parameter dicari dgn Solver — maksimalkan log-likelihood di bawah)'),EM(),EM(),EM(),EM(),EM()]);
+      fd8P([LB('Gumbel — α (scale)'),     FMSx(`B${rStatStd}*SQRT(6)/PI()`,+gumAlpha.toFixed(6),cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})),LB('—'),statNoteEl('σ√6/π (metode momen — referensi)'),EM(),EM(),EM(),EM(),EM()]);
+      fd8P([LB('Gumbel — u (mode)'),      FMSx(`B${rStatMean}-0.5772*B${rStatGumA}`,+gumU.toFixed(6),cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})),LB('—'),statNoteEl('μ - 0.5772α (metode momen — referensi)'),EM(),EM(),EM(),EM(),EM()]);
       fd8P([LB('Minimum CH maks'),         FMSx(`MIN($C$${rAMSStart}:$C$${rAMSEnd})`,+Math.min(...amaxFD).toFixed(4),cs({bg:C.WHITE,fc:C.GRAY_LBL,sz:10,halign:'right',border:true})),LB('mm'),statNoteEl('Min AMS'),EM(),EM(),EM(),EM(),EM()]);
       fd8P([LB('Maksimum CH maks'),         FMSx(`MAX($C$${rAMSStart}:$C$${rAMSEnd})`,+Math.max(...amaxFD).toFixed(4),cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,bold:true,sz:10,halign:'right',border:true})),LB('mm'),statNoteEl('Maks AMS'),EM(),EM(),EM(),EM(),EM()]);
+      {
+        const stN=cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true});
+        const stI=cs({bg:C.BLUE_SOFT,fc:C.BLUE_HDR,sz:10,halign:'right',border:true});
+        const sr=(label,f,v,unit,note)=>fd8P([LB(label), f?FMSx(f,+(+v).toFixed(6),stN):{v:+(+v).toFixed(6),s:stI}, LB(unit), statNoteEl(note),EM(),EM(),EM(),EM(),EM()]);
+        const gLoc=meanFD-YnFD/SnFD*stdFD, gScl=stdFD/SnFD;
+        sr('Gumbel — Yn',null,YnFD,'—','Tabel Yn (Soewarno) untuk n data — nilai tabel (input)');
+        sr('Gumbel — Sn',null,SnFD,'—','Tabel Sn (Soewarno) untuk n data — nilai tabel (input)');
+        sr('Gumbel — loc (Yn/Sn)',`B${rStatMean}-B${rStatYn}/B${rStatSn}*B${rStatStd}`,gLoc,'mm','μ − (Yn/Sn)·σ — dipakai Kala Ulang & uji GoF');
+        sr('Gumbel — scale (Yn/Sn)',`B${rStatStd}/B${rStatSn}`,gScl,'mm','σ / Sn');
+        const p3a=4/(csFD*csFD), p3b=stdFD*csFD/2, p3x=meanFD-2*stdFD/csFD;
+        sr('Pearson III — α (shape)',`4/B${rStatCs}^2`,p3a,'—','4 / Cs²');
+        sr('Pearson III — β (scale)',`B${rStatStd}*B${rStatCs}/2`,p3b,'—','σ·Cs / 2');
+        sr('Pearson III — ξ (batas)',`B${rStatMean}-2*B${rStatStd}/B${rStatCs}`,p3x,'mm','μ − 2σ/Cs');
+        const l3a=4/(lcFD*lcFD), l3b=lsFD*lcFD/2, l3x=lmFD-2*lsFD/lcFD;
+        sr('Log-Pearson III — α (shape)',`4/B${rStatLcs}^2`,l3a,'—','4 / Cs_log²');
+        sr('Log-Pearson III — β (scale)',`B${rStatLss}*B${rStatLcs}/2`,l3b,'—','σY·Cs_log / 2');
+        sr('Log-Pearson III — ξ (batas)',`B${rStatLm}-2*B${rStatLss}/B${rStatLcs}`,l3x,'ln(mm)','μY − 2σY/Cs_log');
+        let llv=0; amaxFD.forEach(x=>{const z=1+gcFD*(x-glFD)/gsFD; llv+=(1+1/gcFD)*Math.log(z)+Math.pow(z,-1/gcFD);}); llv=-nFD*Math.log(gsFD)-llv;
+        sr('GEV — log-likelihood',`-B${rStatN}*LN(B${rStatGs})-SUMPRODUCT((1+1/B${rStatGc})*LN(1+B${rStatGc}*(${AMSR}-B${rStatGl})/B${rStatGs})+(1+B${rStatGc}*(${AMSR}-B${rStatGl})/B${rStatGs})^(-1/B${rStatGc}))`,llv,'—','Σ ln f(x) — gunakan Solver (maks) pada c, loc, scale untuk memperoleh MLE');
+      }
 
       // ── ③ CH Rancangan ──
       fd8P([H2('③ CH Rancangan per Distribusi & Kala Ulang (mm)',C.BLUE_HDR),EM(C.BLUE_HDR),EM(C.BLUE_HDR),EM(C.BLUE_HDR),EM(C.BLUE_HDR),EM(C.BLUE_HDR),EM(C.BLUE_HDR),EM(C.BLUE_HDR),EM(C.BLUE_HDR)]);
       fd8P([H3('Distribusi',C.BLUE_SOFT),...KALA_FD.map(t=>H3('T='+t+' th',C.BLUE_SOFT)),H3('Rekomendasi',C.BLUE_SOFT)]);
+      const rFd3Hdr=fd8Row;
+      const KTf=(g,Pe)=>`IF(ABS(${g})<0.0001,NORMSINV(${Pe}),IF(${g}>0,(GAMMAINV(${Pe},4/${g}^2,1)-4/${g}^2)/SQRT(4/${g}^2),-(GAMMAINV(1-(${Pe}),4/${g}^2,1)-4/${g}^2)/SQRT(4/${g}^2)))`;
       DISTS_FD.forEach((dist,di)=>{
         const syarat=typeof raCekSyarat==='function'?raCekSyarat(dist,statsFD):{ok:false};
         const bg=di%2===0?C.STRIPE_A:C.STRIPE_B;
         const cells=KALA_FD.map((t,ti)=>{
           const v=raFreqDistCalcXT(t,statsFD,dist);
-          const hilite=t===25;
+          const hilite=t===(parseInt(document.getElementById('ra-ih-kala')?.value)||25);
           const stl=cs({bg:hilite?C.AMBER_SOFT:bg,fc:hilite?C.AMBER_HDR:C.BLUE_HDR,bold:hilite,sz:10,halign:'right',border:true});
           let f='';
-          if(dist==='Gumbel')        f=`$B$${rStatGumU}-$B$${rStatGumA}*LN(-LN(1-1/${t}))`;
+          if(dist==='Gumbel')        f=`$B$${rStatGLoc}+$B$${rStatGScl}*(-LN(-LN(1-1/${t})))`;
           else if(dist==='Normal')   f=`$B$${rStatMean}+NORMSINV(1-1/${t})*$B$${rStatStd}`;
           else if(dist==='Log-Normal') f=`EXP($B$${rStatLm}+NORMSINV(1-1/${t})*$B$${rStatLss})`;
+          else if(dist==='Pearson III') f=`$B$${rStatMean}+${KTf('$B$'+rStatCs,`(1-1/${t})`)}*$B$${rStatStd}`;
+          else if(dist==='Log-Pearson III') f=`EXP($B$${rStatLm}+${KTf('$B$'+rStatLcs,`(1-1/${t})`)}*$B$${rStatLss})`;
+          else if(dist==='GEV') f=`IF(ABS($B$${rStatGc})<0.00000001,$B$${rStatGl}-$B$${rStatGs}*LN(-LN(1-1/${t})),$B$${rStatGl}+$B$${rStatGs}/$B$${rStatGc}*((-LN(1-1/${t}))^(-$B$${rStatGc})-1))`;
           return f?{v:isNaN(v)?0:+v.toFixed(4),f,s:stl}:{v:isNaN(v)?0:+v.toFixed(4),s:stl};
         });
         fd8P([{v:dist,s:cs({bg,fc:C.BLUE_HDR,bold:true,sz:10,border:true})},...cells,
-          {v:syarat.ok?'✅ Sesuai':'⚠ Cek',s:cs({bg:syarat.ok?C.GREEN_SOFT:bg,fc:syarat.ok?C.GREEN_HDR:C.GRAY_LBL,bold:true,sz:10,halign:'center',border:true})}]);
+          {v:syarat.ok?'\u2705 Sesuai':'\u26a0 Cek',f:`J${rFd3Hdr+9+di}`,s:cs({bg:syarat.ok?C.GREEN_SOFT:bg,fc:syarat.ok?C.GREEN_HDR:C.GRAY_LBL,bold:true,sz:10,halign:'center',border:true})}]);
       });
 
       // ── ④ Uji Syarat Distribusi — layout mirip app ──
@@ -12833,7 +13135,16 @@ async function exportExcel() {
 
         fd8P([
           {v:dist, s:cs({bg:di%2===0?C.STRIPE_A:C.STRIPE_B,fc:C.BLUE_HDR,bold:true,sz:10,border:true})},
-          {v:def.parStr?def.parStr():'—', s:cs({bg,fc:C.GRAY_LBL,sz:9,border:true,italic:true})},
+          (()=>{ const F=(r,d)=>`FIXED(B${r},${d},TRUE)`;
+            const PF={
+              'GEV':`"c="&${F(rStatGc,3)}&", loc="&${F(rStatGl,2)}&", sc="&${F(rStatGs,2)}`,
+              'Normal':`"μ="&${F(rStatMean,2)}&", σ="&${F(rStatStd,2)}`,
+              'Log-Normal':`"μY="&${F(rStatLm,4)}&", σY="&${F(rStatLss,4)}`,
+              'Gumbel':`"μ="&${F(rStatMean,2)}&", σ="&${F(rStatStd,2)}`,
+              'Pearson III':`"μ="&${F(rStatMean,2)}&", σ="&${F(rStatStd,2)}&", Cs="&${F(rStatCs,3)}`,
+              'Log-Pearson III':`"μY="&${F(rStatLm,4)}&", σY="&${F(rStatLss,4)}&", Cs="&${F(rStatLcs,3)}`
+            };
+            return {v:def.parStr?def.parStr():'—', f:PF[dist], s:cs({bg,fc:C.GRAY_LBL,sz:9,border:true,italic:true})}; })(),
           {v:def.fCs||'—', s:cs({bg,fc:C.GRAY_LBL,sz:9,border:true})},
           makeNilaiCell(def.nCsF, def.nCsV, csMatch),
           {v:def.fCk||'—', s:cs({bg,fc:C.GRAY_LBL,sz:9,border:true})},
@@ -12841,7 +13152,15 @@ async function exportExcel() {
           FMSx(`B${rStatCv}`,+cvFD.toFixed(4),cs({bg,fc:C.BLUE_HDR,sz:9,halign:'right',border:true})),
           FMS(csAktualF,csAktualV,cs({bg:csActBg,fc:csActFc,bold:true,sz:9,halign:'right',border:true})),
           FMSx(`B${rStatCk}`,+ckFD.toFixed(4),cs({bg,fc:C.BLUE_HDR,sz:9,halign:'right',border:true})),
-          {v:syarat.ok?'\u2705 Sesuai':'\u26a0 Cek', s:cs({bg:syarat.ok?C.GREEN_SOFT:C.AMBER_SOFT,fc:syarat.ok?C.GREEN_HDR:C.AMBER_HDR,bold:true,sz:10,halign:'center',border:true})}
+          (()=>{ const OKS='"\u2705 Sesuai"', NOK='"\u26a0 Cek"';
+            const SF={
+              'Normal':`IF(ABS($B$${rStatCs})<=0.5,${OKS},${NOK})`,
+              'Log-Normal':`IF(ABS($B$${rStatLcs})<=0.5,${OKS},${NOK})`,
+              'Gumbel':`IF(AND($B$${rStatCs}>=1,$B$${rStatCs}<=1.4),${OKS},${NOK})`
+            };
+            const o={v:syarat.ok?'\u2705 Sesuai':'\u26a0 Cek', s:cs({bg:syarat.ok?C.GREEN_SOFT:C.AMBER_SOFT,fc:syarat.ok?C.GREEN_HDR:C.AMBER_HDR,bold:true,sz:10,halign:'center',border:true})};
+            if(SF[dist]) o.f=SF[dist]; else o.f=OKS;
+            return o; })()
         ]);
       });
 
@@ -12852,56 +13171,131 @@ async function exportExcel() {
 
       fd8P(H2_10('⑤ Uji Kecocokan Distribusi (Goodness of Fit) — α = 5%', C.PURPLE_HDR));
       fd8P([
-        H3('Distribusi',C.PURPLE_SOFT),
-        H3('χ² hitung',C.PURPLE_SOFT),
-        H3('χ² kritis',C.PURPLE_SOFT),
-        H3('Status χ²',C.PURPLE_SOFT),
-        H3('Δ maks (KS)',C.PURPLE_SOFT),
-        H3('Δ kritis (KS)',C.PURPLE_SOFT),
-        H3('Status KS',C.PURPLE_SOFT),
-        H3('Kesimpulan',C.PURPLE_SOFT),
-        H3(`n=${nFD}, k=${kGoF} kelas`,C.PURPLE_SOFT),
-        EM(C.PURPLE_SOFT),
+        H3('Distribusi',C.PURPLE_SOFT),H3('χ² hitung',C.PURPLE_SOFT),H3('χ² kritis',C.PURPLE_SOFT),H3('Status χ²',C.PURPLE_SOFT),
+        H3('Δ maks (KS)',C.PURPLE_SOFT),H3('Δ kritis (KS)',C.PURPLE_SOFT),H3('Status KS',C.PURPLE_SOFT),H3('Kesimpulan',C.PURPLE_SOFT),
+        H3(`n=${nFD}, k=${kGoF} kelas`,C.PURPLE_SOFT),EM(C.PURPLE_SOFT),
       ]);
+      const COL=i=>String.fromCharCode(65+i);
+      const rGoF0=fd8Row;                       // baris header ⑤
+      const rChiH2=rGoF0+8;                     // setelah 6 baris distribusi + 1 baris catatan
+      const rChiPar=rChiH2+1, rChiHdr=rChiH2+2, rChiS=rChiH2+3, rChiE=rChiS+kGoF-1, rChiTot=rChiE+1;
+      const rKsH2=rChiTot+1, rKsHdr=rKsH2+1, rKsS=rKsH2+2, rKsE=rKsS+nFD-1, rKsMax=rKsE+1;
 
-      DISTS_FD.forEach((dist,di)=>{
+      // CDF teoritis sebagai formula Excel (X = referensi sel / ekspresi nilai CH)
+      const cdfF=(dist,X)=>{
+        const B=r=>`$B$${r}`;
+        const p3=(Y,mean,std,cs,al,be,xi)=>`IF(ABS(${cs})<0.3,NORMSDIST((${Y}-${mean})/${std}),IF(${be}>0,IF((${Y}-${xi})/${be}<=0,0,GAMMADIST((${Y}-${xi})/${be},${al},1,TRUE)),IF(${Y}>=${xi},1,1-GAMMADIST((${xi}-${Y})/(-${be}),${al},1,TRUE))))`;
+        switch(dist){
+          case 'Normal': return `NORMSDIST((${X}-${B(rStatMean)})/${B(rStatStd)})`;
+          case 'Log-Normal': return `IF(${X}<=0,0,NORMSDIST((LN(${X})-${B(rStatLm)})/${B(rStatLss)}))`;
+          case 'Gumbel': return `EXP(-EXP(-(${X}-${B(rStatGLoc)})/${B(rStatGScl)}))`;
+          case 'GEV': { const c=B(rStatGc),l=B(rStatGl),sc=B(rStatGs);
+            return `IF(ABS(${c})<0.00000001,EXP(-EXP(-(${X}-${l})/${sc})),IF(1+${c}*(${X}-${l})/${sc}<=0,IF(${c}<0,1,0),EXP(-((1+${c}*(${X}-${l})/${sc})^(-1/${c})))))`; }
+          case 'Pearson III': return p3(X,B(rStatMean),B(rStatStd),B(rStatCs),B(rStatP3a),B(rStatP3b),B(rStatP3x));
+          case 'Log-Pearson III': return `IF(${X}<=0,0,${p3(`LN(${X})`,B(rStatLm),B(rStatLss),B(rStatLcs),B(rStatLPa),B(rStatLPb),B(rStatLPx))})`;
+        }
+        return '0';
+      };
+
+      const chiRes=[], ksRes=[];
+      DISTS_FD.forEach(dist=>{
         let chi=null, ks=null;
         try { chi = typeof raChiSquareTest==='function' ? raChiSquareTest(amaxFD,statsFD,dist) : null; } catch(e){}
         try { ks  = typeof raKSTest==='function'        ? raKSTest(amaxFD,statsFD,dist)        : null; } catch(e){}
+        chiRes.push(chi); ksRes.push(ks);
+      });
+
+      DISTS_FD.forEach((dist,di)=>{
+        const chi=chiRes[di], ks=ksRes[di];
         const bg = di%2===0 ? C.STRIPE_A : C.STRIPE_B;
         const chiOk = chi && isFinite(chi.chi2) && chi.ok;
         const ksOk  = ks && ks.ok;
         const bothOk = chiOk && ksOk;
-        const chi2cr = chi ? chi.chi2cr : (typeof chiSquareCritical==='function' ? chiSquareCritical(kGoF-3,0.05) : 3.841);
-
+        const m = (dist==='Pearson III'||dist==='Log-Pearson III'||dist==='GEV') ? 3 : 2;
+        const r = fd8Row+1;
         const statusStyle = (ok) => cs({bg:ok?C.GREEN_SOFT:C.RED_SOFT||C.AMBER_SOFT,fc:ok?C.GREEN_HDR:C.RED_HDR||C.AMBER_HDR,bold:true,sz:9,halign:'center',border:true});
         const kesimBg = bothOk?C.GREEN_SOFT:(chiOk||ksOk?C.AMBER_SOFT:C.RED_SOFT||C.AMBER_SOFT);
         const kesimFc = bothOk?C.GREEN_HDR:(chiOk||ksOk?C.AMBER_HDR:C.RED_HDR||C.AMBER_HDR);
-        const kesim   = !chi||!ks?'—':bothOk?'\u2705 Diterima':(chiOk||ksOk?'\u26a0 Sebagian':'\u274c Ditolak');
-
+        const kesim   = !chi||!ks?'—':bothOk?'✅ Diterima':(chiOk||ksOk?'⚠ Sebagian':'❌ Ditolak');
         fd8P([
           {v:dist, s:cs({bg,fc:C.BLUE_HDR,bold:true,sz:10,border:true})},
-          chi&&isFinite(chi.chi2) ? {v:+chi.chi2.toFixed(4),s:cs({bg,fc:chiOk?C.GREEN_HDR:C.AMBER_HDR,bold:true,sz:9,halign:'right',border:true})}
-                                  : {v:'Error',s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:9,halign:'center',border:true})},
-          {v:+chi2cr.toFixed(4), s:cs({bg,fc:C.GRAY_LBL,sz:9,halign:'right',border:true})},
-          {v:chi?(chiOk?'\u2705':'\u274c'):'—', s:statusStyle(chiOk)},
-          {v:ks?+ks.dmax.toFixed(4):'—', s:cs({bg,fc:ksOk?C.GREEN_HDR:C.AMBER_HDR,bold:true,sz:9,halign:'right',border:true})},
+          FMS(`${COL(10+di)}${rChiTot}`, chi&&isFinite(chi.chi2)?+chi.chi2.toFixed(4):0, cs({bg,fc:chiOk?C.GREEN_HDR:C.AMBER_HDR,bold:true,sz:9,halign:'right',border:true})),
+          FMS(`CHIINV(0.05,MAX(1,$D$${rChiPar}-${m}-1))`, chi?+chi.chi2cr.toFixed(4):0, cs({bg,fc:C.GRAY_LBL,sz:9,halign:'right',border:true})),
+          {v:chi?(chiOk?'✅':'❌'):'—', f:`IF(B${r}<=C${r},"✅","❌")`, s:statusStyle(chiOk)},
+          FMS(`${COL(9+di)}${rKsMax}`, ks?+ks.dmax.toFixed(4):0, cs({bg,fc:ksOk?C.GREEN_HDR:C.AMBER_HDR,bold:true,sz:9,halign:'right',border:true})),
           {v:+dcr5.toFixed(4), s:cs({bg,fc:C.GRAY_LBL,sz:9,halign:'right',border:true})},
-          {v:ks?(ksOk?'\u2705':'\u274c'):'—', s:statusStyle(ksOk)},
-          {v:kesim, s:cs({bg:kesimBg,fc:kesimFc,bold:true,sz:9,halign:'center',border:true})},
+          {v:ks?(ksOk?'✅':'❌'):'—', f:`IF(E${r}<=F${r},"✅","❌")`, s:statusStyle(ksOk)},
+          {v:kesim, f:`IF(AND(D${r}="✅",G${r}="✅"),"✅ Diterima",IF(OR(D${r}="✅",G${r}="✅"),"⚠ Sebagian","❌ Ditolak"))`, s:cs({bg:kesimBg,fc:kesimFc,bold:true,sz:9,halign:'center',border:true})},
           EM(bg),EM(bg)
         ]);
       });
-
-      // Catatan GoF
-      fd8P([{v:`* Chi-Kuadrat: k=${kGoF} kelas Sturges, dof bervariasi (k-m-1, m=2 utk Normal/LN/Gumbel, m=3 utk P3/LP3/GEV). KS: posisi plotting Weibull i/(n+1), \u0394kritis tabel Massey 1951 (n=${nFD}).`,
+      fd8P([{v:`* Chi-Kuadrat: k=${kGoF} kelas Sturges, dof = k−m−1 (m=2 utk Normal/LN/Gumbel, m=3 utk P3/LP3/GEV); χ² hitung dari tabel ⑥, χ² kritis =CHIINV(0,05; dof). KS: posisi plotting Weibull i/(n+1), Δ dari tabel ⑦; Δ kritis dari tabel Massey 1951 (n=${nFD}) — nilai tabel (input).`,
              s:cs({bg:C.GRAY_SOFT,fc:C.GRAY_LBL,sz:8,italic:true,border:true})},
             EM(C.GRAY_SOFT),EM(C.GRAY_SOFT),EM(C.GRAY_SOFT),EM(C.GRAY_SOFT),EM(C.GRAY_SOFT),EM(C.GRAY_SOFT),EM(C.GRAY_SOFT),EM(C.GRAY_SOFT),EM(C.GRAY_SOFT)]);
+
+      // ── ⑥ Lampiran χ² per kelas ──
+      const H2_16=(v,bg)=>[H2(v,bg),...Array(15).fill(EM(bg))];
+      fd8P(H2_16('⑥ Lampiran Uji Chi-Kuadrat (χ²) — perhitungan per kelas', C.PURPLE_HDR));
+      const xminFD=amaxFD[0], xmaxFD=amaxFD[nFD-1], wFD=(xmaxFD-xminFD)/kGoF||1;
+      const stP=cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true});
+      fd8P([LB('n data'),FMS(`$B$${rStatN}`,nFD,stP),LB('k (Sturges)'),FMS(`MAX(3,ROUND(1+3.322*LOG10(B${rChiPar}),0))`,kGoF,stP),
+            LB('x min'),FMS(`MIN(${AMSR})`,xminFD,stP),LB('x maks'),FMS(`MAX(${AMSR})`,xmaxFD,stP),
+            LB('Lebar kelas'),FMS(`(H${rChiPar}-F${rChiPar})/D${rChiPar}`,wFD,stP)]);
+      fd8P([H3('Kelas',C.PURPLE_SOFT),H3('Batas bawah',C.PURPLE_SOFT),H3('Batas atas',C.PURPLE_SOFT),H3('Oi (data)',C.PURPLE_SOFT),
+            ...DISTS_FD.map(d=>H3('F('+d+')',C.PURPLE_SOFT)),...DISTS_FD.map(d=>H3('(Oi−Ei)²/Ei '+d,C.PURPLE_SOFT))]);
+      const cdfNum=(x,dist)=>{ try{const v=raDistCDF(x,statsFD,dist); return isFinite(v)?+v.toFixed(6):0;}catch(e){return 0;} };
+      for(let i=0;i<kGoF;i++){
+        const r=fd8Row+1, bg=i%2===0?C.STRIPE_A:C.STRIPE_B, last=i===kGoF-1;
+        const lo=xminFD+i*wFD, hi=last?xmaxFD+Math.max(wFD*1e-6,1e-6):xminFD+(i+1)*wFD;
+        const Oi=amaxFD.filter(v=>last?(v>=lo&&v<=hi):(v>=lo&&v<hi)).length;
+        const sN=cs({bg,fc:C.BLUE_HDR,sz:9,halign:'right',border:true});
+        const row=[STRIPE(i+1,i),
+          FMS(`$F$${rChiPar}+${i}*$J$${rChiPar}`,lo,sN),
+          FMS(last?`$H$${rChiPar}+MAX($J$${rChiPar}*0.000001,0.000001)`:`$F$${rChiPar}+${i+1}*$J$${rChiPar}`,hi,sN),
+          FMS(`COUNTIFS(${AMSR},">="&B${r},${AMSR},"${last?'<=':'<'}"&C${r})`,Oi,sN)];
+        DISTS_FD.forEach(d=>row.push(last?{v:1,s:sN}:FMS(cdfF(d,`$C${r}`),cdfNum(hi,d),sN)));
+        DISTS_FD.forEach((d,di)=>{
+          const prev=i===0?'0':`${COL(4+di)}${r-1}`;
+          const cur=`${COL(4+di)}${r}`;
+          const cl=chiRes[di]&&chiRes[di].classes?chiRes[di].classes[i]:null;
+          const val=cl&&cl.Ei>0?(cl.Oi-cl.Ei)**2/cl.Ei:0;
+          row.push(FMS(`($D${r}-$B$${rChiPar}*MAX(${cur}-${prev},0.000000001))^2/($B$${rChiPar}*MAX(${cur}-${prev},0.000000001))`,+val.toFixed(6),sN));
+        });
+        fd8P(row);
+      }
+      {
+        const rowT=[TL('Σ χ² hitung',C.PURPLE_SOFT,C.PURPLE_HDR),...Array(9).fill(EM(C.PURPLE_SOFT))];
+        DISTS_FD.forEach((d,di)=>rowT.push(FMTOTx(`SUM(${COL(10+di)}${rChiS}:${COL(10+di)}${rChiE})`,chiRes[di]&&isFinite(chiRes[di].chi2)?+chiRes[di].chi2.toFixed(6):0,C.PURPLE_SOFT,C.PURPLE_HDR)));
+        fd8P(rowT);
+      }
+
+      // ── ⑦ Lampiran Smirnov-Kolmogorov per data ──
+      const H2_15=(v,bg)=>[H2(v,bg),...Array(14).fill(EM(bg))];
+      fd8P(H2_15('⑦ Lampiran Uji Smirnov-Kolmogorov — perhitungan per data (urut naik)', C.PURPLE_HDR));
+      fd8P([H3('No',C.PURPLE_SOFT),H3('CH terurut (mm)',C.PURPLE_SOFT),H3('P empiris i/(n+1)',C.PURPLE_SOFT),
+            ...DISTS_FD.map(d=>H3('F('+d+')',C.PURPLE_SOFT)),...DISTS_FD.map(d=>H3('|Δ| '+d,C.PURPLE_SOFT))]);
+      for(let i=0;i<nFD;i++){
+        const r=fd8Row+1, bg=i%2===0?C.STRIPE_A:C.STRIPE_B;
+        const sN=cs({bg,fc:C.BLUE_HDR,sz:9,halign:'right',border:true});
+        const x=amaxFD[i], pe=(i+1)/(nFD+1);
+        const row=[STRIPE(i+1,i),
+          FMS(`SMALL(${AMSR},A${r})`,+x.toFixed(4),sN),
+          FMS(`A${r}/($B$${rStatN}+1)`,+pe.toFixed(6),sN)];
+        const Fv=DISTS_FD.map(d=>cdfNum(x,d));
+        DISTS_FD.forEach((d,di)=>row.push(FMS(cdfF(d,`$B${r}`),Fv[di],sN)));
+        DISTS_FD.forEach((d,di)=>row.push(FMS(`ABS($C${r}-${COL(3+di)}${r})`,+Math.abs(pe-Fv[di]).toFixed(6),sN)));
+        fd8P(row);
+      }
+      {
+        const rowM=[TL('Δ maks',C.PURPLE_SOFT,C.PURPLE_HDR),...Array(8).fill(EM(C.PURPLE_SOFT))];
+        DISTS_FD.forEach((d,di)=>rowM.push(FMTOTx(`MAX(${COL(9+di)}${rKsS}:${COL(9+di)}${rKsE})`,ksRes[di]?+ksRes[di].dmax.toFixed(6):0,C.PURPLE_SOFT,C.PURPLE_HDR)));
+        fd8P(rowM);
+      }
 
     } else {
       fd8P([{v:'Belum ada data — jalankan Rainfall Analysis Step 4 terlebih dahulu.',s:cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,sz:11,halign:'center',italic:true,border:true})},EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT),EM(C.AMBER_SOFT)]);
     }
-    addSS('Freq Distribution',fd8,[28,26,20,14,26,14,12,14,12,14]);
+    addSS('Freq Distribution',fd8,[28,26,20,14,26,14,12,14,12,14,12,12,12,12,12,12]);
   }
 
   // ═══ SHEET 9: INTENSITAS HUJAN (formula-based) ════════════════
@@ -15748,7 +16142,7 @@ function gwUpdateKPI() {
 function collectState() {
   const getV = id => document.getElementById(id)?.value ?? '';
   return {
-    version: 3,
+    version: 4,
     savedAt: new Date().toISOString(),
     dark: isDark,
     rainfall: {
@@ -15766,7 +16160,23 @@ function collectState() {
       tcAsrc:    getV('ra-tc-asrc'),
       tcMethod:  (typeof raTcMethod   !== 'undefined') ? raTcMethod   : 'kirpich',
       tcAreaMode:(typeof raTcAreaMode !== 'undefined') ? raTcAreaMode : 'whole',
+      calcMode:  (typeof raCalcMode   !== 'undefined') ? raCalcMode   : 'all',
+      idfViewMax:(typeof _raIdfViewMax!== 'undefined') ? _raIdfViewMax: 1440,
+      chartType: getV('ra-chart-type'),
+      chartStyle:getV('ra-chart-style'),
+      erosivity: (typeof raErosivityData !== 'undefined') ? JSON.parse(JSON.stringify(raErosivityData)) : null,
     },
+    // Snapshot generik SEMUA kolom input/pilihan (dropdown, checkbox, teks) yang punya id —
+    // jaring pengaman agar tidak ada pilihan/input yang terlewat.
+    formFields: (function(){
+      const out = {};
+      document.querySelectorAll('input[id], select[id], textarea[id]').forEach(el => {
+        if (el.type === 'file' || el.type === 'button' || el.type === 'submit') return;
+        if (['load-file-input','rogrp-input','wtp-name-input'].includes(el.id)) return;
+        out[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? { checked: el.checked } : { value: el.value };
+      });
+      return out;
+    })(),
     bmkg: {
       source:   (typeof chSource !== 'undefined') ? chSource : 'openmeteo',
       selected: (typeof chSelected !== 'undefined') ? chSelected : null,
@@ -15782,6 +16192,7 @@ function collectState() {
     },
     runoff: {
       ch:        getV('ro-ch'),
+      chSource:  (typeof roChSource !== 'undefined') ? roChSource : 'aktual',
       calcMode:  (typeof roCalcMode  !== 'undefined') ? roCalcMode  : 'ch',
       durSource: (typeof roDurSource !== 'undefined') ? roDurSource : 'manual',
       iDurManual: getV('ro-i-dur-manual'),
@@ -15848,7 +16259,7 @@ function collectState() {
 
 // ── Pulihkan semua state dari objek tersimpan ──
 function restoreState(state) {
-  if (!state || ![1,2,3].includes(state.version)) { showToast('❌ Format file tidak dikenali', 'error'); return; }
+  if (!state || ![1,2,3,4].includes(state.version)) { showToast('❌ Format file tidak dikenali', 'error'); return; }
 
   // Dark mode
   if (state.dark && !isDark) toggleDarkMode();
@@ -15877,6 +16288,16 @@ function restoreState(state) {
     // dan kalkulasi Tc/Intensitas dijalankan ulang dengan nilai yang baru dipulihkan.
     if (ra.tcMethod   && typeof raTcSetMethod   === 'function') raTcSetMethod(ra.tcMethod);
     if (ra.tcAreaMode && typeof raTcSetAreaMode === 'function') raTcSetAreaMode(ra.tcAreaMode);
+    // Mode analisis (Semua/Hari Hujan/CH Maks Tahunan), tampilan IDF, jenis grafik, erosivitas
+    if (ra.calcMode && typeof raSetCalcMode === 'function') raSetCalcMode(ra.calcMode);
+    if (ra.idfViewMax && typeof raSetIDFView === 'function') raSetIDFView(ra.idfViewMax === 5040 ? 84 : 24);
+    setV('ra-chart-type',  ra.chartType);
+    setV('ra-chart-style', ra.chartStyle);
+    if (Array.isArray(ra.erosivity) && typeof raErosivityData !== 'undefined') {
+      raErosivityData = ra.erosivity.map(e => ({ rain: e.rain ?? '', days: e.days ?? '', maxp: e.maxp ?? '' }));
+      if (typeof raErosivityRenderTable === 'function') raErosivityRenderTable();
+    }
+    if (typeof raRender === 'function' && typeof raData !== 'undefined' && raData && raData.length) raRender();
     if (typeof raIntensityCalc === 'function') raIntensityCalc();
     if (typeof raTcCalc === 'function') raTcCalc();
   }
@@ -15914,6 +16335,9 @@ function restoreState(state) {
 
     // CH
     document.getElementById('ro-ch').value = ro.ch || '';
+    roChSource = (ro.chSource === 'kala' || ro.chSource === 'manual') ? ro.chSource : 'aktual';
+    { const _s = document.getElementById('ro-ch-source'); if (_s) _s.value = roChSource; }
+    { const _c = document.getElementById('ro-ch'); if (_c) _c.readOnly = (roChSource !== 'manual'); }
 
     // Mode Runoff (CH / Intensitas) — pakai setter resmi agar card, formula,
     // dan tombol toggle ikut ter-update dengan benar (bukan hanya variabelnya).
@@ -16103,6 +16527,26 @@ function restoreState(state) {
     if (c.rasioNum) { const el = document.getElementById('ra-rasio-num'); if (el) el.value = c.rasioNum; }
     if (c.rasioDen) { const el = document.getElementById('ra-rasio-den'); if (el) el.value = c.rasioDen; }
     if (c.rasioN)   { const el = document.getElementById('ra-rasio-n');   if (el) el.value = c.rasioN; }
+  }
+
+  // ── Restore generik semua kolom input/pilihan (jaring pengaman) ──
+  if (state.formFields) {
+    Object.entries(state.formFields).forEach(([id, f]) => {
+      if (id === 'ro-ch' || id === 'ro-ch-source' || id === 'ra-input') return; // ditangani khusus
+      const el = document.getElementById(id);
+      if (!el || el.type === 'file') return;
+      if ('checked' in f) el.checked = !!f.checked;
+      else if (f.value !== undefined && f.value !== null && el.value !== f.value) el.value = f.value;
+    });
+    // Hitung ulang semua modul dengan nilai yang baru dipulihkan
+    try { if (typeof evaCalc === 'function') evaCalc(); } catch(e) {}
+    try { if (typeof raIntensityCalc === 'function') raIntensityCalc(); } catch(e) {}
+    try { if (typeof raTcCalc === 'function') raTcCalc(); } catch(e) {}
+    try { if (typeof roChRefresh === 'function') roChRefresh(); } catch(e) {}
+    try { if (typeof roRecalcAll === 'function') roRecalcAll(); } catch(e) {}
+    try { if (typeof gwRefresh === 'function') gwRefresh(); } catch(e) {}
+    try { if (typeof rpRender === 'function') rpRender(); } catch(e) {}
+    try { if (typeof spUnitRender === 'function') spUnitRender(); } catch(e) {}
   }
 }
 
@@ -18016,6 +18460,7 @@ function scheduleAutoSave() {
       showSaveIndicator();
     } catch(e) {
       console.warn('Auto-save gagal:', e);
+      if (typeof showToast === 'function') showToast('⚠ Auto-save browser penuh/gagal — gunakan tombol Simpan (.hydromine) agar data tidak hilang', 'error');
     }
   }, 1500);
 }
@@ -23465,97 +23910,619 @@ if(typeof _rpOrigRestoreState === 'function') {
      Inject sebagai kompartemen tipe 'dxf' ke rpUnits[uid].design
      ═══════════════════════════════════════════════════════════════ -->
 <script>
-/* ── 1. DXF ASCII Parser ── */
-function dxfParsePOLYLINE(text) {
-  // Normalisasi EOL
-  const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').map(l=>l.trim());
-  const contours = {}; // { z: [[x,y], ...] }
-  const layerMap = {}; // { zRound: { layerName: [[x,y],...] } }  — untuk layer-based clustering
-  let i = 0;
-  const total = lines.length;
+/* ── 1. DXF ASCII Parser v2 ─────────────────────────────────────────────
+   Membaca kontur dari bentuk KOMPLEKS (pit / kolam tak beraturan):
+     • Entitas   : LWPOLYLINE, POLYLINE (2D/3D, bulge), LINE, ARC, CIRCLE, ELLIPSE, SPLINE
+     • Rangkai   : potongan garis/polyline terbuka disambung otomatis (ujung-ke-ujung) per elevasi,
+                   celah kecil ditutup, kontur terbuka (mis. terpotong ramp) ditutup dengan garis lurus
+     • Elevasi   : dari Z entitas; entitas miring (ramp, saluran) diabaikan; jika semua Z = 0 dan
+                   nama layer berisi angka → elevasi diambil dari nama layer
+     • Pulau     : cincin di dalam cincin pada elevasi sama = lubang (luas dikurangi)
+     • Kolam     : dipisah lewat hirarki kontainmen (kontur dalam ⊂ kontur luar), bukan jarak centroid
+   Semua fungsi murni (tanpa DOM) sehingga bisa diuji di Node.                                   */
+const DXF_Z_FLAT_TOL  = 0.05;          // selisih Z maksimum dalam 1 entitas agar dianggap kontur datar (m)
+const DXF_Z_MERGE_TOL = 0.02;          // Z yang selisihnya ≤ ini dianggap elevasi yang sama (m)
+const DXF_ARC_STEP    = Math.PI / 90;  // diskretisasi busur: 2°
+const DXF_GAP_FRAC    = 0.03;          // celah antar-ujung maksimum = 3% diagonal kontur pada elevasi itu
+const DXF_CHORD_MAX   = 0.75;          // kontur terbuka ditutup bila (jarak ujung ke ujung)/(panjang) ≤ ini
 
-  while (i < total - 1) {
-    const code = lines[i].trim();
-    const val  = lines[i+1].trim();
-    i += 2;
+function dxfTokenize(text) {
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  if (text.slice(0, 32).indexOf('AutoCAD Binary DXF') >= 0)
+    throw new Error('DXF biner tidak didukung — simpan ulang sebagai ASCII DXF');
+  const lines = text.split(/\r\n|\n|\r/);
+  const n = lines.length >> 1;
+  const codes = new Int32Array(n), vals = new Array(n);
+  let m = 0;
+  for (let i = 0; i + 1 < lines.length; i += 2) {
+    const c = parseInt(lines[i], 10);
+    codes[m] = isNaN(c) ? -1 : c;
+    vals[m] = lines[i + 1].trim();
+    m++;
+  }
+  return { codes, vals, n: m };
+}
 
-    if (code === '0' && val === 'POLYLINE') {
-      // Z dari group 38 (LWPOLYLINE) atau dari tiap VERTEX group 30 (3dPolyline)
-      let polyZ = null;
-      let polyLayer = '0'; // default layer
-      const verts = [];
-      // Scan header POLYLINE untuk group 38 dan group 8 (layer), berhenti saat ketemu VERTEX/SEQEND/entity lain
-      while (i < total - 1) {
-        const gc = lines[i].trim(), gv = lines[i+1].trim();
-        if (gc === '38') { polyZ = parseFloat(gv); i += 2; }
-        else if (gc === '8') { polyLayer = gv; i += 2; }
-        else if (gc === '0') break; // jangan konsumsi — biarkan loop vertex membacanya
-        else i += 2;
-      }
-      // Scan vertex
-      while (i < total - 1) {
-        const gc2 = lines[i].trim(), gv2 = lines[i+1].trim();
-        i += 2;
-        if (gc2 === '0' && gv2 === 'VERTEX') {
-          let vx=null,vy=null,vz=null;
-          while (i < total - 1) {
-            const vc = lines[i].trim(), vv = lines[i+1].trim();
-            i += 2;
-            if (vc==='10') vx=parseFloat(vv);
-            else if(vc==='20') vy=parseFloat(vv);
-            else if(vc==='30') vz=parseFloat(vv);
-            else if(vc==='0') { i -= 2; break; }
-          }
-          if(vx!==null && vy!==null) {
-            const z = (vz!==null)?vz:(polyZ!==null?polyZ:0);
-            if(polyZ===null) polyZ=z;
-            verts.push([vx,vy,z]);
-          }
-        } else if (gc2==='0' && gv2==='SEQEND') {
-          break;
-        } else if (gc2==='0') {
-          i -= 2; break;
-        }
-      }
-      if (verts.length > 2) {
-        // Tentukan Z kontur dari polyZ atau rata-rata Z vertex
-        const zKey = polyZ !== null ? polyZ : verts.reduce((s,v)=>s+v[2],0)/verts.length;
-        const zRound = Math.round(zKey * 100) / 100;
-        const pts2d = verts.map(v=>[v[0],v[1]]);
-        if (!contours[zRound]) contours[zRound] = [];
-        contours[zRound].push(pts2d);
-        // Simpan juga ke layerMap untuk layer-based clustering
-        if (!layerMap[zRound]) layerMap[zRound] = {};
-        if (!layerMap[zRound][polyLayer]) layerMap[zRound][polyLayer] = [];
-        layerMap[zRound][polyLayer].push(pts2d);
-      }
-    }
-
-    // Juga handle LWPOLYLINE (2D dengan elevation group 38)
-    if (code === '0' && val === 'LWPOLYLINE') {
-      let lwZ = 0, lwVerts = [], lwX = null, lwY = null, lwLayer = '0';
-      while (i < total - 1) {
-        const gc = lines[i].trim(), gv = lines[i+1].trim();
-        i += 2;
-        if (gc === '38') lwZ = parseFloat(gv);
-        else if (gc === '8') lwLayer = gv;
-        else if (gc === '10') { if(lwX!==null&&lwY!==null) lwVerts.push([lwX,lwY]); lwX=parseFloat(gv); lwY=null; }
-        else if (gc === '20') { lwY=parseFloat(gv); }
-        else if (gc === '0') { i -= 2; break; }
-      }
-      if(lwX!==null&&lwY!==null) lwVerts.push([lwX,lwY]);
-      if (lwVerts.length > 2) {
-        const zRound = Math.round(lwZ * 100) / 100;
-        if (!contours[zRound]) contours[zRound] = [];
-        contours[zRound].push(lwVerts);
-        if (!layerMap[zRound]) layerMap[zRound] = {};
-        if (!layerMap[zRound][lwLayer]) layerMap[zRound][lwLayer] = [];
-        layerMap[zRound][lwLayer].push(lwVerts);
+/* Busur bulge (LWPOLYLINE/POLYLINE) → titik-titik antara */
+function dxfBulgeExpand(vs, closed) {
+  const n = vs.length, out = [];
+  const segs = closed ? n : n - 1;
+  for (let i = 0; i < n; i++) {
+    const a = vs[i];
+    out.push([a.x, a.y, a.z]);
+    if (i < segs && a.b) {
+      const b = vs[(i + 1) % n];
+      const dx = b.x - a.x, dy = b.y - a.y, c = Math.hypot(dx, dy);
+      if (c < 1e-12) continue;
+      const th = 4 * Math.atan(a.b);
+      const d = (c / 2) / Math.tan(th / 2);
+      const cx = (a.x + b.x) / 2 - dy / c * d, cy = (a.y + b.y) / 2 + dx / c * d;
+      const r = Math.hypot(a.x - cx, a.y - cy);
+      const a0 = Math.atan2(a.y - cy, a.x - cx);
+      const k = Math.max(2, Math.ceil(Math.abs(th) / DXF_ARC_STEP));
+      for (let s = 1; s < k; s++) {
+        const ang = a0 + th * s / k;
+        out.push([cx + r * Math.cos(ang), cy + r * Math.sin(ang), a.z + (b.z - a.z) * s / k]);
       }
     }
   }
-  // Return object dengan contours (flat) dan layerMap (per-layer)
-  return { contours, layerMap };
+  return out;
+}
+
+/* B-spline (De Boor, mendukung rational/NURBS) */
+function dxfSplinePoints(deg, knots, ctrl, wts) {
+  const n = ctrl.length, p = deg;
+  const pts = [];
+  const PER = 16;
+  const deBoor = (k, u) => {
+    const d = [];
+    for (let j = 0; j <= p; j++) {
+      const c = ctrl[j + k - p], w = wts ? (wts[j + k - p] || 1) : 1;
+      d.push([c[0] * w, c[1] * w, c[2] * w, w]);
+    }
+    for (let r = 1; r <= p; r++) {
+      for (let j = p; j >= r; j--) {
+        const den = knots[j + 1 + k - r] - knots[j + k - p];
+        const al = den === 0 ? 0 : (u - knots[j + k - p]) / den;
+        for (let q = 0; q < 4; q++) d[j][q] = (1 - al) * d[j - 1][q] + al * d[j][q];
+      }
+    }
+    const w = d[p][3] || 1;
+    return [d[p][0] / w, d[p][1] / w, d[p][2] / w];
+  };
+  for (let k = p; k < n; k++) {
+    if (!(knots[k + 1] > knots[k] + 1e-12)) continue;
+    const last = (k === n - 1);
+    for (let s = 0; s <= (last ? PER : PER - 1); s++)
+      pts.push(deBoor(k, knots[k] + (knots[k + 1] - knots[k]) * s / PER));
+  }
+  return pts;
+}
+
+/* Ekstrak semua jalur (path) dari section ENTITIES */
+function dxfExtractPaths(tok) {
+  const codes = tok.codes, vals = tok.vals, N = tok.n;
+  const paths = [];
+  const st = { counts: {}, unsupported: {} };
+  const bump = (o, k) => { o[k] = (o[k] || 0) + 1; };
+  const F = parseFloat;
+
+  const emit = (pts, closed, layer, type, ext) => {
+    if (!pts || pts.length < 2) return;
+    // OCS dengan normal (0,0,-1): sumbu X terbalik
+    if (ext && ext[2] < 0 && Math.abs(ext[0]) < 1e-9 && Math.abs(ext[1]) < 1e-9)
+      for (const p of pts) { p[0] = -p[0]; p[2] = -p[2]; }
+    paths.push({ pts, closed: !!closed, layer, type });
+    bump(st.counts, type);
+  };
+  const nextRec = (from) => { let j = from + 1; while (j < N && codes[j] !== 0) j++; return j; };
+
+  let section = null, sawSection = false, i = 0;
+  while (i < N) {
+    if (codes[i] !== 0) { i++; continue; }
+    const t = vals[i];
+    if (t === 'SECTION') { sawSection = true; section = (codes[i + 1] === 2) ? vals[i + 1] : null; i += 2; continue; }
+    if (t === 'ENDSEC')  { section = null; i++; continue; }
+    if (sawSection && section !== 'ENTITIES') { i++; continue; }
+
+    const s = i + 1, e = nextRec(i);
+
+    if (t === 'LWPOLYLINE') {
+      let layer = '0', flag = 0, elev = 0, ps = false, cur = null;
+      const vs = [], ext = [0, 0, 1];
+      for (let k = s; k < e; k++) {
+        const c = codes[k], v = vals[k];
+        if (c === 8) layer = v;
+        else if (c === 67) ps = (parseInt(v, 10) === 1);
+        else if (c === 70) flag = parseInt(v, 10) || 0;
+        else if (c === 38) elev = F(v) || 0;
+        else if (c === 10) { cur = { x: F(v), y: 0, z: null, b: 0 }; vs.push(cur); }
+        else if (c === 20 && cur) cur.y = F(v);
+        else if (c === 30 && cur) cur.z = F(v);
+        else if (c === 42 && cur) cur.b = F(v) || 0;
+        else if (c === 210) ext[0] = F(v); else if (c === 220) ext[1] = F(v); else if (c === 230) ext[2] = F(v);
+      }
+      if (!ps && vs.length >= 2) {
+        vs.forEach(q => { if (q.z === null || isNaN(q.z)) q.z = elev; });
+        const closed = !!(flag & 1);
+        emit(dxfBulgeExpand(vs, closed), closed, layer, 'LWPOLYLINE', ext);
+      }
+      i = e; continue;
+    }
+
+    if (t === 'POLYLINE') {
+      let layer = '0', flag = 0, hz = null, ps = false;
+      const ext = [0, 0, 1];
+      for (let k = s; k < e; k++) {
+        const c = codes[k], v = vals[k];
+        if (c === 8) layer = v;
+        else if (c === 67) ps = (parseInt(v, 10) === 1);
+        else if (c === 70) flag = parseInt(v, 10) || 0;
+        else if (c === 30) hz = F(v);
+        else if (c === 210) ext[0] = F(v); else if (c === 220) ext[1] = F(v); else if (c === 230) ext[2] = F(v);
+      }
+      const vs = [];
+      let k = e;
+      while (k < N && codes[k] === 0 && vals[k] === 'VERTEX') {
+        const ve = nextRec(k);
+        const q = { x: NaN, y: NaN, z: null, b: 0, f: 0 };
+        for (let m = k + 1; m < ve; m++) {
+          const c = codes[m], v = vals[m];
+          if (c === 10) q.x = F(v); else if (c === 20) q.y = F(v); else if (c === 30) q.z = F(v);
+          else if (c === 42) q.b = F(v) || 0; else if (c === 70) q.f = parseInt(v, 10) || 0;
+        }
+        if (!isNaN(q.x) && !isNaN(q.y)) vs.push(q);
+        k = ve;
+      }
+      if (k < N && codes[k] === 0 && vals[k] === 'SEQEND') k = nextRec(k);
+      i = k;
+
+      if (ps || (flag & (16 | 64))) { if (flag & (16 | 64)) bump(st.unsupported, 'POLYLINE mesh'); continue; }
+      let use = vs;
+      if (flag & (2 | 4)) {                       // curve/spline-fit: pakai titik kurva hasil fit
+        const fitted = vs.filter(q => q.f & 8);
+        use = fitted.length ? fitted : vs.filter(q => !(q.f & 16));
+      }
+      const is3D = !!(flag & 8);
+      use.forEach(q => {
+        if (!is3D && hz !== null && !isNaN(hz)) q.z = hz;
+        else if (q.z === null || isNaN(q.z)) q.z = (hz !== null && !isNaN(hz)) ? hz : 0;
+      });
+      if (use.length >= 2) {
+        const closed = !!(flag & 1);
+        emit(dxfBulgeExpand(use, closed), closed, layer, 'POLYLINE', ext);
+      }
+      continue;
+    }
+
+    if (t === 'LINE') {
+      let layer = '0', ps = false;
+      const a = [0, 0, 0], b = [0, 0, 0];
+      for (let k = s; k < e; k++) {
+        const c = codes[k], v = vals[k];
+        if (c === 8) layer = v; else if (c === 67) ps = (parseInt(v, 10) === 1);
+        else if (c === 10) a[0] = F(v); else if (c === 20) a[1] = F(v); else if (c === 30) a[2] = F(v);
+        else if (c === 11) b[0] = F(v); else if (c === 21) b[1] = F(v); else if (c === 31) b[2] = F(v);
+      }
+      if (!ps) emit([a, b], false, layer, 'LINE');
+      i = e; continue;
+    }
+
+    if (t === 'ARC' || t === 'CIRCLE') {
+      let layer = '0', ps = false, r = 0, a0 = 0, a1 = 360;
+      const c0 = [0, 0, 0], ext = [0, 0, 1];
+      for (let k = s; k < e; k++) {
+        const c = codes[k], v = vals[k];
+        if (c === 8) layer = v; else if (c === 67) ps = (parseInt(v, 10) === 1);
+        else if (c === 10) c0[0] = F(v); else if (c === 20) c0[1] = F(v); else if (c === 30) c0[2] = F(v);
+        else if (c === 40) r = F(v); else if (c === 50) a0 = F(v); else if (c === 51) a1 = F(v);
+        else if (c === 210) ext[0] = F(v); else if (c === 220) ext[1] = F(v); else if (c === 230) ext[2] = F(v);
+      }
+      if (!ps && r > 0) {
+        const pts = [];
+        if (t === 'CIRCLE') {
+          for (let q = 0; q < 180; q++) { const an = 2 * Math.PI * q / 180; pts.push([c0[0] + r * Math.cos(an), c0[1] + r * Math.sin(an), c0[2]]); }
+          emit(pts, true, layer, 'CIRCLE', ext);
+        } else {
+          let span = (a1 - a0) * Math.PI / 180;
+          while (span <= 0) span += 2 * Math.PI;
+          const k2 = Math.max(2, Math.ceil(span / DXF_ARC_STEP)), s0 = a0 * Math.PI / 180;
+          for (let q = 0; q <= k2; q++) { const an = s0 + span * q / k2; pts.push([c0[0] + r * Math.cos(an), c0[1] + r * Math.sin(an), c0[2]]); }
+          emit(pts, false, layer, 'ARC', ext);
+        }
+      }
+      i = e; continue;
+    }
+
+    if (t === 'ELLIPSE') {
+      let layer = '0', ps = false, ratio = 1, p0 = 0, p1 = 2 * Math.PI;
+      const c0 = [0, 0, 0], mj = [1, 0, 0];
+      for (let k = s; k < e; k++) {
+        const c = codes[k], v = vals[k];
+        if (c === 8) layer = v; else if (c === 67) ps = (parseInt(v, 10) === 1);
+        else if (c === 10) c0[0] = F(v); else if (c === 20) c0[1] = F(v); else if (c === 30) c0[2] = F(v);
+        else if (c === 11) mj[0] = F(v); else if (c === 21) mj[1] = F(v); else if (c === 31) mj[2] = F(v);
+        else if (c === 40) ratio = F(v); else if (c === 41) p0 = F(v); else if (c === 42) p1 = F(v);
+      }
+      if (!ps) {
+        let span = p1 - p0; while (span <= 0) span += 2 * Math.PI;
+        const full = Math.abs(span - 2 * Math.PI) < 1e-6;
+        const K = Math.max(8, Math.ceil(180 * span / (2 * Math.PI)));
+        const pts = [];
+        for (let q = 0; q < (full ? K : K + 1); q++) {
+          const tt = p0 + span * q / K, ct = Math.cos(tt), sn = Math.sin(tt);
+          pts.push([c0[0] + ct * mj[0] - sn * ratio * mj[1], c0[1] + ct * mj[1] + sn * ratio * mj[0], c0[2]]);
+        }
+        emit(pts, full, layer, 'ELLIPSE');
+      }
+      i = e; continue;
+    }
+
+    if (t === 'SPLINE') {
+      let layer = '0', ps = false, flag = 0, deg = 3;
+      const knots = [], wts = [], ctrl = [], fit = [];
+      let cc = null, ff = null;
+      for (let k = s; k < e; k++) {
+        const c = codes[k], v = vals[k];
+        if (c === 8) layer = v; else if (c === 67) ps = (parseInt(v, 10) === 1);
+        else if (c === 70) flag = parseInt(v, 10) || 0; else if (c === 71) deg = parseInt(v, 10) || 3;
+        else if (c === 40) knots.push(F(v)); else if (c === 41) wts.push(F(v));
+        else if (c === 10) { cc = [F(v), 0, 0]; ctrl.push(cc); } else if (c === 20 && cc) cc[1] = F(v); else if (c === 30 && cc) cc[2] = F(v);
+        else if (c === 11) { ff = [F(v), 0, 0]; fit.push(ff); } else if (c === 21 && ff) ff[1] = F(v); else if (c === 31 && ff) ff[2] = F(v);
+      }
+      if (!ps) {
+        let pts = null;
+        if (ctrl.length > deg && knots.length === ctrl.length + deg + 1) {
+          const w = (wts.length === ctrl.length) ? wts : null;
+          try { pts = dxfSplinePoints(deg, knots, ctrl, w); } catch (_) { pts = null; }
+          if (pts && pts.some(q => !isFinite(q[0]) || !isFinite(q[1]) || !isFinite(q[2]))) pts = null;
+        }
+        if (!pts || pts.length < 2) pts = fit.length >= 2 ? fit : ctrl;
+        emit(pts, !!(flag & 1), layer, 'SPLINE');
+      }
+      i = e; continue;
+    }
+
+    if (t === 'INSERT' || t === '3DFACE' || t === 'HATCH' || t === 'MESH' || t === 'SOLID') bump(st.unsupported, t);
+    i = e;
+  }
+  return { paths, stats: st };
+}
+
+/* ── Rangkai potongan terbuka (ujung ke ujung) ──
+   Menyambung ujung-ujung chain yang berjarak ≤ maxGap, terdekat lebih dulu.
+   Return: { comps:[{pts, closed}], maxJoin }                                             */
+function dxfLinkEnds(chains, maxGap) {
+  const n = chains.length, E = 2 * n;
+  const ex = new Float64Array(E), ey = new Float64Array(E);
+  for (let i = 0; i < n; i++) {
+    const c = chains[i], l = c[c.length - 1];
+    ex[2 * i] = c[0][0]; ey[2 * i] = c[0][1]; ex[2 * i + 1] = l[0]; ey[2 * i + 1] = l[1];
+  }
+  const other = new Int32Array(E), link = new Int32Array(E).fill(-1);
+  for (let e = 0; e < E; e++) other[e] = e ^ 1;
+
+  const cell = Math.max(maxGap, 1e-9), grid = new Map();
+  for (let e = 0; e < E; e++) {
+    const k = Math.floor(ex[e] / cell) + ',' + Math.floor(ey[e] / cell);
+    const a = grid.get(k); if (a) a.push(e); else grid.set(k, [e]);
+  }
+  const pairs = [];
+  for (let e = 0; e < E; e++) {
+    const cx = Math.floor(ex[e] / cell), cy = Math.floor(ey[e] / cell);
+    for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) {
+      const a = grid.get((cx + dx) + ',' + (cy + dy)); if (!a) continue;
+      for (const f of a) {
+        if (f <= e) continue;
+        const d = Math.hypot(ex[e] - ex[f], ey[e] - ey[f]);
+        if (d <= maxGap) pairs.push([d, e, f]);
+      }
+    }
+  }
+  pairs.sort((p, q) => p[0] - q[0]);
+  let maxJoin = 0;
+  for (const [d, a, b] of pairs) {
+    if (link[a] >= 0 || link[b] >= 0) continue;
+    if (other[a] === b) { link[a] = b; link[b] = a; }
+    else {
+      const oa = other[a], ob = other[b];
+      link[a] = b; link[b] = a; other[oa] = ob; other[ob] = oa;
+    }
+    if (d > maxJoin) maxJoin = d;
+  }
+
+  const comps = [], visited = new Uint8Array(n);
+  const walk = (startEnd, isLoop) => {
+    const pts = []; let cur = startEnd;
+    for (;;) {
+      const ci = cur >> 1; visited[ci] = 1;
+      const c = chains[ci];
+      if (cur & 1) for (let q = c.length - 1; q >= 0; q--) pts.push(c[q]);
+      else for (let q = 0; q < c.length; q++) pts.push(c[q]);
+      const nxt = link[cur ^ 1];
+      if (nxt < 0) break;
+      if (visited[nxt >> 1]) break;
+      cur = nxt;
+    }
+    comps.push({ pts, closed: isLoop });
+  };
+  for (let e = 0; e < E; e++) if (link[e] < 0 && !visited[e >> 1]) walk(e, false);
+  for (let i = 0; i < n; i++) if (!visited[i]) walk(2 * i, true);
+  return { comps, maxJoin };
+}
+
+function dxfRingClean(pts) {
+  const out = [];
+  for (const p of pts) {
+    const l = out[out.length - 1];
+    if (!l || Math.abs(l[0] - p[0]) > 1e-9 || Math.abs(l[1] - p[1]) > 1e-9) out.push(p);
+  }
+  while (out.length > 1 && Math.abs(out[0][0] - out[out.length - 1][0]) < 1e-9 && Math.abs(out[0][1] - out[out.length - 1][1]) < 1e-9) out.pop();
+  return out;
+}
+function dxfPerimeter(pts, closed) {
+  let s = 0;
+  for (let i = 1; i < pts.length; i++) s += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+  if (closed) s += Math.hypot(pts[0][0] - pts[pts.length - 1][0], pts[0][1] - pts[pts.length - 1][1]);
+  return s;
+}
+
+/* Rangkai semua jalur pada SATU elevasi menjadi cincin tertutup */
+function dxfStitchLevel(items, tol, stat) {
+  const rings = [];
+  let open = [];
+  for (const it of items) {
+    const pts = it.pts;
+    if (it.closed) { rings.push(pts); continue; }
+    open.push(pts);
+  }
+  const collect = (res, keepOpen) => {
+    for (const c of res.comps) { if (c.closed) rings.push(c.pts); else keepOpen.push(c.pts); }
+  };
+  // Tahap 1: sambung ujung yang berimpit (toleransi kecil)
+  if (open.length) { const nxt = []; const r1 = dxfLinkEnds(open, tol); collect(r1, nxt); stat.joined += open.length - r1.comps.length; open = nxt; }
+  // Tahap 2: tutup celah lebih besar (mis. ramp / potongan hilang)
+  if (open.length) {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    open.forEach(c => c.forEach(p => { if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0]; if (p[1] < minY) minY = p[1]; if (p[1] > maxY) maxY = p[1]; }));
+    const gap = Math.max(tol, Math.hypot(maxX - minX, maxY - minY) * DXF_GAP_FRAC);
+    const nxt = [];
+    const r2 = dxfLinkEnds(open, gap);
+    const before = rings.length;
+    collect(r2, nxt);
+    const nClosedHere = rings.length - before;
+    if (r2.maxJoin > tol * 1.5) { stat.gapClosed += nClosedHere; stat.maxGap = Math.max(stat.maxGap, r2.maxJoin); }
+    open = nxt;
+  }
+  // Tahap 3: rantai yang masih terbuka ditutup garis lurus bila cukup "melingkar"
+  for (const c of open) {
+    const cl = dxfRingClean(c);
+    if (cl.length < 3) { stat.dropped++; continue; }
+    const per = dxfPerimeter(cl, false);
+    const chord = Math.hypot(cl[0][0] - cl[cl.length - 1][0], cl[0][1] - cl[cl.length - 1][1]);
+    if (per > 0 && chord / per <= DXF_CHORD_MAX) { rings.push(cl); stat.chordClosed++; stat.maxGap = Math.max(stat.maxGap, chord); }
+    else stat.dropped++;
+  }
+  return rings;
+}
+
+/* Titik di DALAM poligon (garis pindai terlebar) — dipakai untuk tes kontainmen */
+function dxfPolyInterior(pts) {
+  const bb = polyBBox(pts);
+  let best = null, bestW = -1;
+  const fr = [0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74, 0.18, 0.82];
+  const n = pts.length;
+  for (const f of fr) {
+    const y = bb.minY + (bb.maxY - bb.minY) * f;
+    const xs = [];
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+      const yi = pts[i][1], yj = pts[j][1];
+      if ((yi > y) !== (yj > y)) xs.push(pts[i][0] + (y - yi) * (pts[j][0] - pts[i][0]) / (yj - yi));
+    }
+    xs.sort((a, b) => a - b);
+    for (let k = 0; k + 1 < xs.length; k += 2) {
+      const w = xs[k + 1] - xs[k];
+      if (w > bestW) { bestW = w; best = [(xs[k] + xs[k + 1]) / 2, y]; }
+    }
+  }
+  return best || polyCentroid(pts);
+}
+
+/* Douglas-Peucker untuk cincin tertutup (hanya bila titik banyak) */
+function dxfSimplifyRing(pts, tol) {
+  const n = pts.length;
+  if (n <= 200) return pts;
+  let far = 0, fd = -1;
+  for (let i = 1; i < n; i++) { const d = dist2(pts[0], pts[i]); if (d > fd) { fd = d; far = i; } }
+  const keep = new Uint8Array(n); keep[0] = 1; keep[far] = 1;
+  const stack = [[0, far], [far, n]];
+  while (stack.length) {
+    const [s, e] = stack.pop();
+    const A = pts[s], B = pts[e % n];
+    const dx = B[0] - A[0], dy = B[1] - A[1], L = Math.hypot(dx, dy);
+    let md = -1, mi = -1;
+    for (let i = s + 1; i < e; i++) {
+      const P = pts[i];
+      const d = L < 1e-12 ? Math.hypot(P[0] - A[0], P[1] - A[1]) : Math.abs(dx * (A[1] - P[1]) - dy * (A[0] - P[0])) / L;
+      if (d > md) { md = d; mi = i; }
+    }
+    if (md > tol && mi > 0) { keep[mi] = 1; stack.push([s, mi], [mi, e]); }
+  }
+  return pts.filter((_, i) => keep[i]);
+}
+
+/* ── 2c. Bangun "kolam" dari hirarki kontainmen ──
+   Kontur yang berada di DALAM kontur lain (dan elevasinya ≤ elevasi kontur luar) satu kolam.
+   Kontur terluar tanpa induk = akar 1 kolam. Cocok untuk pit besar berlekuk maupun
+   beberapa kolam dalam 1 file (kolam terpisah = pohon terpisah).                         */
+function dxfBuildPonds(rings) {
+  rings.sort((a, b) => {
+    const r = (a.area - b.area) / Math.max(a.area, b.area);
+    return Math.abs(r) > 1e-4 ? b.area - a.area : b.z - a.z;
+  });
+  const N = rings.length, parent = new Int32Array(N).fill(-1), root = new Int32Array(N);
+  for (let j = 0; j < N; j++) {
+    const rj = rings[j];
+    for (let i = j - 1; i >= 0; i--) {
+      const ri = rings[i];
+      if (ri.z < rj.z - 1e-6) continue;
+      const bb = ri.bb;
+      if (rj.ip[0] < bb.minX || rj.ip[0] > bb.maxX || rj.ip[1] < bb.minY || rj.ip[1] > bb.maxY) continue;
+      if (pointInPoly(rj.ip, ri.pts)) { parent[j] = i; break; }
+    }
+    root[j] = parent[j] < 0 ? j : root[parent[j]];
+  }
+  const groups = new Map();
+  for (let j = 0; j < N; j++) { const g = groups.get(root[j]); if (g) g.push(rings[j]); else groups.set(root[j], [rings[j]]); }
+  return Array.from(groups.values());
+}
+
+/* ── Luas 1 elevasi dengan pulau/lubang (even-odd nesting) ── */
+function dxfLevelArea(rings) {
+  if (rings.length === 1) return shoelaceArea(rings[0]);
+  const info = rings.map(pts => ({ pts, area: shoelaceArea(pts), bb: polyBBox(pts), ip: dxfPolyInterior(pts) }));
+  info.sort((a, b) => b.area - a.area);
+  let total = 0;
+  for (let j = 0; j < info.length; j++) {
+    let depth = 0;
+    for (let i = 0; i < j; i++) {
+      const bb = info[i].bb;
+      if (info[j].ip[0] < bb.minX || info[j].ip[0] > bb.maxX || info[j].ip[1] < bb.minY || info[j].ip[1] > bb.maxY) continue;
+      if (pointInPoly(info[j].ip, info[i].pts)) depth++;
+    }
+    total += (depth % 2 === 0) ? info[j].area : -info[j].area;
+  }
+  return Math.max(total, 0);
+}
+
+/* ── Pipeline lengkap: teks DXF → daftar kolam ──
+   return { ponds:[{contours:{z:[ring,...]}, notes:[]}], warnings:[], summary:'' }          */
+function dxfAnalyze(text) {
+  const tok = dxfTokenize(text);
+  const ex = dxfExtractPaths(tok);
+  const warnings = [];
+
+  // 1) Pisahkan jalur datar (kontur) dari jalur miring
+  let items = [], sloped = 0;
+  for (const p of ex.paths) {
+    let zmin = Infinity, zmax = -Infinity, zs = 0;
+    for (const q of p.pts) { if (q[2] < zmin) zmin = q[2]; if (q[2] > zmax) zmax = q[2]; zs += q[2]; }
+    if (zmax - zmin > DXF_Z_FLAT_TOL) { sloped++; continue; }
+    items.push({ z: zs / p.pts.length, pts: p.pts.map(q => [q[0], q[1]]), closed: p.closed, layer: p.layer, n: 1 });
+  }
+  let zFromLayer = false;
+  {
+    const zset = new Set(items.map(it => Math.round(it.z * 100)));
+    if (items.length >= 2 && zset.size < 2) {
+      const lz = items.map(it => { const m = /(-?\d+(?:[.,]\d+)?)/.exec(it.layer || ''); return m ? parseFloat(m[1].replace(',', '.')) : null; });
+      const ok = lz.filter(v => v !== null);
+      if (ok.length >= items.length * 0.6 && new Set(ok.map(v => Math.round(v * 100))).size >= 2) {
+        items = items.filter((_, i) => lz[i] !== null).map((it, _i) => it);
+        const lzOk = lz.filter(v => v !== null);
+        items.forEach((it, i) => { it.z = lzOk[i]; });
+        zFromLayer = true;
+        warnings.push('Semua Z = 0 — elevasi diambil dari angka pada nama layer.');
+      }
+    }
+  }
+  if (sloped) warnings.push(`${sloped} garis miring (Z tidak konstan, mis. ramp/saluran) diabaikan.`);
+  Object.keys(ex.stats.unsupported).forEach(k => warnings.push(`${ex.stats.unsupported[k]}× ${k} tidak dibaca (EXPLODE dulu di CAD bila berisi kontur).`));
+  if (!items.length) return { ponds: [], warnings, summary: 'Tidak ada garis kontur datar yang ditemukan.' };
+
+  // 2) Toleransi berbasis ukuran gambar
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  items.forEach(it => it.pts.forEach(p => { if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0]; if (p[1] < minY) minY = p[1]; if (p[1] > maxY) maxY = p[1]; }));
+  const diag = Math.hypot(maxX - minX, maxY - minY) || 1;
+  const tol = Math.min(0.05, Math.max(0.001, diag * 1e-5));
+  const minArea = Math.max(0.01, diag * diag * 1e-10);
+
+  // 3) Kelompokkan per elevasi (Z berdekatan digabung)
+  items.sort((a, b) => a.z - b.z);
+  const levels = [];
+  for (const it of items) {
+    const L = levels[levels.length - 1];
+    if (L && it.z - L.last <= DXF_Z_MERGE_TOL) { L.items.push(it); L.last = it.z; L.sum += it.z; }
+    else levels.push({ items: [it], last: it.z, sum: it.z });
+  }
+
+  // 4) Rangkai → cincin per elevasi
+  const stat = { joined: 0, gapClosed: 0, chordClosed: 0, dropped: 0, maxGap: 0 };
+  let all = [];
+  for (const L of levels) {
+    const z = Math.round((L.sum / L.items.length) * 100) / 100;
+    const rs = dxfStitchLevel(L.items, tol, stat);
+    const seen = [];
+    for (const raw of rs) {
+      const pts = dxfRingClean(raw);
+      if (pts.length < 3) continue;
+      const area = shoelaceArea(pts), per = dxfPerimeter(pts, true);
+      if (area < minArea || area / (per * per) < 1e-6) continue;
+      const bb = polyBBox(pts);
+      if (seen.some(s => Math.abs(s.area - area) <= 1e-6 * area && Math.abs(s.bb.minX - bb.minX) < tol * 4 && Math.abs(s.bb.maxY - bb.maxY) < tol * 4)) continue; // duplikat
+      const ring = { z, pts, area, bb, ip: dxfPolyInterior(pts) };
+      seen.push(ring); all.push(ring);
+    }
+  }
+  if (stat.gapClosed) warnings.push(`${stat.gapClosed} kontur ditutup otomatis pada celah (maks ${stat.maxGap.toFixed(1)} m).`);
+  if (stat.chordClosed) warnings.push(`${stat.chordClosed} kontur terbuka ditutup dengan garis lurus (maks ${stat.maxGap.toFixed(1)} m) — cek preview.`);
+  if (stat.dropped) warnings.push(`${stat.dropped} garis terbuka yang tidak membentuk kontur tertutup diabaikan.`);
+
+  // 5) Hirarki kontainmen → kolam
+  const groups = all.length ? dxfBuildPonds(all) : [];
+  const ponds = [];
+  let orphan = 0;
+  for (const g of groups) {
+    const zs = Array.from(new Set(g.map(r => r.z))).sort((a, b) => a - b);
+    if (zs.length < 2) { orphan += g.length; continue; }
+    const notes = [];
+    // buang elevasi pencilan yang terpisah jauh dari kelompok utama (mis. objek tersasar di Z=0)
+    let lo = 0, hi = zs.length - 1;
+    if (zs.length >= 4) {
+      const gaps = []; for (let i = 1; i < zs.length; i++) gaps.push(zs[i] - zs[i - 1]);
+      const med = gaps.slice().sort((a, b) => a - b)[gaps.length >> 1] || 1e-9;
+      while (hi - lo >= 3 && zs[lo + 1] - zs[lo] > med * 10) { notes.push(`Kontur El. ${zs[lo]} dibuang (terpisah jauh dari kontur lain).`); lo++; }
+      while (hi - lo >= 3 && zs[hi] - zs[hi - 1] > med * 10) { notes.push(`Kontur El. ${zs[hi]} dibuang (terpisah jauh dari kontur lain).`); hi--; }
+    }
+    const zLo = zs[lo], zHi = zs[hi];
+    const contours = {};
+    for (const r of g) {
+      if (r.z < zLo || r.z > zHi) continue;
+      (contours[r.z] = contours[r.z] || []).push(r.pts);
+    }
+    const dpTol = Math.max(0.005, diag * 2e-6);
+    Object.keys(contours).forEach(k => { contours[k] = contours[k].map(p => dxfSimplifyRing(p, dpTol)); });
+    ponds.push({ contours, notes, topArea: Math.max(...g.map(r => r.area)) });
+  }
+  ponds.sort((a, b) => b.topArea - a.topArea);
+  if (orphan) warnings.push(`${orphan} kontur tunggal tidak terhubung ke kolam mana pun (hanya 1 elevasi) diabaikan.`);
+
+  const nRings = all.length, nLv = levels.length;
+  const summary = `${ex.paths.length} entitas → ${nLv} elevasi · ${nRings} kontur tertutup · ${ponds.length} kolam` +
+    (stat.joined ? ` · ${stat.joined} sambungan otomatis` : '') + (zFromLayer ? ' · Z dari layer' : '');
+  return { ponds, warnings, summary };
+}
+
+/* Pemakaian bersama oleh loader Sediment Pond & Retention Pond */
+function dxfLoadText(text, fileName) {
+  const A = dxfAnalyze(text);
+  const results = [];
+  A.ponds.forEach((p, ci) => {
+    const r = dxfComputeVolume(p.contours);
+    if (!r.intervals.length) return;
+    r.fileName = A.ponds.length > 1 ? `${fileName} — Kolam ${ci + 1}/${A.ponds.length}` : fileName;
+    r.contours = p.contours;
+    const notes = (p.notes || []).slice();
+    const a0 = r.areas[r.elevs[0]], a1 = r.areas[r.elevs[r.elevs.length - 1]];
+    if (a1 < a0) notes.push('Luas mengecil ke atas — bentuk ini kemungkinan gundukan, bukan cekungan kolam.');
+    if (notes.length) r.notes = notes;
+    results.push(r);
+  });
+  return { results, summary: A.summary, warnings: A.warnings };
+}
+
+function dxfNotesHTML(r) {
+  if (!r || !r.notes || !r.notes.length) return '';
+  return `<div style="margin:-4px 0 10px;padding:6px 10px;background:rgba(243,156,18,0.10);border-left:3px solid #f39c12;border-radius:4px;font-size:11px;color:var(--muted)">${r.notes.map(n => '⚠ ' + String(n).replace(/</g, '&lt;')).join('<br>')}</div>`;
 }
 
 /* ── 2. Shoelace (Gauss) area ── */
@@ -23657,127 +24624,20 @@ function pointInPoly(pt, poly) {
   return inside;
 }
 
-/* ── 2c. Cluster kontur menjadi beberapa "kolam" ──
-   Pendekatan: clustering spasial GLOBAL berbasis jarak-terdekat (single-linkage) antar SEMUA
-   poligon dari SEMUA elevasi. Threshold ditentukan dari RELATIVE GAP terbesar dalam distribusi
-   jarak (rasio d[k+1]/d[k]), bukan absolute gap. Ini menangani kasus kolam berdekatan yang
-   jarak antar-kolam-nya lebih kecil dari absolute gap terbesar tapi masih jauh lebih besar
-   dari jarak intra-kolam (bottom↔top dalam kolam yang sama).
-   Fallback ke layer-name grouping jika DXF menggunakan konvensi layer per kolam. */
-function dxfClusterPonds(contours, layerMap) {
-  // ── Coba grouping berbasis layer name terlebih dahulu ──
-  // layerMap: { zRound: { layerName: [[x,y],...] } }  (opsional, diisi oleh parser baru)
-  // Jika tersedia dan ada >1 layer unik → gunakan sebagai cluster
-  if (layerMap && typeof layerMap === 'object') {
-    const layerNames = new Set();
-    Object.values(layerMap).forEach(lm => Object.keys(lm).forEach(l => layerNames.add(l)));
-    if (layerNames.size > 1) {
-      // Build cluster per layer
-      const layerContours = {};
-      Object.entries(layerMap).forEach(([zStr, lm]) => {
-        const z = Number(zStr);
-        Object.entries(lm).forEach(([lyr, ptsList]) => {
-          if (!layerContours[lyr]) layerContours[lyr] = {};
-          if (!layerContours[lyr][z]) layerContours[lyr][z] = [];
-          ptsList.forEach(pts => layerContours[lyr][z].push(pts));
-        });
-      });
-      const clusters = Object.values(layerContours).filter(c => Object.keys(c).length >= 2);
-      if (clusters.length > 1) return clusters;
-    }
-  }
-
-  // ── Fallback: clustering spasial berbasis jarak centroid ──
-  // Kumpulkan semua poligon jadi list flat: {z, pts, centroid}
-  const items = [];
-  Object.keys(contours).filter(k => !isNaN(Number(k))).forEach(zKey => {
-    const z = Number(zKey);
-    (contours[zKey] || []).forEach(pts => {
-      if (pts.length < 3) return;
-      items.push({ z, pts, centroid: polyCentroid(pts) });
-    });
-  });
-  const n = items.length;
-  if (n === 0) return [];
-  if (n === 1) return [{ [items[0].z]: [items[0].pts] }];
-
-  // Matriks jarak (euclid antar centroid) — n biasanya kecil (puluhan kontur), aman O(n^2)
-  const D = Array.from({length:n}, ()=>new Array(n).fill(0));
-  for (let i=0;i<n;i++) for (let j=i+1;j<n;j++) {
-    const d = Math.sqrt(dist2(items[i].centroid, items[j].centroid));
-    D[i][j] = D[j][i] = d;
-  }
-
-  const allDists = [];
-  for (let i=0;i<n;i++) for (let j=i+1;j<n;j++) allDists.push(D[i][j]);
-  allDists.sort((a,b)=>a-b);
-
-  // ── Threshold dari RELATIVE GAP (rasio) — jauh lebih robust dari absolute gap ──
-  // Kasus: kolam berdekatan, jarak intra-kolam ~3m, jarak inter-kolam ~30m → rasio 10x
-  // Cari d[k+1]/d[k] > MIN_RATIO_THRESHOLD → threshold = d[k] (semua jarak <= d[k] masuk 1 klaster)
-  const MIN_RATIO = 3.0; // jarak antar-kolam minimal 3x jarak intra-kolam
-  let threshold = Infinity;
-  if (allDists.length >= 2) {
-    // Scan dari awal: cari lompatan RELATIF pertama yang signifikan
-    let bestRatio = 0, bestIdx = -1;
-    for (let k = 0; k < allDists.length - 1; k++) {
-      if (allDists[k] === 0) continue;
-      const ratio = allDists[k+1] / allDists[k];
-      if (ratio > bestRatio) { bestRatio = ratio; bestIdx = k; }
-    }
-    if (bestIdx >= 0 && bestRatio >= MIN_RATIO) {
-      // Threshold = nilai jarak tepat sebelum lompatan relatif besar
-      threshold = allDists[bestIdx];
-    }
-    // Sanity check: jika threshold terlalu kecil (< 0.1m) akibat duplikat koordinat, naikkan sedikit
-    if (threshold < 0.1) threshold = allDists[Math.min(bestIdx+1, allDists.length-1)] * 0.5;
-  }
-
-  // Union-Find dengan threshold jarak
-  const parent = items.map((_,i)=>i);
-  function find(i){ while(parent[i]!==i){ parent[i]=parent[parent[i]]; i=parent[i]; } return i; }
-  function union(i,j){ const ri=find(i), rj=find(j); if(ri!==rj) parent[ri]=rj; }
-  for (let i=0;i<n;i++) for (let j=i+1;j<n;j++) {
-    if (D[i][j] <= threshold) union(i,j);
-  }
-
-  // Kelompokkan berdasarkan root cluster
-  const groups = {};
-  items.forEach((it,i)=>{
-    const r = find(i);
-    if (!groups[r]) groups[r] = [];
-    groups[r].push(it);
-  });
-
-  // Bangun kembali struktur contours per grup (kolam) — gabungkan poligon dg elevasi sama dalam 1 grup
-  return Object.values(groups).map(groupItems => {
-    const contoursOfGroup = {};
-    groupItems.forEach(it=>{
-      if(!contoursOfGroup[it.z]) contoursOfGroup[it.z] = [];
-      contoursOfGroup[it.z].push(it.pts);
-    });
-    return contoursOfGroup;
-  });
-}
-
 /* ── 3. Volume prismatoid antar 2 elevasi ── */
 function prismatoidVol(A1, A2, h) {
   return (h / 3) * (A1 + A2 + Math.sqrt(A1 * A2));
 }
 
-/* ── 4. Hitung semua interval dari data kontur (untuk SATU kolam/cluster) ── */
+/* ── 4. Hitung semua interval dari data kontur (untuk SATU kolam/cluster) ──
+   Luas per elevasi = jumlah semua cincin luar − pulau/lubang di dalamnya (even-odd).       */
 function dxfComputeVolume(contours) {
   const elevs = Object.keys(contours).filter(k=>!isNaN(Number(k))).map(Number).sort((a,b)=>a-b);
   if (elevs.length < 2) return { elevs, areas:{}, intervals:[], totalVol:0 };
 
-  // Hitung luas per elevasi (ambil poligon terbesar jika multiple)
   const areas = {};
-  elevs.forEach(z => {
-    const polys = contours[z];
-    areas[z] = Math.max(...polys.map(pts => shoelaceArea(pts)));
-  });
+  elevs.forEach(z => { areas[z] = dxfLevelArea(contours[z]); });
 
-  // Volume per interval
   const intervals = [];
   let totalVol = 0;
   for (let i = 0; i < elevs.length - 1; i++) {
@@ -23827,13 +24687,14 @@ function dxfPreviewSVG(contours, elevs, areas) {
     (contours[z]||[]).forEach(pts => {
       if(pts.length < 2) return;
       const d = pts.map((p,j)=>`${j===0?'M':'L'}${tx(p[0]).toFixed(1)},${ty(p[1]).toFixed(1)}`).join(' ')+'Z';
-      paths += `<path d="${d}" fill="none" stroke="${colors[ei]}" stroke-width="${1.5 + ei*0.2}" opacity="0.85"/>`;
+      paths += `<path d="${d}" fill="none" stroke="${colors[ei]}" stroke-width="${nE>12 ? 0.9 : Math.min(3, 1.5 + ei*0.2)}" opacity="0.85"/>`;
     });
-    // Label elevasi di titik paling kanan kontur
+    // Label elevasi di titik paling kanan kontur (dijarangkan bila kontur banyak)
     const allPts = (contours[z]||[]).flat();
-    if(allPts.length) {
+    const lblStep = nE>12 ? Math.ceil(nE/4) : 1;
+    if(allPts.length && (ei % lblStep === 0 || ei === nE-1)) {
       const rightPt = allPts.reduce((m,p)=>p[0]>m[0]?p:m, allPts[0]);
-      paths += `<text x="${(tx(rightPt[0])+4).toFixed(1)}" y="${ty(rightPt[1]).toFixed(1)}" font-size="9" fill="${colors[ei]}" font-family="monospace" dominant-baseline="middle">${z} m</text>`;
+      paths += `<text x="${(tx(rightPt[0])+4).toFixed(1)}" y="${ty(rightPt[1]).toFixed(1)}" font-size="8" fill="${colors[ei]}" stroke="var(--bg-secondary)" stroke-width="2.5" paint-order="stroke" font-family="monospace" dominant-baseline="middle">${z} m</text>`;
     }
   });
 
@@ -24019,7 +24880,7 @@ function rpDxfLoad(uid, inputEl) {
   rpDxfEnsureArray(u);
 
   let remaining = files.length;
-  let okCount = 0, errMsgs = [];
+  let okCount = 0, errMsgs = [], infoMsgs = [];
 
   const finish = () => {
     remaining--;
@@ -24030,7 +24891,7 @@ function rpDxfLoad(uid, inputEl) {
       if(errMsgs.length) {
         statusEl.innerHTML = `<span style="color:#e74c3c">⚠ ${okCount} file OK, ${errMsgs.length} gagal: ${errMsgs.join('; ')}</span>`;
       } else {
-        statusEl.textContent = '';
+        statusEl.innerHTML = infoMsgs.map(m=>`<div style="color:var(--muted);font-size:11px">✓ ${String(m).replace(/</g,'&lt;')}</div>`).join('');
       }
     }
     // Reset input agar file yang sama bisa diupload ulang jika perlu
@@ -24043,41 +24904,14 @@ function rpDxfLoad(uid, inputEl) {
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
-        const text = e.target.result;
-        const parsed = dxfParsePOLYLINE(text);
-        const contours = parsed.contours;
-        const layerMapParsed = parsed.layerMap;
-        const elevKeys = Object.keys(contours).filter(k=>!isNaN(Number(k))).map(Number).sort((a,b)=>a-b);
-
-        if(elevKeys.length < 2) {
-          errMsgs.push(`${file.name}: minimal 2 kontur tidak ditemukan`);
+        const out = dxfLoadText(e.target.result, file.name);
+        if(!out.results.length) {
+          errMsgs.push(`${file.name}: minimal 2 elevasi kontur tertutup tidak ditemukan` + (out.warnings.length ? ` (${out.warnings.join(' ')})` : ''));
           finish();
           return;
         }
-
-        // Deteksi otomatis apakah 1 file DXF berisi lebih dari 1 kolam terpisah
-        // (mis. beberapa kolam retensi dalam 1 gambar) via layer-based grouping atau clustering spasial.
-        const clusters = dxfClusterPonds(contours, layerMapParsed);
-
-        if (clusters.length <= 1) {
-          // Hanya 1 kolam — perilaku seperti sebelumnya
-          const result = dxfComputeVolume(contours);
-          result.fileName = file.name;
-          result.contours = contours;
-          rpDxfEnsureArray(u).push(result);
-        } else {
-          // Lebih dari 1 kolam terdeteksi dalam 1 file — pecah jadi beberapa entri,
-          // masing-masing dihitung volumenya sendiri lalu otomatis dijumlahkan (via dxfResults array).
-          clusters.forEach((clusterContours, ci) => {
-            const clusterElevKeys = Object.keys(clusterContours).map(Number).filter(k=>!isNaN(k)).sort((a,b)=>a-b);
-            if (clusterElevKeys.length < 2) return; // skip cluster yang tidak lengkap (misal noise)
-            const result = dxfComputeVolume(clusterContours);
-            result.fileName = `${file.name} — Kolam ${ci+1}/${clusters.length}`;
-            result.contours = clusterContours;
-            rpDxfEnsureArray(u).push(result);
-          });
-        }
-
+        out.results.forEach(r => rpDxfEnsureArray(u).push(r));
+        infoMsgs.push(`${file.name}: ${out.summary}` + (out.warnings.length ? ' — ⚠ ' + out.warnings.join(' ') : ''));
         okCount++;
         finish();
       } catch(err) {
@@ -24120,6 +24954,7 @@ function rpDxfRenderResult(uid) {
       </div>
       <button onclick="rpDxfRemoveOne(${uid},${idx})" style="padding:2px 8px;font-size:11px;cursor:pointer;background:rgba(231,76,60,0.1);color:#e74c3c;border:1px solid #e74c3c;border-radius:4px">✕ Hapus file ini</button>
     </div>
+    ${dxfNotesHTML(r)}
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
       <div style="background:var(--bg-secondary);border-radius:6px;padding:8px 14px;flex:1;min-width:110px">
         <div style="font-size:10px;color:var(--muted);margin-bottom:2px">Volume kolam ini</div>
@@ -24298,7 +25133,7 @@ function spDxfLoad(uid, inputEl) {
   spDxfEnsureArray(u);
 
   let remaining = files.length;
-  let okCount = 0, errMsgs = [];
+  let okCount = 0, errMsgs = [], infoMsgs = [];
 
   const finish = () => {
     remaining--;
@@ -24308,7 +25143,7 @@ function spDxfLoad(uid, inputEl) {
       if(errMsgs.length) {
         statusEl.innerHTML = `<span style="color:#e74c3c">⚠ ${okCount} file OK, ${errMsgs.length} gagal: ${errMsgs.join('; ')}</span>`;
       } else {
-        statusEl.textContent = '';
+        statusEl.innerHTML = infoMsgs.map(m=>`<div style="color:var(--muted);font-size:11px">✓ ${String(m).replace(/</g,'&lt;')}</div>`).join('');
       }
     }
     inputEl.value = '';
@@ -24320,36 +25155,14 @@ function spDxfLoad(uid, inputEl) {
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
-        const text = e.target.result;
-        const parsed = dxfParsePOLYLINE(text);
-        const contours = parsed.contours;
-        const layerMapParsed = parsed.layerMap;
-        const elevKeys = Object.keys(contours).filter(k=>!isNaN(Number(k))).map(Number).sort((a,b)=>a-b);
-
-        if(elevKeys.length < 2) {
-          errMsgs.push(`${file.name}: minimal 2 kontur tidak ditemukan`);
+        const out = dxfLoadText(e.target.result, file.name);
+        if(!out.results.length) {
+          errMsgs.push(`${file.name}: minimal 2 elevasi kontur tertutup tidak ditemukan` + (out.warnings.length ? ` (${out.warnings.join(' ')})` : ''));
           finish();
           return;
         }
-
-        const clusters = dxfClusterPonds(contours, layerMapParsed);
-
-        if (clusters.length <= 1) {
-          const result = dxfComputeVolume(contours);
-          result.fileName = file.name;
-          result.contours = contours;
-          spDxfEnsureArray(u).push(result);
-        } else {
-          clusters.forEach((clusterContours, ci) => {
-            const clusterElevKeys = Object.keys(clusterContours).map(Number).filter(k=>!isNaN(k)).sort((a,b)=>a-b);
-            if (clusterElevKeys.length < 2) return;
-            const result = dxfComputeVolume(clusterContours);
-            result.fileName = `${file.name} — Kolam ${ci+1}/${clusters.length}`;
-            result.contours = clusterContours;
-            spDxfEnsureArray(u).push(result);
-          });
-        }
-
+        out.results.forEach(r => spDxfEnsureArray(u).push(r));
+        infoMsgs.push(`${file.name}: ${out.summary}` + (out.warnings.length ? ' — ⚠ ' + out.warnings.join(' ') : ''));
         okCount++;
         finish();
       } catch(err) {
@@ -24392,6 +25205,7 @@ function spDxfRenderResult(uid) {
       </div>
       <button onclick="spDxfRemoveOne(${uid},${idx})" style="padding:2px 8px;font-size:11px;cursor:pointer;background:rgba(231,76,60,0.1);color:#e74c3c;border:1px solid #e74c3c;border-radius:4px">✕ Hapus file ini</button>
     </div>
+    ${dxfNotesHTML(r)}
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
       <div style="background:var(--bg-secondary);border-radius:6px;padding:8px 14px;flex:1;min-width:110px">
         <div style="font-size:10px;color:var(--muted);margin-bottom:2px">Volume kolam ini</div>
