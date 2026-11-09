@@ -1243,6 +1243,62 @@ body.dark #page-evaporation #eva-sensitivity tr:hover td { background: #162030; 
   letter-spacing: 0.5px;
 }
 
+
+/* ══════════ Faktor Erosivitas Hujan (R) ══════════ */
+.ero-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.ero-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ero-seg{display:inline-flex;padding:3px;border-radius:999px;background:var(--bg2);border:1px solid var(--border)}
+.ero-seg-btn{border:0;background:transparent;color:var(--muted);font:600 11.5px var(--mono);padding:6px 16px;border-radius:999px;cursor:pointer;transition:background .15s,color .15s}
+.ero-seg-btn:hover:not(.active){color:var(--text)}
+.ero-seg-btn.active{background:var(--blue);color:#fff;box-shadow:0 1px 6px rgba(26,127,212,.35)}
+.ero-auto{display:inline-flex;align-items:center;gap:6px;font:600 11.5px var(--mono);padding:7px 14px;border-radius:8px;border:1.5px solid var(--blue);background:var(--blue-soft);color:var(--blue2);cursor:pointer;transition:all .15s}
+.ero-auto:hover{background:var(--blue);color:#fff}
+.ero-formula{grid-template-columns:auto 1fr;gap:8px 24px;align-items:center;background:var(--blue-soft);border:1px solid var(--border2);border-radius:var(--rs);padding:12px 18px;margin-bottom:14px;display:grid}
+.ero-eq{font:700 15px var(--mono);color:var(--blue2);white-space:nowrap}
+.ero-legend{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:11px;color:var(--muted)}
+.ero-legend b{color:var(--text);margin-right:4px}
+.ero-desc{grid-column:1/-1;font-size:11px;line-height:1.6;color:var(--muted);border-top:1px dashed var(--border2);padding-top:8px}
+.ero-desc b{color:var(--text)}
+.ero-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.ero-tile{background:var(--card2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 14px;min-width:0}
+.ero-tile .l{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ero-tile .v{font:800 19px var(--mono);color:var(--text);margin:2px 0;font-variant-numeric:tabular-nums}
+.ero-tile .s{font-size:11px;color:var(--muted)}
+.ero-tile.accent{border-color:var(--orange)}
+.ero-tile.accent .v{color:var(--orange)}
+.ero-empty{grid-column:1/-1;font-size:12px;color:var(--muted);padding:10px 4px}
+.ero-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--rs)}
+.ero-table{width:100%;min-width:560px;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
+.ero-table th{background:var(--bg2);padding:9px 14px;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--blue2);text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}
+.ero-table th i{font-style:normal;text-transform:none;font-weight:600;letter-spacing:0;opacity:.8}
+.ero-table th.l,.ero-table td.l{text-align:left;width:22%}
+.ero-table th.r-col{color:var(--orange);text-transform:none;font-size:12.5px}
+.ero-table td{padding:3px 14px;border-bottom:1px solid var(--border);text-align:right;font:12.5px var(--mono);color:var(--text)}
+.ero-table td.l{font-weight:600}
+.ero-table tbody tr:nth-child(even){background:var(--card2)}
+.ero-table tbody tr:hover{background:var(--blue-soft)}
+.ero-in{display:block;margin-left:auto;width:100%;max-width:120px;box-sizing:border-box;text-align:right;font:12.5px var(--mono);font-variant-numeric:tabular-nums;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);transition:border-color .15s,box-shadow .15s}
+.ero-in:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+.ero-in::placeholder{color:var(--muted);opacity:.6}
+.ero-mm{color:var(--muted)}
+.ero-rbar{position:relative;height:24px;display:flex;align-items:center;justify-content:flex-end;border-radius:5px;overflow:hidden}
+.ero-rbar-fill{position:absolute;left:0;top:3px;bottom:3px;background:var(--orange);opacity:.16;border-radius:4px;transition:width .25s}
+.ero-rval{position:relative;font-weight:700;color:var(--orange);padding-right:4px}
+.ero-table tfoot td{background:var(--bg2);font-weight:700;font-size:12.5px;border-bottom:0;border-top:2px solid var(--border);padding:11px 14px;text-align:left}
+.ero-table tfoot td.ero-total{text-align:right;color:var(--orange);font-weight:800;font-size:14px;padding-right:18px}
+.ero-foot{margin-top:10px;font-size:10.5px;color:var(--muted);line-height:1.6}
+@media (max-width:900px){.ero-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.ero-formula{grid-template-columns:1fr}}
+
+/* ══════════ Stepper sejajar judul halaman ══════════ */
+.page-header.has-stepper{align-items:center;flex-wrap:wrap;gap:12px 28px;margin-bottom:16px;padding-bottom:12px}
+.page-header.has-stepper .eva-wiz-tabs{margin:0 0 0 auto;max-width:none;flex:0 1 auto;justify-content:flex-end;flex-wrap:nowrap}
+.page-header.has-stepper .eva-wiz-tab{flex-direction:row;gap:7px}
+.page-header.has-stepper .eva-wiz-num{width:26px;height:26px;font-size:12px}
+.page-header.has-stepper .eva-wiz-label{font-size:11.5px}
+.page-header.has-stepper .eva-wiz-line{width:clamp(10px,1.4vw,26px);margin:0 6px}
+@media (max-width:1500px){.page-header.has-stepper .eva-wiz-tab:not(.active) .eva-wiz-label{display:none}}
+@media (max-width:1000px){.page-header.has-stepper .eva-wiz-tabs{margin-left:0;width:100%;justify-content:flex-start}}
+
 /* ── Evaporation Wizard (4-step) ── */
 .eva-wiz-tabs {
   display: flex;
@@ -1627,9 +1683,11 @@ body > * { position: relative; z-index: 1; }
 (function(){
   var saved = localStorage.getItem('hm-dark');
   var isDarkInit = saved !== null ? saved === 'true' : true;
-  if (isDarkInit) document.body.classList.add('dark');
-  // Sync topbar button once DOM ready
+  // body belum ada saat skrip ini jalan di <head> → terapkan saat DOM siap
+  document.documentElement.classList.toggle('dark-pre', isDarkInit);
   document.addEventListener('DOMContentLoaded', function(){
+    document.body.classList.toggle('dark', isDarkInit);
+    try { isDark = isDarkInit; } catch(e) {}
     var icon  = document.getElementById('theme-icon');
     var label = document.getElementById('theme-label');
     if (icon)  icon.textContent  = isDarkInit ? '🌙' : '☀';
@@ -2317,6 +2375,805 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
 .ch-kpi-val { font-size:17px; font-weight:800; font-family:var(--head); line-height:1; }
 .ch-kpi-unit { font-size:9px; color:var(--muted); margin-top:2px; }
 </style>
+<style id="hydrosan-theme-v3">
+/* ═════════════════════════════════════════════════════════════
+   HYDROSAN THEME v3 — "Deep Ocean" (dark) & "Clear Water" (light)
+   Lapisan override: dimuat terakhir, tidak mengubah logika app.
+═════════════════════════════════════════════════════════════ */
+
+/* ── DARK: deep ocean navy, permukaan berlapis, aksen biru-cyan + tanah ── */
+body.dark {
+  --bg:#070d18; --bg2:#0d1626; --sidebar:#0a1220;
+  --card:rgba(24,38,63,0.74); --card2:rgba(24,38,63,0.46);
+  --border:rgba(130,175,235,0.15); --border2:rgba(90,162,240,0.40);
+  --text:#eaf1fb; --muted:#9fb2ca; --light:#8296b0;
+  --blue:#5aa2f0; --blue2:#9ccbff; --blue3:#3b82d6;
+  --blue-grad:linear-gradient(135deg,#1a56a8 0%,#2468c4 55%,#2f7ad8 100%);
+  --blue-grad2:var(--blue-grad);
+  --blue-soft:rgba(70,140,230,0.17);
+  --brown:#e0a46b; --brown2:#f0c08e; --brown-soft:rgba(224,164,107,0.15);
+  --green:#e0a46b; --green2:#f0c08e;
+  --orange:#f2ab60; --red:#ff7b7b; --yellow:#f1d462; --teal:#4fd1c5;
+  --mesh-a:rgba(40,110,210,0.30); --mesh-b:rgba(224,164,107,0.13);
+  --mesh-c:rgba(56,189,248,0.12); --mesh-d:rgba(70,90,220,0.16);
+  --shadow:0 6px 26px rgba(0,0,0,0.45);
+  --shadow-md:0 12px 40px rgba(0,0,0,0.55);
+  --shadow-3d:0 24px 64px rgba(0,0,0,0.6),0 8px 24px rgba(0,0,0,0.4),0 1px 0 rgba(255,255,255,0.06);
+  color-scheme: dark;
+}
+body:not(.dark) {
+  --bg:#EAF1F9; --bg2:#E0EAF5;
+  --muted:#52647a; --light:#7a8ba0;
+  --mesh-a:rgba(45,111,184,0.14); --mesh-b:rgba(160,112,63,0.09);
+  --mesh-c:rgba(56,189,248,0.08); --mesh-d:rgba(29,78,137,0.08);
+  --shadow:0 2px 14px rgba(20,50,100,0.08);
+  --shadow-md:0 8px 30px rgba(20,50,100,0.14);
+  color-scheme: light;
+}
+
+/* Scrollbar & seleksi */
+body.dark ::selection { background:rgba(90,162,240,0.40); color:#fff; }
+body:not(.dark) ::selection { background:rgba(45,111,184,0.22); }
+body.dark ::-webkit-scrollbar-thumb { background:rgba(130,175,235,0.28); border-radius:8px; }
+body.dark ::-webkit-scrollbar-thumb:hover { background:rgba(130,175,235,0.48); }
+body.dark ::-webkit-scrollbar-track { background:transparent; }
+
+/* ── TOPBAR ── */
+body.dark .hm-topbar {
+  background:linear-gradient(180deg,rgba(15,26,46,0.94),rgba(9,16,30,0.94));
+  backdrop-filter:blur(16px) saturate(140%); -webkit-backdrop-filter:blur(16px) saturate(140%);
+  border-bottom:1px solid rgba(130,175,235,0.18);
+  box-shadow:0 1px 0 rgba(90,162,240,0.20),0 10px 34px rgba(0,0,0,0.45);
+}
+body.dark .nav-item { color:#b4c4da; }
+body.dark .nav-item:hover { color:#fff; background:rgba(130,175,235,0.10); }
+body.dark .nav-item.active {
+  color:#d6eaff; background:rgba(90,162,240,0.18);
+  box-shadow:inset 0 0 0 1px rgba(90,162,240,0.45),0 0 18px rgba(90,162,240,0.18);
+  border-bottom-color:transparent;
+}
+body.dark .hm-tb-btn, body.dark .hm-tb-theme-v2 {
+  color:#d3e2f5; border-color:rgba(130,175,235,0.28); background:rgba(130,175,235,0.07);
+}
+body.dark .hm-tb-btn:hover, body.dark .hm-tb-theme-v2:hover {
+  color:#fff; border-color:rgba(156,203,255,0.6); background:rgba(130,175,235,0.16);
+}
+body.dark .hm-tb-sub, body.dark .hm-tb-saved { color:#9fb2ca; }
+body.dark .nav-dropdown, body.dark .nav-dd {
+  background:#0f1b30; border:1px solid rgba(130,175,235,0.22);
+  box-shadow:0 18px 50px rgba(0,0,0,0.6);
+}
+body.dark .nav-dd-item { color:#c3d3e8; }
+body.dark .nav-dd-item:hover { background:rgba(90,162,240,0.14); color:#fff; }
+body.dark .nav-dd-item.active { background:rgba(90,162,240,0.22); color:#cfe6ff; }
+
+/* ── CARD / PANEL ── */
+body.dark .card, body.dark .stat-card, body.dark .toggle-card,
+body.dark .hm-card, body.dark .lap-block, body.dark .rekap-table-card,
+body.dark #page-rekap .rekap-kpi-card, body.dark .ch-src-card {
+  background:linear-gradient(180deg,rgba(30,46,76,0.80),rgba(17,28,48,0.80));
+  border:1px solid var(--border);
+  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,0.06);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+}
+body.dark .card:hover, body.dark .hm-card:hover, body.dark .ch-src-card:hover {
+  border-color:var(--border2);
+  box-shadow:var(--shadow-md),0 0 0 1px rgba(90,162,240,0.14),0 0 28px rgba(60,130,230,0.12),inset 0 1px 0 rgba(255,255,255,0.07);
+}
+body.dark .stat-val, body.dark .hm-stat-num { color:#f4f9ff; }
+body.dark .formula-box { background:linear-gradient(135deg,rgba(24,64,128,0.55),rgba(14,30,60,0.75)); border-color:rgba(90,162,240,0.35); }
+body.dark .input-hint { background:rgba(56,120,210,0.12); border-color:rgba(90,162,240,0.25); }
+body.dark .fmt-tag { background:rgba(130,175,235,0.10); color:#c3d3e8; border-color:rgba(130,175,235,0.22); }
+body.dark .total-debit-row { background:rgba(56,120,210,0.14); border-color:var(--border2); }
+body.dark .ch-kpi { background:rgba(10,18,34,0.55); }
+body.dark .catchment-row { background:rgba(130,175,235,0.05); border-color:var(--border); }
+body.dark .catchment-row:hover { background:rgba(130,175,235,0.09); border-color:var(--border2); }
+
+/* ── INPUT ── */
+body.dark textarea, body.dark input[type="number"], body.dark input[type="text"],
+body.dark input[type="date"], body.dark input[type="email"], body.dark input[type="password"],
+body.dark select, body.dark .catchment-row input, body.dark .catchment-row select {
+  background:rgba(6,12,24,0.62); color:var(--text); border:1px solid rgba(130,175,235,0.24);
+}
+body.dark textarea:hover, body.dark input:hover, body.dark select:hover { border-color:rgba(156,203,255,0.42); }
+body.dark textarea:focus, body.dark input:focus, body.dark select:focus {
+  border-color:#5aa2f0; background:rgba(6,12,24,0.85);
+  box-shadow:0 0 0 3px rgba(90,162,240,0.22),0 0 18px rgba(90,162,240,0.14); outline:none;
+}
+body.dark textarea::placeholder, body.dark input::placeholder { color:#7f94b0; opacity:1; }
+body.dark select option, body.dark select optgroup { background:#0f1b30; color:#eaf1fb; }
+body.dark input:disabled, body.dark select:disabled, body.dark textarea:disabled { opacity:.55; }
+body.dark input[type="checkbox"], body.dark input[type="radio"] { accent-color:#5aa2f0; }
+
+/* ── TABEL ── */
+body.dark th { background:rgba(70,140,230,0.13); color:#c3d6ee; border-bottom:1px solid rgba(130,175,235,0.24); }
+body.dark td { color:#e3edf9; border-bottom-color:rgba(130,175,235,0.10); }
+body.dark tbody tr:nth-child(even) td { background:rgba(130,175,235,0.025); }
+body.dark tr:hover td { background:rgba(70,140,230,0.14); }
+
+/* ── TOMBOL ── */
+body.dark .btn-primary, body.dark .bp {
+  background:var(--blue-grad); color:#fff; border:1px solid rgba(156,203,255,0.30);
+  box-shadow:0 6px 20px rgba(40,110,210,0.38),inset 0 1px 0 rgba(255,255,255,0.22);
+}
+body.dark .btn-primary:hover { filter:brightness(1.12); box-shadow:0 8px 26px rgba(56,150,248,0.45),inset 0 1px 0 rgba(255,255,255,0.28); }
+body.dark .btn-secondary, body.dark .btn-ghost, body.dark .btn, body.dark .btn-sm {
+  color:#d3e2f5; background:rgba(130,175,235,0.09); border:1px solid rgba(130,175,235,0.30);
+}
+body.dark .btn-secondary:hover, body.dark .btn-ghost:hover, body.dark .btn:hover, body.dark .btn-sm:hover {
+  color:#fff; background:rgba(130,175,235,0.18); border-color:rgba(156,203,255,0.6);
+}
+body.dark .grpby-btn, body.dark .rekap-toggle-btn { color:#b4c4da; }
+body.dark .grpby-btn.grpby-active, body.dark .rekap-toggle-btn.active { color:#fff; }
+
+body.dark .grpby-btn.grpby-active, body.dark .rekap-toggle-btn.active, body.dark .hm-btn-primary,
+body.dark .eva-wiz-btn-next {
+  background:var(--blue-grad) !important; color:#fff !important; border-color:rgba(156,203,255,0.35) !important;
+  box-shadow:0 4px 16px rgba(40,110,210,0.35);
+}
+body.dark [style*="background:var(--green)"] { color:#1b1208 !important; font-weight:700; }
+body.dark th[style*="#27ae60"] { color:#5fdc95 !important; }
+body.dark th[style*="#9b59b6"], body.dark th[style*="#9B59B6"] { color:#d2aaf0 !important; }
+body:not(.dark) th[style*="#27ae60"] { color:#1b8148 !important; }
+body:not(.dark) th[style*="#9b59b6"] { color:#7d3c98 !important; }
+/* ── JUDUL & TEKS ── */
+body.dark .page-title { color:#f4f9ff; text-shadow:0 0 30px rgba(90,162,240,0.25); }
+body.dark .page-subtitle, body.dark .form-label, body.dark .stat-lbl { color:var(--muted); }
+body.dark .section-title, body.dark .hm-card-name { color:#f1f7ff; }
+body.dark .section-title .dot { box-shadow:0 0 10px currentColor; }
+body.dark .hm-card-desc { color:#a9bbd2; }
+body.dark .hm-card-tag, body.dark .hm-card-arrow { color:var(--blue2); }
+body.dark .hm-sec-label { color:#9fb2ca; }
+body.dark .hm-sec-line { background:linear-gradient(90deg,rgba(130,175,235,0.30),transparent); }
+/* teks "samar" bawaan (var(--light)) kini terbaca */
+body.dark [style*="var(--light)"] { color:var(--muted) !important; }
+body.dark .param-key span { color:var(--light) !important; }
+
+/* ── HERO beranda ── */
+body.dark .hm-stat { background:linear-gradient(180deg,rgba(30,46,76,0.7),rgba(17,28,48,0.7)); }
+body.dark .hm-stat-num { background:linear-gradient(135deg,#9ccbff,#38bdf8); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+
+/* ── REKAP ── */
+body.dark #page-rekap .rekap-hero {
+  background:linear-gradient(135deg,#0a1e3d 0%,#0f3a74 50%,#1565a8 100%);
+  box-shadow:0 14px 44px rgba(10,60,140,0.40),inset 0 1px 0 rgba(255,255,255,0.10);
+}
+body.dark .rekap-tbl th { background:rgba(70,140,230,0.13); }
+body.dark .lap-block-hd { background:rgba(70,140,230,0.10); }
+
+/* ── LIGHT: air jernih — kartu putih, bayangan kebiruan, aksen halus ── */
+body:not(.dark) .card, body:not(.dark) .stat-card, body:not(.dark) .hm-card,
+body:not(.dark) .lap-block, body:not(.dark) .rekap-table-card,
+body:not(.dark) #page-rekap .rekap-kpi-card, body:not(.dark) .toggle-card {
+  background:linear-gradient(180deg,#FFFFFF,#F9FBFE);
+  border:1px solid rgba(29,78,137,0.11);
+  box-shadow:0 1px 2px rgba(20,50,100,0.05),0 8px 26px rgba(20,50,100,0.07);
+}
+body:not(.dark) .card:hover, body:not(.dark) .hm-card:hover {
+  border-color:rgba(45,111,184,0.38);
+  box-shadow:0 2px 4px rgba(20,50,100,0.06),0 14px 36px rgba(45,111,184,0.16);
+}
+body:not(.dark) .page-title { color:#12263f; }
+body:not(.dark) .nav-dropdown, body:not(.dark) .nav-dd {
+  background:#fff; border:1px solid rgba(29,78,137,0.14); box-shadow:0 18px 46px rgba(20,50,100,0.20);
+}
+body:not(.dark) .btn-primary, body:not(.dark) .bp {
+  background:linear-gradient(135deg,#1D4E89,#2D6FB8); color:#fff;
+  box-shadow:0 6px 18px rgba(29,78,137,0.30),inset 0 1px 0 rgba(255,255,255,0.18);
+}
+body:not(.dark) .btn-primary:hover { filter:brightness(1.08); box-shadow:0 8px 24px rgba(29,78,137,0.38); }
+body:not(.dark) .btn-secondary, body:not(.dark) .btn-ghost, body:not(.dark) .btn-sm {
+  color:#1D4E89; border-color:rgba(29,78,137,0.30); background:#fff;
+}
+body:not(.dark) .btn-secondary:hover, body:not(.dark) .btn-ghost:hover, body:not(.dark) .btn-sm:hover {
+  background:rgba(29,78,137,0.07); border-color:rgba(29,78,137,0.55);
+}
+body:not(.dark) input:focus, body:not(.dark) textarea:focus, body:not(.dark) select:focus {
+  border-color:#2D6FB8; box-shadow:0 0 0 3px rgba(45,111,184,0.18);
+}
+body:not(.dark) input::placeholder, body:not(.dark) textarea::placeholder { color:#8394a8; opacity:1; }
+body:not(.dark) th { background:rgba(29,78,137,0.07); color:#1b3350; }
+body:not(.dark) tbody tr:nth-child(even) td { background:rgba(29,78,137,0.02); }
+body:not(.dark) tr:hover td { background:rgba(45,111,184,0.07); }
+body:not(.dark) .nav-item.active { box-shadow:0 2px 10px rgba(0,0,0,0.18); }
+
+/* transisi tema halus */
+body, .hm-topbar, .card, .stat-card, .hm-card, .btn, .btn-primary, input, select, textarea, th, td {
+  transition:background-color .25s, border-color .25s, color .25s, box-shadow .25s;
+}
+@media (prefers-reduced-motion: reduce) { body::before { animation:none !important; } }
+
+/* ══ v4: STEPPER ══ */
+.eva-wiz-tab, .page-header.has-stepper .eva-wiz-tab { overflow:visible; }
+.eva-wiz-tab.active .eva-wiz-label { font-weight:700; color:var(--blue2); }
+body:not(.dark) .eva-wiz-tab.active .eva-wiz-label { color:#1D4E89; }
+.eva-wiz-tab.active .eva-wiz-num { box-shadow:0 0 0 4px rgba(90,162,240,0.20),0 4px 14px rgba(40,110,210,0.45); }
+.eva-wiz-tab.done + .eva-wiz-line { background:linear-gradient(90deg,#27ae60,rgba(39,174,96,0.35)); }
+body.dark .eva-wiz-tab:not(.active):not(.done) .eva-wiz-num { background:rgba(130,175,235,0.08); color:#9fb2ca; border-color:rgba(130,175,235,0.28); }
+body.dark .eva-wiz-tab.done .eva-wiz-num { color:#5fdc95; border-color:#2fbf71; background:rgba(47,191,113,0.14); }
+body.dark .eva-wiz-tab { opacity:0.8; } body.dark .eva-wiz-tab.active { opacity:1; }
+
+/* ══ v4: DEKORASI — latar, judul, kartu, hero ══ */
+body.dark::after {
+  background-image:radial-gradient(circle at 1px 1px,rgba(130,175,235,0.10) 1px,transparent 0);
+  background-size:26px 26px; opacity:1;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,0.25) 70%,transparent 100%);
+          mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,0.25) 70%,transparent 100%);
+}
+body:not(.dark)::after {
+  background-image:radial-gradient(circle at 1px 1px,rgba(29,78,137,0.09) 1px,transparent 0);
+  background-size:26px 26px; opacity:1;
+  -webkit-mask-image:linear-gradient(180deg,#000,transparent 85%); mask-image:linear-gradient(180deg,#000,transparent 85%);
+}
+.hm-topbar { position:sticky; }
+.hm-topbar::after {
+  content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; pointer-events:none;
+  background:linear-gradient(90deg,transparent 0%,#38bdf8 25%,#3b82f6 50%,#e0a46b 78%,transparent 100%);
+  opacity:0.75;
+}
+.page-header { position:relative; }
+.page-header::after {
+  content:''; position:absolute; left:0; bottom:-1px; width:140px; height:3px; border-radius:3px;
+  background:linear-gradient(90deg,#38bdf8,#3b82f6 60%,transparent);
+}
+body.dark .page-title {
+  background:linear-gradient(90deg,#ffffff 0%,#bfdcff 60%,#7cc4ff 100%);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; text-shadow:none;
+}
+body:not(.dark) .page-title {
+  background:linear-gradient(90deg,#0f2a4a,#1D4E89 70%,#2D6FB8);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+}
+/* garis cahaya di tepi atas kartu */
+body.dark .card, body.dark .hm-card, body.dark .toggle-card, body.dark .lap-block {
+  background:
+    linear-gradient(90deg,transparent,rgba(120,190,255,0.75),transparent) top/100% 1.5px no-repeat,
+    linear-gradient(180deg,rgba(30,46,76,0.82),rgba(17,28,48,0.82));
+}
+body:not(.dark) .card, body:not(.dark) .hm-card, body:not(.dark) .toggle-card {
+  background:
+    linear-gradient(90deg,transparent,rgba(45,111,184,0.55),transparent) top/100% 2px no-repeat,
+    linear-gradient(180deg,#FFFFFF,#F7FAFE);
+}
+.section-title .dot { box-shadow:0 0 12px currentColor; }
+body.dark .section-title .dot { box-shadow:0 0 12px rgba(90,162,240,0.8); }
+
+/* HERO beranda */
+.hm-hero { position:relative; isolation:isolate; }
+.hm-hero::before {
+  content:''; position:absolute; z-index:-1; left:50%; top:-70px; width:100vw; height:440px; transform:translateX(-50%);
+  background:
+    radial-gradient(ellipse 34% 55% at 50% 12%,rgba(56,140,248,0.42),rgba(56,140,248,0) 100%),
+    radial-gradient(ellipse 22% 40% at 22% 42%,rgba(224,164,107,0.24),rgba(224,164,107,0) 100%),
+    radial-gradient(ellipse 22% 40% at 78% 40%,rgba(56,189,248,0.24),rgba(56,189,248,0) 100%);
+  animation:hmGlow 9s ease-in-out infinite alternate; pointer-events:none;
+}
+body:not(.dark) .hm-hero::before {
+  background:
+    radial-gradient(ellipse 34% 55% at 50% 12%,rgba(45,111,184,0.18),rgba(45,111,184,0) 100%),
+    radial-gradient(ellipse 22% 40% at 22% 42%,rgba(160,112,63,0.09),rgba(160,112,63,0) 100%),
+    radial-gradient(ellipse 22% 40% at 78% 40%,rgba(56,189,248,0.11),rgba(56,189,248,0) 100%);
+}
+@keyframes hmGlow { from{opacity:.75;transform:translateX(-50%) scale(1)} to{opacity:1;transform:translateX(-50%) scale(1.06)} }
+.hm-hero-accent {
+  background:linear-gradient(90deg,#3b82f6,#38bdf8,#7cc4ff,#3b82f6); background-size:220% 100%;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  animation:hmShine 7s linear infinite;
+}
+body:not(.dark) .hm-hero-accent { background-image:linear-gradient(90deg,#1D4E89,#2D6FB8,#0ea5e9,#1D4E89); }
+@keyframes hmShine { to { background-position:220% 0; } }
+.hm-hero-title { text-shadow:none; }
+body.dark .hm-hero-title { color:#f4f9ff; }
+.hm-btn-primary { position:relative; overflow:hidden; }
+body.dark .hm-btn-primary { box-shadow:0 8px 28px rgba(40,110,210,0.50),inset 0 1px 0 rgba(255,255,255,0.25); }
+body.dark .hm-btn-ghost { color:#d6e6f8; border-color:rgba(130,175,235,0.35); background:rgba(130,175,235,0.08); }
+body.dark .hm-btn-ghost:hover { background:rgba(130,175,235,0.18); color:#fff; border-color:rgba(156,203,255,0.65); }
+body.dark .hm-hero-sub { color:#b4c4da; }
+body.dark .hm-hero-eyebrow { color:#8fb8e8; }
+.hm-card { transition:transform .25s ease, box-shadow .25s, border-color .25s, background .25s; }
+.hm-card:hover { transform:translateY(-4px); }
+.hm-card-icon { transition:transform .3s ease, box-shadow .3s; }
+.hm-card:hover .hm-card-icon { transform:scale(1.1) rotate(-4deg); }
+body.dark .hm-card-icon {
+  background:linear-gradient(135deg,rgba(90,162,240,0.30),rgba(56,189,248,0.10));
+  box-shadow:0 0 0 1px rgba(130,175,235,0.28),0 6px 20px rgba(40,110,210,0.30);
+}
+body:not(.dark) .hm-card-icon { box-shadow:0 0 0 1px rgba(29,78,137,0.12),0 6px 16px rgba(45,111,184,0.16); }
+.hm-card-arrow { transition:transform .25s; } .hm-card:hover .hm-card-arrow { transform:translateX(5px); }
+.hm-stat { transition:background .25s, transform .25s; }
+body.dark .hm-stat:hover { background:rgba(70,140,230,0.12); }
+
+/* KPI & stat card beraksen */
+body.dark .stat-card { border-left:3px solid #5aa2f0; }
+body.dark .stat-card:nth-child(2n) { border-left-color:#e0a46b; }
+body.dark .stat-card:nth-child(3n) { border-left-color:#4fd1c5; }
+body.dark #page-rekap .rekap-kpi-card:hover, body.dark .stat-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-md),0 0 26px rgba(60,130,230,0.16); }
+body.dark .lap-block-hd { border-bottom:1px solid rgba(130,175,235,0.18); background:linear-gradient(90deg,rgba(70,140,230,0.16),rgba(70,140,230,0.04)); }
+body.dark .btn-primary, body.dark .bp, body.dark .hm-btn-primary { background-size:140% 100%; transition:filter .2s, box-shadow .2s, transform .15s; }
+.btn-primary:active, .hm-btn-primary:active { transform:translateY(1px) scale(0.99); }
+
+/* ══ v4: kertas grafik putih → gelap di dark (PNG ekspor tetap putih) ══ */
+body.dark div[style*="background:#ffffff"]:has(> canvas), body.dark div[style*="background:#fff;"]:has(> canvas),
+body.dark div[style*="background: #fff"]:has(> canvas), body.dark div[style*="background:#FFFFFF"]:has(> canvas) {
+  background:linear-gradient(180deg,#101c31,#0b1527) !important; border-color:rgba(130,175,235,0.22) !important;
+  box-shadow:inset 0 0 0 1px rgba(130,175,235,0.06);
+}
+body.dark div[style*="background:#ffffff"] > canvas, body.dark div[style*="background:#fff;"] > canvas,
+body.dark div[style*="background: #fff"] > canvas, body.dark div[style*="background:#FFFFFF"] > canvas {
+  filter:invert(0.92) hue-rotate(180deg) saturate(1.15);
+}
+
+body:not(.dark) .formula-box .grpby-btn:not(.grpby-active) { color:rgba(255,255,255,0.85); border-color:rgba(255,255,255,0.28); background:rgba(255,255,255,0.06); }
+
+/* ══ v5: LIGHT MODE — lebih hidup ══ */
+body:not(.dark) {
+  --mesh-a:rgba(56,140,248,0.26); --mesh-b:rgba(224,164,107,0.20);
+  --mesh-c:rgba(56,189,248,0.20); --mesh-d:rgba(99,102,241,0.14);
+  --bg:#E6EEF9;
+}
+body:not(.dark)::before {
+  background:
+    radial-gradient(ellipse 60% 50% at -5% -5%, var(--mesh-a) 0%, transparent 62%),
+    radial-gradient(ellipse 50% 45% at 105% 0%, var(--mesh-b) 0%, transparent 58%),
+    radial-gradient(ellipse 55% 50% at 105% 105%, var(--mesh-c) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at -5% 105%, var(--mesh-d) 0%, transparent 60%),
+    linear-gradient(180deg,#EEF4FC 0%,#E3ECF8 100%);
+}
+body:not(.dark)::after { background-image:radial-gradient(circle at 1px 1px,rgba(29,78,137,0.13) 1px,transparent 0); }
+
+/* header halaman: pita gradien lembut */
+body:not(.dark) .page-header {
+  background:linear-gradient(90deg,rgba(45,111,184,0.13),rgba(56,189,248,0.07) 55%,rgba(255,255,255,0));
+  border-radius:14px; padding:14px 18px 16px; border-bottom:none;
+  box-shadow:inset 0 0 0 1px rgba(45,111,184,0.12);
+}
+body:not(.dark) .page-header::after { left:18px; bottom:8px; width:90px; }
+body:not(.dark) .page-subtitle { color:#4a5f78; }
+
+/* kartu: tepi atas berwarna + tint */
+body:not(.dark) .card, body:not(.dark) .hm-card, body:not(.dark) .toggle-card, body:not(.dark) .lap-block {
+  background:
+    linear-gradient(90deg,#2D6FB8,#38bdf8 55%,#e0a46b) top/100% 3px no-repeat,
+    linear-gradient(180deg,#FFFFFF 0%,#F3F8FE 100%);
+  border:1px solid rgba(45,111,184,0.16);
+  box-shadow:0 2px 4px rgba(20,50,100,0.05),0 12px 32px rgba(45,111,184,0.12);
+}
+body:not(.dark) .card:hover, body:not(.dark) .hm-card:hover {
+  box-shadow:0 4px 8px rgba(20,50,100,0.07),0 20px 44px rgba(45,111,184,0.22);
+}
+body:not(.dark) .section-title { color:#12263f; }
+body:not(.dark) .section-title .dot { box-shadow:0 0 0 4px rgba(45,111,184,0.14); }
+
+/* kartu statistik beraksen warna */
+body:not(.dark) .stat-card {
+  border-left:4px solid #2D6FB8;
+  background:linear-gradient(135deg,#FFFFFF 55%,#EAF2FC);
+  box-shadow:0 2px 4px rgba(20,50,100,0.05),0 10px 26px rgba(45,111,184,0.12);
+}
+body:not(.dark) .stat-card:nth-child(2n) { border-left-color:#c4895a; background:linear-gradient(135deg,#FFFFFF 55%,#FBF1E7); }
+body:not(.dark) .stat-card:nth-child(3n) { border-left-color:#14a59a; background:linear-gradient(135deg,#FFFFFF 55%,#E5F7F5); }
+body:not(.dark) .stat-card:hover { transform:translateY(-2px); }
+body:not(.dark) #page-rekap .rekap-kpi-card { background:linear-gradient(180deg,#FFFFFF,#F1F7FD); }
+
+/* ikon & hero beranda */
+body:not(.dark) .hm-card-icon {
+  background:linear-gradient(135deg,#DCEBFB,#EAF6FD); box-shadow:0 0 0 1px rgba(45,111,184,0.20),0 8px 18px rgba(45,111,184,0.20);
+}
+body:not(.dark) .hm-hero::before {
+  background:
+    radial-gradient(ellipse 34% 55% at 50% 12%,rgba(45,111,184,0.30),rgba(45,111,184,0) 100%),
+    radial-gradient(ellipse 22% 40% at 22% 42%,rgba(224,164,107,0.26),rgba(224,164,107,0) 100%),
+    radial-gradient(ellipse 22% 40% at 78% 40%,rgba(56,189,248,0.26),rgba(56,189,248,0) 100%);
+}
+body:not(.dark) .hm-stats, body:not(.dark) .hm-stat {
+  background:linear-gradient(180deg,#FFFFFF,#EFF6FD);
+}
+body:not(.dark) .hm-stat-num {
+  background:linear-gradient(135deg,#1D4E89,#2D6FB8 60%,#0ea5e9); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+}
+body:not(.dark) .hm-stat:hover { background:linear-gradient(180deg,#F4F9FF,#E3EEFA); }
+body:not(.dark) .hm-btn-primary { box-shadow:0 8px 24px rgba(29,78,137,0.38),inset 0 1px 0 rgba(255,255,255,0.22); }
+body:not(.dark) .hm-btn-ghost { background:#fff; border-color:rgba(29,78,137,0.30); color:#1D4E89; }
+body:not(.dark) .hm-sec-line { background:linear-gradient(90deg,rgba(45,111,184,0.35),transparent); }
+body:not(.dark) .hm-sec-label { color:#2a4a72; }
+
+/* tabel & input */
+body:not(.dark) th { background:linear-gradient(180deg,#E3EEFA,#D8E7F7); color:#12304f; border-bottom:2px solid rgba(45,111,184,0.30); }
+body:not(.dark) tbody tr:nth-child(even) td { background:rgba(45,111,184,0.045); }
+body:not(.dark) tr:hover td { background:rgba(56,189,248,0.14); }
+body:not(.dark) input[type="text"], body:not(.dark) input[type="number"], body:not(.dark) select, body:not(.dark) textarea {
+  background:#FBFDFF; border-color:rgba(45,111,184,0.28); box-shadow:inset 0 1px 2px rgba(20,50,100,0.05);
+}
+body:not(.dark) .input-hint { background:linear-gradient(90deg,rgba(45,111,184,0.12),rgba(45,111,184,0.04)); }
+body:not(.dark) .lap-block-hd { background:linear-gradient(90deg,rgba(45,111,184,0.13),rgba(45,111,184,0.03)); border-bottom:1px solid rgba(45,111,184,0.14); }
+body:not(.dark) .rekap-table-card { background:linear-gradient(180deg,#FFFFFF,#F3F8FE); }
+
+/* topbar light: kilau + aksen */
+body:not(.dark) .hm-topbar { background:linear-gradient(90deg,#17427a 0%,#1D4E89 45%,#1f5a9e 100%); }
+body:not(.dark) .eva-wiz-tab:not(.active):not(.done) .eva-wiz-num { background:#fff; border-color:rgba(45,111,184,0.30); color:#4a5f78; }
+body:not(.dark) .eva-wiz-tab.done .eva-wiz-num { background:#E3F6EC; color:#1b8148; border-color:#27ae60; }
+
+/* ══ v6: LIGHT MODE — bersih, tegas, tanpa gumpalan warna ══ */
+body:not(.dark) { --bg:#F2F6FC; }
+body:not(.dark)::before {
+  animation:none;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% -10%, rgba(45,111,184,0.22), transparent 70%),
+    linear-gradient(180deg,#DDEAF9 0px,#EAF1FA 260px,#F2F6FC 520px,#F2F6FC 100%);
+}
+body:not(.dark)::after { background-image:radial-gradient(circle at 1px 1px,rgba(29,78,137,0.07) 1px,transparent 0); }
+
+/* hero: panel biru tua */
+body:not(.dark) .hm-hero {
+  max-width:none; margin:6px 0 20px; padding:48px 24px 40px; border-radius:22px; overflow:hidden;
+  background:linear-gradient(135deg,#0c2a52 0%,#164a8c 52%,#2368b4 100%);
+  box-shadow:0 18px 50px rgba(20,60,130,0.32),inset 0 1px 0 rgba(255,255,255,0.18);
+}
+body:not(.dark) .hm-hero::before {
+  left:0; top:0; width:100%; height:100%; transform:none; animation:none;
+  background:
+    radial-gradient(circle at 12% 20%,rgba(56,189,248,0.38),transparent 38%),
+    radial-gradient(circle at 90% 85%,rgba(224,164,107,0.28),transparent 36%),
+    radial-gradient(circle at 78% 10%,rgba(255,255,255,0.14),transparent 30%);
+}
+body:not(.dark) .hm-hero::after {
+  content:''; position:absolute; inset:0; z-index:-1; pointer-events:none; opacity:.5;
+  background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.18) 1px,transparent 0); background-size:24px 24px;
+}
+body:not(.dark) .hm-hero-title { color:#fff; }
+body:not(.dark) .hm-hero-accent { background-image:linear-gradient(90deg,#8fd3ff,#ffffff,#7cc4ff,#8fd3ff); background-size:220% 100%; }
+body:not(.dark) .hm-hero-sub { color:rgba(255,255,255,0.84); }
+body:not(.dark) .hm-hero-eyebrow { color:#bfe0ff; }
+body:not(.dark) .hm-hero-dot { background:#5fe3b0; box-shadow:0 0 10px #5fe3b0; }
+body:not(.dark) .hm-btn-primary { background:#fff; color:#0f3a70; border:none; box-shadow:0 8px 24px rgba(0,0,0,0.28); }
+body:not(.dark) .hm-btn-primary:hover { background:#eaf3ff; }
+body:not(.dark) .hm-btn-ghost { background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.45); }
+body:not(.dark) .hm-btn-ghost:hover { background:rgba(255,255,255,0.24); }
+
+/* stat strip beranda */
+body:not(.dark) .hm-stats { border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(20,60,130,0.12); border:1px solid #D3E0F0; background:#fff; }
+body:not(.dark) .hm-stat { background:#fff; border-color:#E1EAF5; }
+body:not(.dark) .hm-stat:hover { background:#F1F7FE; }
+
+/* kartu: putih bersih, satu aksen biru */
+body:not(.dark) .card, body:not(.dark) .hm-card, body:not(.dark) .toggle-card, body:not(.dark) .lap-block,
+body:not(.dark) .rekap-table-card, body:not(.dark) #page-rekap .rekap-kpi-card {
+  background:linear-gradient(90deg,#1D4E89,#2D8FE0 60%,#38bdf8) top/100% 3px no-repeat, #FFFFFF;
+  border:1px solid #D3E0F0;
+  box-shadow:0 1px 2px rgba(15,45,95,0.06),0 8px 24px rgba(15,45,95,0.08);
+}
+body:not(.dark) #page-rekap .rekap-kpi-card { background:#fff; }
+body:not(.dark) .card:hover, body:not(.dark) .hm-card:hover { border-color:#8DB6E6; box-shadow:0 4px 10px rgba(15,45,95,0.08),0 18px 40px rgba(29,78,137,0.18); }
+body:not(.dark) .hm-card-icon { background:linear-gradient(135deg,#E3EFFC,#F2F8FF); box-shadow:0 0 0 1px #C9DCF2; }
+
+/* header halaman: tanpa pita, bersih */
+body:not(.dark) .page-header { background:none; box-shadow:none; border-radius:0; padding:4px 0 14px; border-bottom:1px solid #D3E0F0; }
+body:not(.dark) .page-header::after { left:0; bottom:-1px; width:110px; height:3px; background:linear-gradient(90deg,#1D4E89,#38bdf8); }
+
+/* stat card: putih + aksen kiri */
+body:not(.dark) .stat-card, body:not(.dark) .stat-card:nth-child(2n), body:not(.dark) .stat-card:nth-child(3n) { background:#fff; }
+body:not(.dark) .stat-card { border:1px solid #D3E0F0; border-left:4px solid #2D6FB8; box-shadow:0 6px 20px rgba(15,45,95,0.08); }
+body:not(.dark) .stat-card:nth-child(2n) { border-left-color:#c4895a; }
+body:not(.dark) .stat-card:nth-child(3n) { border-left-color:#14a59a; }
+
+/* tabel */
+body:not(.dark) th { background:#E8F0FA; color:#173456; border-bottom:2px solid #B9D0EA; }
+body:not(.dark) tbody tr:nth-child(even) td { background:#F7FAFE; }
+body:not(.dark) tr:hover td { background:#E6F1FD; }
+body:not(.dark) .lap-block-hd { background:#EAF2FB; }
+
+/* ══ v7: LIGHT MODE — maksimal ══ */
+body:not(.dark) #page-home { padding:0 28px 32px; }
+body:not(.dark) .hm-hero {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 80' preserveAspectRatio='none'%3E%3Cpath d='M0 40 C150 10 300 70 450 40 S750 10 900 40 S1100 60 1200 30 V80 H0Z' fill='rgba(255,255,255,0.07)'/%3E%3Cpath d='M0 55 C200 30 350 80 600 52 S950 28 1200 55 V80 H0Z' fill='rgba(255,255,255,0.09)'/%3E%3C/svg%3E") bottom/100% 70px no-repeat,
+    linear-gradient(135deg,#0b2850 0%,#164a8c 50%,#2368b4 100%);
+  padding:56px 24px 64px;
+}
+body:not(.dark) .hm-hero-title { font-size:clamp(30px,3.6vw,44px); }
+
+/* kartu modul berwarna */
+body:not(.dark) .hm-card { --c1:#2D6FB8; --c2:#38bdf8; --t1:#DCEBFF; --t2:#B6D3FA; }
+body:not(.dark) .hm-card:nth-child(6n+2) { --c1:#0b8fb0; --c2:#22d3ee; --t1:#D6F4FB; --t2:#A3E3F3; }
+body:not(.dark) .hm-card:nth-child(6n+3) { --c1:#d98a14; --c2:#fbbf24; --t1:#FFF0CF; --t2:#FFD98E; }
+body:not(.dark) .hm-card:nth-child(6n+4) { --c1:#8B5E34; --c2:#d9a07a; --t1:#F6E6D6; --t2:#E6C7A4; }
+body:not(.dark) .hm-card:nth-child(6n+5) { --c1:#0f9d8f; --c2:#34d6c0; --t1:#D3F6EF; --t2:#9FE8D8; }
+body:not(.dark) .hm-card:nth-child(6n+6) { --c1:#5b5bd6; --c2:#8b8cf5; --t1:#E6E5FF; --t2:#C7C6FA; }
+body:not(.dark) .hm-card {
+  background:linear-gradient(90deg,var(--c1),var(--c2)) top/100% 4px no-repeat,
+             linear-gradient(180deg,#FFFFFF 40%,color-mix(in srgb,var(--t1) 45%,#fff));
+}
+body:not(.dark) .hm-card:hover { border-color:var(--c1); box-shadow:0 6px 12px rgba(15,45,95,0.08),0 22px 44px color-mix(in srgb,var(--c1) 28%,transparent); }
+body:not(.dark) .hm-card-icon {
+  width:46px; height:46px; font-size:23px; border-radius:14px;
+  background:linear-gradient(135deg,var(--t1),var(--t2)); box-shadow:0 6px 16px color-mix(in srgb,var(--c1) 30%,transparent),inset 0 1px 0 rgba(255,255,255,0.8);
+}
+body:not(.dark) .hm-card-name { font-size:15px; }
+body:not(.dark) .hm-card-tag { color:var(--c1); background:none; border:none; padding:0; font-weight:700; }
+body:not(.dark) .hm-card-arrow {
+  opacity:1; color:#fff; background:linear-gradient(135deg,var(--c1),var(--c2)); width:28px; height:28px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center; box-shadow:0 4px 10px color-mix(in srgb,var(--c1) 40%,transparent);
+}
+body:not(.dark) .hm-card-arrow svg { stroke:#fff; }
+
+/* statistik beranda berwarna */
+body:not(.dark) .hm-stat { border-bottom:3px solid transparent; }
+body:not(.dark) .hm-stat:nth-child(1) { border-bottom-color:#2D6FB8; }
+body:not(.dark) .hm-stat:nth-child(2) { border-bottom-color:#0b8fb0; }
+body:not(.dark) .hm-stat:nth-child(3) { border-bottom-color:#d98a14; }
+body:not(.dark) .hm-stat:nth-child(4) { border-bottom-color:#0f9d8f; }
+body:not(.dark) .hm-stat-num { font-size:30px; }
+body:not(.dark) .hm-sec-label { background:#fff; border:1px solid #CFE0F3; padding:5px 14px; border-radius:20px; color:#1D4E89; box-shadow:0 2px 8px rgba(15,45,95,0.06); }
+
+/* header halaman = panel biru, seirama dengan hero */
+body:not(.dark) .page-header {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 80' preserveAspectRatio='none'%3E%3Cpath d='M0 40 C150 10 300 70 450 40 S750 10 900 40 S1100 60 1200 30 V80 H0Z' fill='rgba(255,255,255,0.07)'/%3E%3Cpath d='M0 55 C200 30 350 80 600 52 S950 28 1200 55 V80 H0Z' fill='rgba(255,255,255,0.09)'/%3E%3C/svg%3E") bottom/100% 44px no-repeat,
+    linear-gradient(120deg,#0b2850 0%,#164a8c 55%,#2368b4 100%);
+  border:none; border-radius:18px; padding:20px 26px 22px; margin-bottom:20px; overflow:hidden;
+  box-shadow:0 14px 36px rgba(20,60,130,0.26),inset 0 1px 0 rgba(255,255,255,0.16);
+}
+body:not(.dark) .page-header::after { display:none; }
+body:not(.dark) .page-title { background:none; -webkit-text-fill-color:#fff; color:#fff; }
+body:not(.dark) .page-subtitle { color:rgba(255,255,255,0.80); }
+body:not(.dark) .page-header .btn-primary, body:not(.dark) .page-header button[class*='primary'] { background:#fff !important; color:#0f3a70 !important; border:none !important; box-shadow:0 6px 18px rgba(0,0,0,0.25) !important; }
+body:not(.dark) .page-header .btn-primary:hover { background:#eaf3ff !important; filter:none; }
+body:not(.dark) .page-header .btn-secondary, body:not(.dark) .page-header .btn-ghost, body:not(.dark) .page-header .btn {
+  background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.40);
+}
+body:not(.dark) .page-header .btn-secondary:hover, body:not(.dark) .page-header .btn:hover { background:rgba(255,255,255,0.24); }
+/* stepper di atas panel biru */
+body:not(.dark) .page-header .eva-wiz-tab { opacity:1; }
+body:not(.dark) .page-header .eva-wiz-tab:not(.active):not(.done) .eva-wiz-num { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.40); color:#fff; }
+body:not(.dark) .page-header .eva-wiz-tab:not(.active) .eva-wiz-label { color:rgba(255,255,255,0.72); }
+body:not(.dark) .page-header .eva-wiz-tab.active .eva-wiz-label { color:#fff; }
+body:not(.dark) .page-header .eva-wiz-tab.active .eva-wiz-num { background:#fff; color:#164a8c; box-shadow:0 0 0 4px rgba(255,255,255,0.25); border-color:#fff; }
+body:not(.dark) .page-header .eva-wiz-tab.done .eva-wiz-num { background:#27c07a; color:#fff; border-color:#27c07a; }
+body:not(.dark) .page-header .eva-wiz-line { background:rgba(255,255,255,0.30); }
+body:not(.dark) .page-header .eva-wiz-tab.done + .eva-wiz-line { background:#27c07a; }
+
+/* tombol utama konten */
+body:not(.dark) .btn-primary:not(.hm-btn-primary) { background:linear-gradient(135deg,#1D4E89,#2D7BD0); }
+body:not(.dark) .section-title .dot { background:linear-gradient(135deg,#1D4E89,#38bdf8); }
+
+/* ══ v8: DARK = struktur & ornamen SAMA dengan light (v6/v7), hanya palet gelap ══ */
+body.dark { --bg:#0A1424; --card:#101D33; --card2:#0D192D; }
+body.dark::before {
+  animation:none;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% -10%, rgba(45,111,184,0.22), transparent 70%),
+    linear-gradient(180deg,#0F1D35 0px,#0C1829 260px,#0A1424 520px,#0A1424 100%);
+}
+body.dark::after {
+  background-image:radial-gradient(circle at 1px 1px,rgba(130,175,235,0.07) 1px,transparent 0);
+  -webkit-mask-image:linear-gradient(180deg,#000,transparent 85%); mask-image:linear-gradient(180deg,#000,transparent 85%);
+}
+body.dark .hm-topbar { background:linear-gradient(90deg,#0c1b33 0%,#10253f 45%,#12294a 100%); backdrop-filter:none; -webkit-backdrop-filter:none; }
+
+/* hero: panel biru tua (sama dengan light, sedikit lebih dalam) */
+body.dark #page-home { padding:0 28px 32px; }
+body.dark .hm-hero {
+  max-width:none; margin:6px 0 20px; padding:56px 24px 64px; border-radius:22px; overflow:hidden;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 80' preserveAspectRatio='none'%3E%3Cpath d='M0 40 C150 10 300 70 450 40 S750 10 900 40 S1100 60 1200 30 V80 H0Z' fill='rgba(255,255,255,0.05)'/%3E%3Cpath d='M0 55 C200 30 350 80 600 52 S950 28 1200 55 V80 H0Z' fill='rgba(255,255,255,0.07)'/%3E%3C/svg%3E") bottom/100% 70px no-repeat,
+    linear-gradient(135deg,#071a36 0%,#0f3366 50%,#18508f 100%);
+  box-shadow:0 18px 50px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+body.dark .hm-hero::before {
+  left:0; top:0; width:100%; height:100%; transform:none; animation:none;
+  background:
+    radial-gradient(circle at 12% 20%,rgba(56,189,248,0.26),transparent 38%),
+    radial-gradient(circle at 90% 85%,rgba(224,164,107,0.20),transparent 36%),
+    radial-gradient(circle at 78% 10%,rgba(255,255,255,0.09),transparent 30%);
+}
+body.dark .hm-hero::after {
+  content:''; position:absolute; inset:0; z-index:-1; pointer-events:none; opacity:.5;
+  background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.14) 1px,transparent 0); background-size:24px 24px;
+}
+body.dark .hm-hero-title { color:#fff; font-size:clamp(30px,3.6vw,44px); }
+body.dark .hm-hero-accent { background-image:linear-gradient(90deg,#8fd3ff,#ffffff,#7cc4ff,#8fd3ff); background-size:220% 100%; }
+body.dark .hm-hero-sub { color:rgba(255,255,255,0.82); }
+body.dark .hm-hero-eyebrow { color:#bfe0ff; }
+body.dark .hm-hero-dot { background:#5fe3b0; box-shadow:0 0 10px #5fe3b0; }
+body.dark .hm-btn-primary { background:#fff; color:#0f3a70; border:none; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
+body.dark .hm-btn-primary:hover { background:#eaf3ff; }
+body.dark .hm-btn-ghost { background:rgba(255,255,255,0.10); color:#fff; border:1px solid rgba(255,255,255,0.40); }
+body.dark .hm-btn-ghost:hover { background:rgba(255,255,255,0.22); color:#fff; }
+
+/* stat strip beranda */
+body.dark .hm-stats { border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.35); border:1px solid rgba(130,175,235,0.18); background:#101D33; }
+body.dark .hm-stat { background:#101D33; border-color:rgba(130,175,235,0.12); border-bottom:3px solid transparent; }
+body.dark .hm-stat:hover { background:#14253f; }
+body.dark .hm-stat:nth-child(1) { border-bottom-color:#2D6FB8; }
+body.dark .hm-stat:nth-child(2) { border-bottom-color:#0b8fb0; }
+body.dark .hm-stat:nth-child(3) { border-bottom-color:#d98a14; }
+body.dark .hm-stat:nth-child(4) { border-bottom-color:#0f9d8f; }
+body.dark .hm-stat-num { font-size:30px; background:linear-gradient(135deg,#9ccbff,#5aa2f0 60%,#38bdf8); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+body.dark .hm-sec-label { background:#101D33; border:1px solid rgba(130,175,235,0.22); padding:5px 14px; border-radius:20px; color:#9ccbff; box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+body.dark .hm-sec-line { background:linear-gradient(90deg,rgba(130,175,235,0.35),transparent); }
+
+/* kartu: permukaan gelap bersih, satu aksen biru di tepi atas */
+body.dark .card, body.dark .hm-card, body.dark .toggle-card, body.dark .lap-block,
+body.dark .rekap-table-card, body.dark #page-rekap .rekap-kpi-card {
+  background:linear-gradient(90deg,#1D4E89,#2D8FE0 60%,#38bdf8) top/100% 3px no-repeat, #101D33;
+  border:1px solid rgba(130,175,235,0.18);
+  box-shadow:0 1px 2px rgba(0,0,0,0.3),0 8px 24px rgba(0,0,0,0.30);
+}
+body.dark .card:hover, body.dark .hm-card:hover { border-color:rgba(130,175,235,0.45); box-shadow:0 4px 10px rgba(0,0,0,0.35),0 18px 40px rgba(0,0,0,0.45); }
+
+/* kartu modul berwarna */
+body.dark .hm-card { --c1:#2D6FB8; --c2:#38bdf8; --t1:#1b3a63; --t2:#245089; }
+body.dark .hm-card:nth-child(6n+2) { --c1:#0b8fb0; --c2:#22d3ee; --t1:#10404d; --t2:#16596b; }
+body.dark .hm-card:nth-child(6n+3) { --c1:#d98a14; --c2:#fbbf24; --t1:#4a3410; --t2:#6b4a12; }
+body.dark .hm-card:nth-child(6n+4) { --c1:#8B5E34; --c2:#d9a07a; --t1:#42301f; --t2:#5c4129; }
+body.dark .hm-card:nth-child(6n+5) { --c1:#0f9d8f; --c2:#34d6c0; --t1:#0f4640; --t2:#146158; }
+body.dark .hm-card:nth-child(6n+6) { --c1:#5b5bd6; --c2:#8b8cf5; --t1:#2a2a5e; --t2:#38387f; }
+body.dark .hm-card {
+  background:linear-gradient(90deg,var(--c1),var(--c2)) top/100% 4px no-repeat,
+             linear-gradient(180deg,#101D33 40%,color-mix(in srgb,var(--c1) 16%,#101D33));
+}
+body.dark .hm-card:hover { border-color:var(--c1); box-shadow:0 6px 12px rgba(0,0,0,0.4),0 22px 44px color-mix(in srgb,var(--c1) 30%,transparent); }
+body.dark .hm-card-icon {
+  width:46px; height:46px; font-size:23px; border-radius:14px;
+  background:linear-gradient(135deg,var(--t1),var(--t2)); box-shadow:0 6px 16px color-mix(in srgb,var(--c1) 30%,transparent),inset 0 1px 0 rgba(255,255,255,0.10);
+}
+body.dark .hm-card-name { font-size:15px; }
+body.dark .hm-card-tag { color:var(--c2); background:none; border:none; padding:0; font-weight:700; }
+body.dark .hm-card-arrow {
+  opacity:1; color:#fff; background:linear-gradient(135deg,var(--c1),var(--c2)); width:28px; height:28px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center; box-shadow:0 4px 10px color-mix(in srgb,var(--c1) 40%,transparent);
+}
+body.dark .hm-card-arrow svg { stroke:#fff; }
+
+/* header halaman = panel biru (sama dengan light) */
+body.dark .page-header {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 80' preserveAspectRatio='none'%3E%3Cpath d='M0 40 C150 10 300 70 450 40 S750 10 900 40 S1100 60 1200 30 V80 H0Z' fill='rgba(255,255,255,0.05)'/%3E%3Cpath d='M0 55 C200 30 350 80 600 52 S950 28 1200 55 V80 H0Z' fill='rgba(255,255,255,0.07)'/%3E%3C/svg%3E") bottom/100% 44px no-repeat,
+    linear-gradient(120deg,#071a36 0%,#0f3366 55%,#18508f 100%);
+  border:none; border-radius:18px; padding:20px 26px 22px; margin-bottom:20px; overflow:hidden;
+  box-shadow:0 14px 36px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+body.dark .page-header::after { display:none; }
+body.dark .page-title { background:none; -webkit-text-fill-color:#fff; color:#fff; }
+body.dark .page-subtitle { color:rgba(255,255,255,0.80); }
+body.dark .page-header .btn-primary, body.dark .page-header button[class*='primary'] { background:#fff !important; color:#0f3a70 !important; border:none !important; box-shadow:0 6px 18px rgba(0,0,0,0.35) !important; }
+body.dark .page-header .btn-primary:hover { background:#eaf3ff !important; filter:none; }
+body.dark .page-header .btn-secondary, body.dark .page-header .btn-ghost, body.dark .page-header .btn {
+  background:rgba(255,255,255,0.10); color:#fff; border:1px solid rgba(255,255,255,0.38);
+}
+body.dark .page-header .btn-secondary:hover, body.dark .page-header .btn:hover { background:rgba(255,255,255,0.22); }
+body.dark .page-header .eva-wiz-tab { opacity:1; }
+body.dark .page-header .eva-wiz-tab:not(.active):not(.done) .eva-wiz-num { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.40); color:#fff; }
+body.dark .page-header .eva-wiz-tab:not(.active) .eva-wiz-label { color:rgba(255,255,255,0.72); }
+body.dark .page-header .eva-wiz-tab.active .eva-wiz-label { color:#fff; }
+body.dark .page-header .eva-wiz-tab.active .eva-wiz-num { background:#fff; color:#164a8c; box-shadow:0 0 0 4px rgba(255,255,255,0.25); border-color:#fff; }
+body.dark .page-header .eva-wiz-tab.done .eva-wiz-num { background:#27c07a; color:#fff; border-color:#27c07a; }
+body.dark .page-header .eva-wiz-line { background:rgba(255,255,255,0.30); }
+body.dark .page-header .eva-wiz-tab.done + .eva-wiz-line { background:#27c07a; }
+
+/* stat card: permukaan + aksen kiri */
+body.dark .stat-card, body.dark .stat-card:nth-child(2n), body.dark .stat-card:nth-child(3n) { background:#101D33; }
+body.dark .stat-card { border:1px solid rgba(130,175,235,0.18); border-left:4px solid #2D6FB8; box-shadow:0 6px 20px rgba(0,0,0,0.3); }
+body.dark .stat-card:nth-child(2n) { border-left-color:#c4895a; }
+body.dark .stat-card:nth-child(3n) { border-left-color:#14a59a; }
+
+/* tabel */
+body.dark th { background:#15294a; color:#cfe2f8; border-bottom:2px solid rgba(130,175,235,0.30); }
+body.dark tbody tr:nth-child(even) td { background:rgba(130,175,235,0.04); }
+body.dark tr:hover td { background:rgba(56,189,248,0.10); }
+body.dark .lap-block-hd { background:#14243e; border-bottom:1px solid rgba(130,175,235,0.18); }
+
+body.dark .hm-card-desc { color:#b9c9df; }
+body.dark .hm-card-tag { color:color-mix(in srgb,var(--c2) 85%,#fff); }
+body.dark .td-num { color:#cfe2f8; }
+/* tombol & judul seksi */
+body.dark .btn-primary:not(.hm-btn-primary) { background:linear-gradient(135deg,#1D4E89,#2D7BD0); }
+body.dark .section-title { color:#eaf1fb; }
+body.dark .section-title .dot { background:linear-gradient(135deg,#1D4E89,#38bdf8); box-shadow:0 0 0 4px rgba(90,162,240,0.16); }
+</style>
+
+<script id="hydrosan-autocontrast">
+/* Auto-kontras: perbaiki teks yang sulit dibaca (warna hardcoded gelap di dark / terang di light),
+   termasuk konten yang dibuat dinamis. Hanya mengubah warna teks inline; bisa dipulihkan saat ganti tema. */
+(function(){
+  var TIMER=null, RUNNING=false;
+  function parse(s){var m=s&&s.match(/rgba?\(([^)]+)\)/);if(!m)return null;var a=m[1].split(/[,\s\/]+/).filter(Boolean).map(parseFloat);return {r:a[0],g:a[1],b:a[2],a:a.length>3?a[3]:1};}
+  function ch(v){v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);}
+  function lum(c){return 0.2126*ch(c[0])+0.7152*ch(c[1])+0.0722*ch(c[2]);}
+  function cr(a,b){var x=lum(a),y=lum(b);return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05);}
+  function over(base,c,a){return [c.r*a+base[0]*(1-a),c.g*a+base[1]*(1-a),c.b*a+base[2]*(1-a)];}
+  function rgb2hsl(r,g,b){r/=255;g/=255;b/=255;var mx=Math.max(r,g,b),mn=Math.min(r,g,b),h=0,s=0,l=(mx+mn)/2;
+    if(mx!==mn){var d=mx-mn;s=l>0.5?d/(2-mx-mn):d/(mx+mn);
+      if(mx===r)h=(g-b)/d+(g<b?6:0);else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;h/=6;}
+    return [h,s,l];}
+  function hsl2rgb(h,s,l){function f(p,q,t){if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;}
+    if(s===0){var v=Math.round(l*255);return [v,v,v];}
+    var q=l<0.5?l*(1+s):l+s-l*s,p=2*l-q;
+    return [Math.round(f(p,q,h+1/3)*255),Math.round(f(p,q,h)*255),Math.round(f(p,q,h-1/3)*255)];}
+  function fix(fg,bg,target){
+    if(cr(fg,bg)>=target) return null;
+    var hsl=rgb2hsl(fg[0],fg[1],fg[2]), up=lum(bg)<0.4, l=hsl[2], best=null;
+    for(var i=0;i<40;i++){
+      l+= up?0.025:-0.025; if(l>1||l<0) break;
+      var c=hsl2rgb(hsl[0],Math.min(hsl[1],up?0.9:1),l);
+      if(cr(c,bg)>=target){best=c;break;}
+    }
+    return best;
+  }
+  function bgOf(el,cache,base){
+    if(cache.has(el)) return cache.get(el);
+    var cs=getComputedStyle(el), res;
+    var bi=cs.backgroundImage, c=parse(cs.backgroundColor), parent=el.parentElement;
+    if(bi && bi!=='none' && /url\(/.test(bi) && !/gradient/.test(bi)){ res=null; }
+    else {
+      var under = (c && c.a>=0.98) ? null : (parent? bgOf(parent,cache,base) : base);
+      if(under===null && !(c&&c.a>=0.98)) res=null;
+      else {
+        var cur = (c&&c.a>=0.98)? [c.r,c.g,c.b] : (c&&c.a>0? over(under,c,c.a) : under);
+        if(bi && /gradient/.test(bi)){
+          var stops=bi.match(/rgba?\([^)]+\)/g)||[], acc=[0,0,0], n=0;
+          stops.forEach(function(sv){var p=parse(sv); if(p&&p.a>0.3){var o=over(cur,p,p.a);acc[0]+=o[0];acc[1]+=o[1];acc[2]+=o[2];n++;}});
+          if(n) cur=[acc[0]/n,acc[1]/n,acc[2]/n];
+        }
+        res=cur;
+      }
+    }
+    cache.set(el,res); return res;
+  }
+  function svgText(el,cache,base,target){
+    var tn=el.tagName.toLowerCase(); if(tn!=='text'&&tn!=='tspan') return;
+    var has=false; for(var k=0;k<el.childNodes.length;k++){var n=el.childNodes[k]; if(n.nodeType===3&&n.textContent.trim().length>0){has=true;break;}}
+    if(!has) return;
+    var cs=getComputedStyle(el), f=parse(cs.fill); if(!f||f.a===0) return;
+    var svg=el.ownerSVGElement||el.closest('svg'); var bg=bgOf(svg,cache,base); if(!bg) return;
+    var fg=over(bg,f,f.a), nc=fix(fg,bg,target);
+    if(nc){ el.setAttribute('data-ac-svg',el.style.getPropertyValue('fill')||''); el.setAttribute('data-ac',''); el.style.setProperty('fill','rgb('+nc.join(',')+')','important'); }
+  }
+  function run(){
+    if(RUNNING) return; RUNNING=true;
+    try{
+      var dark=document.body.classList.contains('dark');
+      var base=dark?[8,14,26]:[234,241,249], target=dark?4.6:4.2;
+      document.querySelectorAll('[data-ac]').forEach(function(e){
+        if(e.hasAttribute('data-ac-svg')){var q=e.getAttribute('data-ac-svg'); if(q) e.style.setProperty('fill',q); else e.style.removeProperty('fill'); e.removeAttribute('data-ac-svg');}
+        else {var o=e.getAttribute('data-ac'); if(o) e.style.setProperty('color',o); else e.style.removeProperty('color');}
+        e.removeAttribute('data-ac');});
+      var cache=new Map();
+      var roots=[document.querySelector('.hm-topbar'),document.querySelector('.page.active')];
+      roots.forEach(function(root){
+        if(!root) return;
+        var els=root.querySelectorAll('*');
+        for(var i=0;i<els.length;i++){
+          var el=els[i], tn=el.tagName;
+          if(tn==='SCRIPT'||tn==='STYLE'||tn==='svg'||tn==='CANVAS'||tn==='OPTION') continue;
+          if(el.closest('svg')){ svgText(el,cache,base,target); continue; }
+          var has=false; for(var k=0;k<el.childNodes.length;k++){var n=el.childNodes[k]; if(n.nodeType===3&&n.textContent.trim().length>0){has=true;break;}}
+          if(!has) continue;
+          var cs=getComputedStyle(el);
+          if(cs.visibility==='hidden'||cs.display==='none') continue;
+          if(cs.webkitTextFillColor==='rgba(0, 0, 0, 0)'||cs.backgroundClip==='text'||cs.webkitBackgroundClip==='text') continue;
+          var f=parse(cs.color); if(!f||f.a===0) continue;
+          var bg=bgOf(el,cache,base); if(!bg) continue;
+          var fg=over(bg,f,f.a);
+          var gradientBg = /gradient/.test(cs.backgroundImage);
+          var nc=fix(fg,bg,gradientBg?3.2:target);
+          if(nc){ el.setAttribute('data-ac',el.style.getPropertyValue('color')||''); el.style.setProperty('color','rgb('+nc.join(',')+')','important'); }
+        }
+      });
+    }catch(e){}
+    RUNNING=false;
+  }
+  function schedule(){ clearTimeout(TIMER); TIMER=setTimeout(run,220); }
+  document.addEventListener('DOMContentLoaded',function(){
+    schedule();
+    new MutationObserver(function(ms){
+      for(var i=0;i<ms.length;i++){var m=ms[i]; if(m.type==='attributes'&&m.attributeName==='style') continue; schedule(); return;}
+    }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+  });
+  window.hydrosanAutoContrast=run;
+})();
+</script>
+
 </head>
 <body>
 
@@ -2652,17 +3509,12 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
      ╚══════════════════════════════════════╝ -->
 <div class="page" id="page-rainfall">
 
-  <div class="page-header">
+  <div class="page-header has-stepper">
     <div>
       <div class="page-title">Rainfall Analysis</div>
       <div class="page-subtitle">Analisis statistik data curah hujan harian · mendukung data >30 tahun</div>
     </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════
-       WIZARD STEP TABS (indicator only, klik tidak aktif — navigasi via tombol)
-  ══════════════════════════════════════════ -->
-  <div class="eva-wiz-tabs">
+    <div class="eva-wiz-tabs">
     <div class="eva-wiz-tab active" id="ra-wt-1" data-step="1" onclick="raWizGoto(1)">
       <span class="eva-wiz-num">1</span>
       <span class="eva-wiz-label">Input</span>
@@ -2697,6 +3549,7 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
       <span class="eva-wiz-num">7</span>
       <span class="eva-wiz-label">Waktu Konsentrasi</span>
     </div>
+  </div>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -2860,11 +3713,11 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
       <!-- Row 2: Panel biru statistik kunci (padat, 4 kartu) -->
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
         <div class="bp">
-          <div><div class="bp-lbl">Rerata Bulanan</div><div class="bp-val" id="bp-monthly">—</div><div class="bp-unit">mm / bulan</div></div>
+          <div><div class="bp-lbl">Rerata Bulanan</div><div class="bp-val" id="bp-monthly">—</div><div class="bp-unit" id="bp-monthly-unit">mm / bulan</div></div>
           <div class="mini-bars" id="mb1"></div>
         </div>
         <div class="bp">
-          <div><div class="bp-lbl">Rerata Tahunan</div><div class="bp-val" id="bp-yearly">—</div><div class="bp-unit">mm / tahun</div></div>
+          <div><div class="bp-lbl">Rerata Tahunan</div><div class="bp-val" id="bp-yearly">—</div><div class="bp-unit" id="bp-yearly-unit">mm / tahun</div></div>
           <div class="mini-bars" id="mb2"></div>
         </div>
         <div class="bp" style="background:linear-gradient(135deg,#1e8449,#2ecc71)">
@@ -2882,7 +3735,7 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
         <div class="card">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
             <div class="section-title" style="margin-bottom:0"><div class="dot" style="background:#27ae60"></div>Pola Musiman — Rerata Bulanan</div>
-            <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">mm/bulan</span>
+            <span id="ra-monthly-unit" style="font-size:10px;color:var(--muted);font-family:var(--mono)">mm/hari</span>
           </div>
           <div style="position:relative;width:100%;height:180px">
             <canvas id="ra-monthly-chart"></canvas>
@@ -2970,76 +3823,73 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
       </div>
 
       <!-- Row 7: Faktor Erosivitas Hujan (R) -->
-      <div class="card" style="margin-top:14px" id="ra-erosivity-card">
-        <!-- Header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="card ero-card" style="margin-top:14px" id="ra-erosivity-card">
+        <div class="ero-head">
           <div class="section-title" style="margin-bottom:0">
             <div class="dot" style="background:#e67e22"></div>
-            Faktor Erosivitas Hujan (R) — Bols (1978) dalam Arsyad (2000)
+            <span id="ra-eros-title">Faktor Erosivitas Hujan (R) — Bols (1978) dalam Arsyad (2000)</span>
           </div>
-          <button onclick="raErosivityAutoFill()"
-            style="display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;padding:5px 14px;border-radius:6px;border:1.5px solid var(--blue);background:var(--blue-soft);color:var(--blue2);cursor:pointer;transition:all .15s"
-            onmouseover="this.style.background='var(--blue3)';this.style.color='#fff'"
-            onmouseout="this.style.background='var(--blue-soft)';this.style.color='var(--blue2)'">
-            ⚡ Isi Otomatis dari Data
-          </button>
+          <div class="ero-actions">
+            <div class="ero-seg" role="group" aria-label="Metode perhitungan R">
+              <button type="button" id="ra-eros-btn-bols" class="ero-seg-btn active" onclick="raErosivitySetMethod('bols')">Bols (1978)</button>
+              <button type="button" id="ra-eros-btn-lenvain" class="ero-seg-btn" onclick="raErosivitySetMethod('lenvain')">Lenvain (1975)</button>
+            </div>
+            <button type="button" class="ero-auto" onclick="raErosivityAutoFill()">⚡ Isi Otomatis dari Data</button>
+          </div>
         </div>
 
-        <!-- Formula box -->
-        <div style="background:var(--blue-soft);border:1px solid var(--border2);border-radius:var(--rs);padding:12px 16px;margin-bottom:14px">
-          <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:8px">
-            Nilai erosivitas berpengaruh pada besar energi kinetik terhadap tanah yang mampu memecah agregat dan menghasilkan aliran permukaan.
-            Nilai indeks diasumsikan sama untuk setiap satuan peta lahan.
+        <!-- Rumus: Lenvain -->
+        <div id="ra-eros-info-lenvain" class="ero-formula" style="display:none">
+          <div class="ero-eq">R<sub>m</sub> = 2,21 × CH<sup>1,36</sup></div>
+          <div class="ero-legend">
+            <span><b>R<sub>m</sub></b> indeks erosivitas bulanan</span>
+            <span><b>CH</b> curah hujan rerata bulanan (cm)</span>
           </div>
-          <div style="text-align:center;padding:8px 0;font-size:14px;font-weight:700;color:var(--blue2);letter-spacing:0.3px;font-family:var(--mono)">
-            R = 6,119 × RAIN<sup>1,21</sup> × DAYS<sup>−0,47</sup> × MAXP<sup>0,53</sup>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px">
-            <div style="font-size:10.5px;color:var(--muted);background:var(--card);border-radius:5px;padding:6px 10px;line-height:1.5">
-              <strong style="color:var(--text)">RAIN</strong> — Curah hujan rata-rata bulanan <em>(cm)</em>
-            </div>
-            <div style="font-size:10.5px;color:var(--muted);background:var(--card);border-radius:5px;padding:6px 10px;line-height:1.5">
-              <strong style="color:var(--text)">DAYS</strong> — Jumlah hari hujan rata-rata bulanan <em>(hari)</em>
-            </div>
-            <div style="font-size:10.5px;color:var(--muted);background:var(--card);border-radius:5px;padding:6px 10px;line-height:1.5">
-              <strong style="color:var(--text)">MAXP</strong> — Curah hujan maksimum 24 jam dalam bulan <em>(cm)</em>
-            </div>
-          </div>
-          <div style="font-size:10px;color:var(--muted);margin-top:8px;font-style:italic">
-            ⚠️ Input dalam satuan <strong>cm</strong>. Jika data tersedia dalam mm, bagi 10 sebelum memasukkan nilai.
+          <div class="ero-desc">
+            Menduga erosivitas bulanan hanya dari curah hujan bulanan rerata; R tahunan = ΣR<sub>m</sub> dari 12 bulan.
+            Satuan input <b>cm</b> (10 mm = 1 cm). Saat <b>Isi Otomatis</b>, CH mengikuti
+            <b>Mode Perhitungan Statistik</b>: <b id="ra-eros-mode-badge" style="color:var(--blue)">Semua Data</b>.
           </div>
         </div>
+
+        <!-- Rumus: Bols -->
+        <div id="ra-eros-info-bols" class="ero-formula">
+          <div class="ero-eq">R = 6,119 × RAIN<sup>1,21</sup> × DAYS<sup>−0,47</sup> × MAXP<sup>0,53</sup></div>
+          <div class="ero-legend">
+            <span><b>RAIN</b> curah hujan rerata bulanan (cm)</span>
+            <span><b>DAYS</b> hari hujan rerata bulanan (hari)</span>
+            <span><b>MAXP</b> CH harian maksimum bulanan, rerata (cm)</span>
+          </div>
+          <div class="ero-desc">
+            Energi kinetik hujan yang memecah agregat tanah dan menghasilkan aliran permukaan; indeks diasumsikan sama untuk setiap satuan lahan.
+            Satuan input <b>cm</b> (bila data dalam mm, bagi 10).
+          </div>
+        </div>
+
+        <!-- Ringkasan -->
+        <div class="ero-summary" id="ra-eros-summary"></div>
 
         <!-- Tabel input + hasil -->
-        <div style="overflow-x:auto">
-          <table id="ra-erosivity-table" style="width:100%;min-width:680px;border-collapse:collapse">
-            <thead>
-              <tr style="background:var(--bg2)">
-                <th style="text-align:left;padding:8px 10px;font-size:11.5px;border-bottom:1px solid var(--border)">Bulan</th>
-                <th style="text-align:right;padding:8px 10px;font-size:11.5px;border-bottom:1px solid var(--border);color:var(--blue2)">RAIN (cm)</th>
-                <th style="text-align:right;padding:8px 10px;font-size:11.5px;border-bottom:1px solid var(--border);color:var(--blue2)">DAYS (hari)</th>
-                <th style="text-align:right;padding:8px 10px;font-size:11.5px;border-bottom:1px solid var(--border);color:var(--blue2)">MAXP (cm)</th>
-                <th style="text-align:right;padding:8px 10px;font-size:11.5px;border-bottom:1px solid var(--border);color:var(--orange);font-weight:700">R</th>
-              </tr>
-            </thead>
+        <div class="ero-table-wrap">
+          <table class="ero-table" id="ra-erosivity-table">
+            <thead id="ra-erosivity-thead"></thead>
             <tbody id="ra-erosivity-tbody"></tbody>
             <tfoot>
-              <tr style="background:var(--bg2);border-top:2px solid var(--border)">
-                <td colspan="4" style="padding:9px 10px;font-size:12px;font-weight:700;color:var(--text)">Total Erosivitas Tahunan</td>
-                <td style="text-align:right;padding:9px 10px;font-size:13px;font-weight:800;color:var(--orange);font-family:var(--mono)" id="ra-erosivity-total">—</td>
+              <tr>
+                <td id="ra-erosivity-total-label" colspan="4">Total Erosivitas Tahunan</td>
+                <td class="ero-total" id="ra-erosivity-total">—</td>
               </tr>
             </tfoot>
           </table>
         </div>
+        <div id="ra-erosivity-incomplete" class="ero-foot" style="display:none">* Belum semua bulan terisi lengkap — total hanya menjumlahkan bulan yang sudah terhitung.</div>
 
-        <!-- Info + sumber -->
-        <div style="margin-top:10px;font-size:10.5px;color:var(--muted);background:var(--card);border-radius:5px;padding:7px 12px;line-height:1.6">
+        <div class="ero-foot">
           <strong style="color:var(--orange)">📌 Catatan:</strong>
-          Nilai R total merupakan indeks erosivitas hujan tahunan yang digunakan dalam persamaan USLE (<em>Universal Soil Loss Equation</em>).
-          Semakin tinggi nilai R, semakin besar potensi erosi akibat hujan pada kawasan tambang.
+          R tahunan adalah indeks erosivitas hujan pada persamaan USLE; semakin besar R, semakin besar potensi erosi akibat hujan di kawasan tambang.
           <span style="float:right;font-style:italic">Sumber: Hasil Perhitungan, <span id="ra-erosivity-year"></span></span>
         </div>
-        <div id="ra-erosivity-source-note" style="margin-top:4px;font-size:10px;color:var(--muted);font-style:italic;display:none"></div>
+        <div id="ra-erosivity-source-note" class="ero-foot" style="font-style:italic;display:none"></div>
       </div>
 
     </div>
@@ -4195,17 +5045,12 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
      ╚══════════════════════════════════════════╝ -->
 <div class="page" id="page-evaporation">
 
-  <div class="page-header">
+  <div class="page-header has-stepper">
     <div>
       <div class="page-title">Evaporation Analysis</div>
       <div class="page-subtitle">Laju penguapan Irving Langmuir via Diagram Psikrometrik</div>
     </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════
-       WIZARD STEP TABS (indicator only, klik tidak aktif — navigasi via tombol)
-  ══════════════════════════════════════════ -->
-  <div class="eva-wiz-tabs">
+    <div class="eva-wiz-tabs">
     <div class="eva-wiz-tab active" id="eva-wt-1" data-step="1" onclick="evaWizGoto(1)">
       <span class="eva-wiz-num">1</span>
       <span class="eva-wiz-label">Input</span>
@@ -4225,6 +5070,7 @@ body.dark .lap-stat-item { background:rgba(255,255,255,.03); }
       <span class="eva-wiz-num">4</span>
       <span class="eva-wiz-label">Hasil</span>
     </div>
+  </div>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -8267,6 +9113,56 @@ function raAnalyze() {
   raRender();
 }
 
+// ── Statistik bulanan/tahunan yang mengikuti Mode Perhitungan Statistik ──
+function raMonthlyYearlyByMode(mode, s, nM, nY) {
+  if (mode === 'annual_max') {
+    // Rerata dari CH harian maksimum tiap bulan (dan tiap tahun) — satuan mm/hari
+    const mx = {};
+    raData.forEach(d => {
+      const k = d.date.getFullYear() * 12 + d.date.getMonth();
+      if (mx[k] === undefined || d.value > mx[k]) mx[k] = d.value;
+    });
+    const v = Object.values(mx);
+    return {
+      monthly: v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0,
+      yearly : s.mean,
+      mUnit  : 'mm/hari · rerata maks bulanan',
+      yUnit  : 'mm/hari · rerata maks tahunan',
+      dec    : 1
+    };
+  }
+  // 'all' / 'wet': s.sum sudah mengikuti mode (wet = hanya hari > 0,5 mm).
+  // Rerata tahunan = 12 × rerata bulanan → konsisten walau tahun pertama/terakhir tidak penuh
+  // (s.sum / nY menganggap tahun parsial sebagai tahun penuh sehingga hasilnya terlalu kecil).
+  const monthly = s.sum / nM;
+  return { monthly, yearly: monthly * 12, mUnit: 'mm / bulan', yUnit: 'mm / tahun', dec: 0 };
+}
+
+// Rincian per bulan kalender (Jan–Des) untuk mode tertentu
+//  totalMm : rerata total CH bulanan (mm/bulan) dari data yang dipakai mode tsb
+//  perDay  : rerata CH per hari (mm/hari) dari data yang dipakai mode tsb
+//  maxAvg  : rerata CH harian maksimum per bulan (mm/hari)
+function raMonthlyBreakdown(mode) {
+  mode = mode || 'all';
+  const sum = Array(12).fill(0), cnt = Array(12).fill(0);
+  const yrs = Array.from({ length: 12 }, () => new Set());
+  const mx = {};
+  raData.forEach(d => {
+    const m = d.date.getMonth(), y = d.date.getFullYear();
+    yrs[m].add(y);
+    if (mode !== 'wet' || d.value > 0.5) { sum[m] += d.value; cnt[m]++; }
+    const k = y + '-' + m;
+    if (mx[k] === undefined || d.value > mx[k]) mx[k] = d.value;
+  });
+  const mxSum = Array(12).fill(0), mxCnt = Array(12).fill(0);
+  Object.keys(mx).forEach(k => { const m = +k.split('-')[1]; mxSum[m] += mx[k]; mxCnt[m]++; });
+  return Array.from({ length: 12 }, (_, i) => ({
+    totalMm: yrs[i].size > 0 ? sum[i] / yrs[i].size : 0,
+    perDay : cnt[i] > 0 ? sum[i] / cnt[i] : 0,
+    maxAvg : mxCnt[i] > 0 ? mxSum[i] / mxCnt[i] : 0
+  }));
+}
+
 function raSetCalcMode(mode) {
   raCalcMode = mode;
   ['all','wet','annual_max'].forEach(m => {
@@ -8309,8 +9205,12 @@ function raRender() {
   document.getElementById('sc-wetdays').innerHTML = wetV.length.toLocaleString('id-ID') + '<span class="u">hari</span>';
 
   // ── Blue panels ──
-  document.getElementById('bp-monthly').textContent  = f0n(s.sum / nM);
-  document.getElementById('bp-yearly').textContent   = f0n(s.sum / nY);
+  const _my = raMonthlyYearlyByMode(raCalcMode, s, nM, nY);
+  const _fmtMY = v => _my.dec === 1 ? f1(v) : f0n(v);
+  document.getElementById('bp-monthly').textContent  = _fmtMY(_my.monthly);
+  document.getElementById('bp-yearly').textContent   = _fmtMY(_my.yearly);
+  const _mu = document.getElementById('bp-monthly-unit'); if (_mu) _mu.textContent = _my.mUnit;
+  const _yu = document.getElementById('bp-yearly-unit');  if (_yu) _yu.textContent = _my.yUnit;
   document.getElementById('bp-wetdays').textContent  = wetV.length.toLocaleString('id-ID');
   document.getElementById('bp-sd').textContent       = f2(s.sd);
   [1,2,3,4].forEach(i => { document.getElementById('mb'+i).innerHTML = fmb(); });
@@ -8443,7 +9343,10 @@ function raRender() {
 
   raUpdateChart();
   raRenderExtraCharts();
-  if (typeof raErosivityRenderTable === 'function') raErosivityRenderTable();
+  if (typeof raErosivityRenderTable === 'function') {
+    if (raErosAuto && typeof raErosivityAutoFill === 'function') raErosivityAutoFill(true);
+    else raErosivityRenderTable();
+  }
 
   // refresh CH runoff (dilakukan juga oleh wrapper roChRefresh)
 }
@@ -8524,12 +9427,16 @@ function raUpdateChart() {
     infoText = `${keys.length} bulan · ${nYears} tahun`;
 
   } else if (type === 'monthly_avg') {
-    const sumM = new Array(12).fill(0), cntM = new Array(12).fill(0);
-    raData.forEach(d => { sumM[d.date.getMonth()] += d.value; cntM[d.date.getMonth()]++; });
+    // Mengikuti Mode Perhitungan Statistik (sama dengan grafik Pola Musiman)
+    const _cm = raCalcMode || 'all';
+    const _mb = raMonthlyBreakdown(_cm);
     labels = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-    const vals = sumM.map((s,i) => cntM[i] > 0 ? +(s/cntM[i]).toFixed(2) : 0);
+    const vals = _mb.map(x => +(_cm === 'annual_max' ? x.maxAvg : x.perDay).toFixed(2));
+    const _lbl = _cm === 'wet' ? 'Rerata Bulanan — hari hujan saja (mm/hari hujan)'
+               : _cm === 'annual_max' ? 'Rerata CH Maks Bulanan (mm/hari)'
+               : 'Rerata Bulanan — semua data (mm/hari)';
     datasets = [{
-      label: 'Rerata Bulanan (mm/hari)',
+      label: _lbl,
       data: vals,
       backgroundColor: 'rgba(39,174,96,0.6)',
       borderColor: '#27ae60',
@@ -8540,7 +9447,7 @@ function raUpdateChart() {
       tension: 0.4,
       type: baseChartType,
     }];
-    infoText = `Rata-rata dari ${nYears} tahun data`;
+    infoText = `Rata-rata dari ${nYears} tahun data · Mode: ${_cm === 'wet' ? 'Hari Hujan Saja' : _cm === 'annual_max' ? 'CH Maks Tahunan' : 'Semua Data'}`;
 
   } else if (type === 'monthly_max') {
     // CH harian tertinggi dalam tiap bulan (per tahun) — untuk identifikasi bulan basah ekstrem
@@ -8910,86 +9817,186 @@ const BULAN_NAMES = ['Januari','Februari','Maret','April','Mei','Juni',
 // State: erosivity data per bulan (RAIN cm, DAYS, MAXP cm)
 let raErosivityData = BULAN_NAMES.map(() => ({ rain: '', days: '', maxp: '' }));
 
+let raErosMethod = 'bols';   // 'bols' | 'lenvain'
+let raErosAuto   = false;    // true bila tabel diisi otomatis → ikut berubah saat Mode Statistik diganti
+let raErosNYears = 0;
+
 function raCalcR(rain, days, maxp) {
   if (!rain || !days || !maxp || rain <= 0 || days <= 0 || maxp <= 0) return null;
   return 6.119 * Math.pow(rain, 1.21) * Math.pow(days, -0.47) * Math.pow(maxp, 0.53);
 }
 
+// Lenvain (1975): Rm = 2,21 × CH^1,36   (CH = curah hujan rerata bulanan, cm)
+function raCalcRLenvain(rainCm) {
+  if (!rainCm || rainCm <= 0) return null;
+  return 2.21 * Math.pow(rainCm, 1.36);
+}
+
+function raErosivitySetMethod(method) {
+  raErosMethod = (method === 'lenvain') ? 'lenvain' : 'bols';
+  raErosivityRenderTable();
+}
+
+function raErosModeLabel() {
+  const m = (typeof raCalcMode !== 'undefined') ? raCalcMode : 'all';
+  return m === 'wet' ? 'Hari Hujan Saja (> 0,5 mm)'
+       : m === 'annual_max' ? 'CH Maks Tahunan (CH bulanan memakai total semua data)'
+       : 'Semua Data';
+}
+
+// ── Helper angka erosivitas ──
+function raErosNum(v) {            // string/number → number (menerima koma desimal)
+  const n = parseFloat(String(v == null ? '' : v).replace(',', '.'));
+  return isNaN(n) ? NaN : n;
+}
+function raErosFmt(v, dec) {       // tampilan id-ID tetap dengan jumlah desimal tertentu
+  const n = raErosNum(v);
+  return isNaN(n) ? '' : n.toLocaleString('id-ID', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+const RA_EROS_DEC = { rain: 3, days: 2, maxp: 3 };   // hanya tampilan; hitungan memakai nilai penuh
+
+function raErosFocus(el) {         // saat diedit tampilkan nilai penuh (tanpa pembulatan)
+  const d = raErosivityData[+el.dataset.i][el.dataset.f];
+  el.value = String(d == null ? '' : d).replace('.', ',');
+  el.select();
+}
+function raErosBlur(el) {
+  const d = raErosivityData[+el.dataset.i][el.dataset.f];
+  el.value = raErosFmt(d, RA_EROS_DEC[el.dataset.f]);
+}
+function raErosInput(el) {
+  const clean = el.value.replace(/[^0-9.,]/g, '');
+  if (clean !== el.value) el.value = clean;
+  raErosivityData[+el.dataset.i][el.dataset.f] = clean.replace(',', '.');
+  raErosAuto = false;
+  raErosivityRefreshOutputs();     // hanya perbarui hasil → fokus input tidak hilang
+}
+
 function raErosivityRenderTable() {
   const tbody = document.getElementById('ra-erosivity-tbody');
   if (!tbody) return;
+  const isLv = raErosMethod === 'lenvain';
 
-  let html = '';
-  let totalR = 0;
-  let hasAll = true;
+  // ── UI sesuai metode ──
+  const setDisp = (id, v) => { const e = document.getElementById(id); if (e) e.style.display = v; };
+  setDisp('ra-eros-info-bols',    isLv ? 'none' : 'grid');
+  setDisp('ra-eros-info-lenvain', isLv ? 'grid' : 'none');
+  const ttl = document.getElementById('ra-eros-title');
+  if (ttl) ttl.textContent = isLv
+    ? 'Faktor Erosivitas Hujan (R) — Lenvain (1975)'
+    : 'Faktor Erosivitas Hujan (R) — Bols (1978) dalam Arsyad (2000)';
+  [['bols', !isLv], ['lenvain', isLv]].forEach(([m, active]) => {
+    const btn = document.getElementById('ra-eros-btn-' + m);
+    if (btn) btn.classList.toggle('active', active);
+  });
+  const badge = document.getElementById('ra-eros-mode-badge');
+  if (badge) badge.textContent = raErosModeLabel();
 
-  BULAN_NAMES.forEach((bln, i) => {
+  const thead = document.getElementById('ra-erosivity-thead');
+  if (thead) thead.innerHTML = '<tr><th class="l">Bulan</th>' + (isLv
+    ? '<th>CH rerata <i>(cm)</i></th><th>CH <i>(mm)</i></th><th class="r-col">R<sub>m</sub></th>'
+    : '<th>RAIN <i>(cm)</i></th><th>DAYS <i>(hari)</i></th><th>MAXP <i>(cm)</i></th><th class="r-col">R</th>') + '</tr>';
+  const lbl = document.getElementById('ra-erosivity-total-label');
+  if (lbl) {
+    lbl.colSpan = isLv ? 3 : 4;
+    lbl.textContent = isLv ? 'Total Erosivitas Tahunan (ΣRm)' : 'Total Erosivitas Tahunan';
+  }
+
+  const inp = (i, f) => `<td><input type="text" inputmode="decimal" class="ero-in" data-i="${i}" data-f="${f}"
+      value="${raErosFmt(raErosivityData[i][f], RA_EROS_DEC[f])}" placeholder="—" autocomplete="off"
+      onfocus="raErosFocus(this)" onblur="raErosBlur(this)" oninput="raErosInput(this)"></td>`;
+  tbody.innerHTML = BULAN_NAMES.map((bln, i) => `<tr>
+      <td class="l">${bln}</td>
+      ${isLv
+        ? inp(i, 'rain') + `<td class="ero-mm" id="ra-eros-mm-${i}">—</td>`
+        : inp(i, 'rain') + inp(i, 'days') + inp(i, 'maxp')}
+      <td class="r-col"><div class="ero-rbar"><span class="ero-rbar-fill" id="ra-eros-bar-${i}"></span><span class="ero-rval" id="ra-eros-r-${i}">—</span></div></td>
+    </tr>`).join('');
+
+  raErosivityRefreshOutputs();
+}
+
+// Hitung ulang kolom R, total, ringkasan & catatan (tanpa membangun ulang input)
+function raErosivityRefreshOutputs() {
+  const isLv = raErosMethod === 'lenvain';
+  const rs = BULAN_NAMES.map((_, i) => {
     const d = raErosivityData[i];
-    const r = raCalcR(parseFloat(d.rain), parseFloat(d.days), parseFloat(d.maxp));
-    const rStr = (r !== null) ? r.toLocaleString('id-ID', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) : '—';
-    if (r !== null) totalR += r; else hasAll = false;
+    const rain = raErosNum(d.rain);
+    return isLv ? raCalcRLenvain(rain) : raCalcR(rain, raErosNum(d.days), raErosNum(d.maxp));
+  });
+  const valid = rs.filter(r => r !== null);
+  const total = valid.reduce((a, r) => a + r, 0);
+  const rMax = valid.length ? Math.max(...valid) : 0;
 
-    const stripe = i % 2 === 0 ? 'background:var(--card2)' : '';
-    html += `<tr style="${stripe}">
-      <td style="padding:7px 10px;font-size:12px;font-weight:600;color:var(--text)">${bln}</td>
-      <td style="padding:5px 6px">
-        <input type="number" min="0" step="0.001" value="${d.rain}"
-          oninput="raErosivityData[${i}].rain=this.value;raErosivityRenderTable()"
-          style="width:90px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--mono);font-size:11.5px;text-align:right"
-          placeholder="cm">
-      </td>
-      <td style="padding:5px 6px">
-        <input type="number" min="0" step="0.1" value="${d.days}"
-          oninput="raErosivityData[${i}].days=this.value;raErosivityRenderTable()"
-          style="width:80px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--mono);font-size:11.5px;text-align:right"
-          placeholder="hari">
-      </td>
-      <td style="padding:5px 6px">
-        <input type="number" min="0" step="0.001" value="${d.maxp}"
-          oninput="raErosivityData[${i}].maxp=this.value;raErosivityRenderTable()"
-          style="width:90px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--mono);font-size:11.5px;text-align:right"
-          placeholder="cm">
-      </td>
-      <td style="text-align:right;padding:7px 10px;font-family:var(--mono);font-size:12px;font-weight:700;color:${r !== null ? 'var(--orange)' : 'var(--muted)'}">${rStr}</td>
-    </tr>`;
+  rs.forEach((r, i) => {
+    const el = document.getElementById('ra-eros-r-' + i);
+    if (el) el.textContent = r !== null ? raErosFmt(r, 3) : '—';
+    const bar = document.getElementById('ra-eros-bar-' + i);
+    if (bar) bar.style.width = (r !== null && rMax > 0) ? (r / rMax * 100).toFixed(1) + '%' : '0%';
+    const mm = document.getElementById('ra-eros-mm-' + i);
+    if (mm) { const rain = raErosNum(raErosivityData[i].rain); mm.textContent = rain > 0 ? raErosFmt(rain * 10, 1) : '—'; }
   });
 
-  tbody.innerHTML = html;
-
+  const hasAll = valid.length === 12;
   const totalEl = document.getElementById('ra-erosivity-total');
-  if (totalEl) {
-    totalEl.textContent = hasAll
-      ? totalR.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-      : (totalR > 0
-          ? totalR.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' *'
-          : '—');
+  if (totalEl) totalEl.textContent = valid.length ? raErosFmt(total, 2) + (hasAll ? '' : ' *') : '—';
+  const incEl = document.getElementById('ra-erosivity-incomplete');
+  if (incEl) incEl.style.display = (valid.length && !hasAll) ? 'block' : 'none';
+
+  // ── Ringkasan ──
+  const sumEl = document.getElementById('ra-eros-summary');
+  if (sumEl) {
+    let hi = -1, lo = -1;
+    rs.forEach((r, i) => {
+      if (r === null) return;
+      if (hi < 0 || r > rs[hi]) hi = i;
+      if (lo < 0 || r < rs[lo]) lo = i;
+    });
+    const tile = (cls, l, v, sub) => `<div class="ero-tile ${cls}"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${sub}</div></div>`;
+    sumEl.innerHTML = valid.length ? [
+      tile('accent', 'R Tahunan', raErosFmt(total, 2) + (hasAll ? '' : ' *'), isLv ? 'ΣR<sub>m</sub> 12 bulan' : 'ΣR 12 bulan'),
+      tile('', 'Rerata R / Bulan', raErosFmt(total / valid.length, 2), valid.length + ' bulan terhitung'),
+      tile('', 'Bulan Tertinggi', raErosFmt(rs[hi], 2), BULAN_NAMES[hi]),
+      tile('', 'Bulan Terendah', raErosFmt(rs[lo], 2), BULAN_NAMES[lo])
+    ].join('') : '<div class="ero-empty">Isi data bulanan atau klik <b>⚡ Isi Otomatis dari Data</b> untuk menghitung R.</div>';
+  }
+
+  // ── Catatan sumber data (hanya bila hasil isi otomatis) ──
+  const noteEl = document.getElementById('ra-erosivity-source-note');
+  if (noteEl) {
+    if (raErosAuto && raErosNYears) {
+      noteEl.style.display = 'block';
+      noteEl.textContent = isLv
+        ? `* CH bulanan = rerata total CH tiap bulan dari ${raErosNYears} tahun data (mm → cm), mengikuti Mode Perhitungan Statistik: ${raErosModeLabel()}.`
+        : `* RAIN & MAXP dihitung dari rata-rata ${raErosNYears} tahun data curah hujan harian (mm → cm). RAIN mengikuti Mode Perhitungan Statistik: ${raErosModeLabel()}. DAYS = rata-rata hari hujan >0,5 mm per bulan.`;
+    } else {
+      noteEl.style.display = 'none';
+    }
   }
 }
 
-function raErosivityAutoFill() {
+function raErosivityAutoFill(silent) {
   if (!raData || !raData.length) {
-    showToast('⚠ Data curah hujan belum dimuat. Upload data terlebih dahulu.', 'error');
+    if (!silent) showToast('⚠ Data curah hujan belum dimuat. Upload data terlebih dahulu.', 'error');
     return;
   }
 
   // Kumpulkan data per bulan per tahun
-  const byMonthYear = {};  // key: "year-month"
-  const sumM   = Array(12).fill(0);  // total mm per bulan (semua data)
   const cntM   = Array(12).fill(0);  // jumlah hari per bulan (dengan data)
   const wetM   = Array(12).fill(0);  // hari hujan per bulan
-  const maxByMonthYear = {};  // max harian per bulan-tahun → untuk rata-rata MAXP
+  const yrsM   = Array.from({ length: 12 }, () => new Set()); // tahun yang punya data utk tiap bulan kalender
+  const maxByMonthYear = {};         // max harian per bulan-tahun → untuk rata-rata MAXP
 
   raData.forEach(d => {
     const mo = d.date.getMonth();
     const yr = d.date.getFullYear();
     const key = `${yr}-${mo}`;
-    sumM[mo] += d.value;
     cntM[mo]++;
+    yrsM[mo].add(yr);
     if (d.value > 0.5) wetM[mo]++;
     if (!maxByMonthYear[key] || d.value > maxByMonthYear[key]) maxByMonthYear[key] = d.value;
   });
 
-  // Hitung avg MAXP per bulan: rata-rata dari max bulanan per tahun
   const maxSumM = Array(12).fill(0);
   const maxCntM = Array(12).fill(0);
   Object.entries(maxByMonthYear).forEach(([key, val]) => {
@@ -8998,29 +10005,32 @@ function raErosivityAutoFill() {
     maxCntM[mo]++;
   });
 
-  // Jumlah tahun unik
   const nYears = new Set(raData.map(d => d.date.getFullYear())).size || 1;
 
+  // CH bulanan rerata mengikuti Mode Perhitungan Statistik
+  // (mode CH Maks Tahunan tidak punya total bulanan → memakai semua data)
+  const mode = (typeof raCalcMode !== 'undefined') ? raCalcMode : 'all';
+  const mb = raMonthlyBreakdown(mode === 'annual_max' ? 'all' : mode);
+
   BULAN_NAMES.forEach((_, i) => {
-    const avgRainCm  = cntM[i] > 0 ? (sumM[i] / nYears / 10) : 0;   // mm→cm, rata tahunan
-    const avgDays    = wetM[i] / nYears;
-    const avgMaxpCm  = maxCntM[i] > 0 ? (maxSumM[i] / maxCntM[i] / 10) : 0;  // mm→cm
+    const avgRainCm  = yrsM[i].size > 0 ? mb[i].totalMm / 10 : 0;                     // mm→cm
+    // Dibagi jumlah tahun yang punya data bulan tsb (sama dengan penyebut RAIN & MAXP),
+    // bukan jumlah seluruh tahun data → tidak bias bila data awal/akhir tidak penuh 12 bulan.
+    const avgDays    = yrsM[i].size > 0 ? wetM[i] / yrsM[i].size : 0;
+    const avgMaxpCm  = maxCntM[i] > 0 ? (maxSumM[i] / maxCntM[i] / 10) : 0;      // mm→cm
 
     raErosivityData[i] = {
-      rain:  avgRainCm  > 0 ? avgRainCm.toFixed(3)  : '',
-      days:  avgDays    > 0 ? avgDays.toFixed(1)     : '',
-      maxp:  avgMaxpCm  > 0 ? avgMaxpCm.toFixed(3)   : ''
+      // Presisi penuh (6 desimal ≈ eksak) agar R cocok dengan hitungan Excel
+      rain:  avgRainCm  > 0 ? String(+avgRainCm.toFixed(6)) : '',
+      days:  avgDays    > 0 ? String(+avgDays.toFixed(6))   : '',
+      maxp:  avgMaxpCm  > 0 ? String(+avgMaxpCm.toFixed(6)) : ''
     };
   });
 
-  const noteEl = document.getElementById('ra-erosivity-source-note');
-  if (noteEl) {
-    noteEl.style.display = 'block';
-    noteEl.textContent = `* Nilai RAIN & MAXP dihitung dari rata-rata ${nYears} tahun data curah hujan harian yang telah dimuat (konversi mm → cm). DAYS = rata-rata hari hujan >0,5 mm per bulan.`;
-  }
-
+  raErosAuto = true;
+  raErosNYears = nYears;
   raErosivityRenderTable();
-  showToast('✓ Data erosivitas diisi otomatis dari data curah hujan.', 'success');
+  if (!silent) showToast('✓ Data erosivitas diisi otomatis dari data curah hujan.', 'success');
 }
 
 // Init tabel saat halaman load
@@ -9040,9 +10050,14 @@ function raRenderExtraCharts() {
   const tc = isDk ? '#4a7a9a' : '#6080a0';
 
   // ── 1. Monthly average bar chart ──────────────────
-  const sumM = new Array(12).fill(0), cntM = new Array(12).fill(0);
-  raData.forEach(d => { sumM[d.date.getMonth()] += d.value; cntM[d.date.getMonth()]++; });
-  const mAvg = sumM.map((s,i) => cntM[i] > 0 ? +(s/cntM[i]).toFixed(2) : 0);
+  const _cm = raCalcMode || 'all';
+  const _mb = raMonthlyBreakdown(_cm);
+  const mAvg = _mb.map(x => +(_cm === 'annual_max' ? x.maxAvg : x.perDay).toFixed(2));
+  const _mLbl = _cm === 'wet' ? 'mm/hari hujan (>0,5 mm)'
+              : _cm === 'annual_max' ? 'mm/hari · rerata CH maks bulanan'
+              : 'mm/hari · semua data';
+  const _mUnitEl = document.getElementById('ra-monthly-unit');
+  if (_mUnitEl) _mUnitEl.textContent = _mLbl;
   const mLabels = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
   const maxM = Math.max(...mAvg, 1);
   const mColors = mAvg.map(v => {
@@ -9055,7 +10070,7 @@ function raRenderExtraCharts() {
     raMonthlyChart = new Chart(mcCtx.getContext('2d'), {
       type:'bar',
       data:{ labels:mLabels, datasets:[{
-        label:'Rerata Bulanan (mm/hari)', data:mAvg,
+        label:'Rerata Bulanan ('+_mLbl+')', data:mAvg,
         backgroundColor:mColors, borderRadius:4, borderWidth:0
       }]},
       options:{
@@ -10762,6 +11777,7 @@ function xlsxAutofitWidths(rows, minW = 8, maxW = 60) {
     if (!Array.isArray(row)) return;
     row.forEach((cell, ci) => {
       if (cell === null || cell === undefined) return;
+      if (cell && cell.skipFit) return; // teks panjang pada sel yang di-merge: jangan melebarkan kolom pertamanya
       let val = (typeof cell === 'object' && 'v' in cell) ? cell.v : cell;
       if (val === null || val === undefined) val = '';
       const bold = !!(cell && cell.s && cell.s.font && cell.s.font.bold);
@@ -10853,8 +11869,12 @@ async function writeXlsxBlob(book) {
     if (!s) s = {};
     // s comes from cs() in SheetJS-style shape:
     // { fill:{fgColor:{rgb}}, font:{color:{rgb}, bold, sz, italic, underline, name}, alignment:{horizontal}, border:{top:{color:{rgb}},...} }
-    const bg = (s.fill && s.fill.fgColor && s.fill.fgColor.rgb) || null;
-    const fc = (s.font && s.font.color && s.font.color.rgb) || 'FF000000';
+    // Normalisasi warna → aRGB 8 digit hex (Excel menolak/mem-"repair" nilai seperti '#059669' atau objek)
+    const normRgb = (v, def) => typeof v !== 'string' ? def
+      : /^[0-9A-Fa-f]{8}$/.test(v) ? v.toUpperCase()
+      : /^#?[0-9A-Fa-f]{6}$/.test(v) ? 'FF' + v.replace('#', '').toUpperCase() : def;
+    const bg = normRgb(s.fill && s.fill.fgColor && s.fill.fgColor.rgb, null);
+    const fc = normRgb(s.font && s.font.color && s.font.color.rgb, 'FF000000');
     const bold = !!(s.font && s.font.bold);
     const italic = !!(s.font && s.font.italic);
     const underline = !!(s.font && s.font.underline);
@@ -11267,7 +12287,8 @@ async function exportExcel() {
     [{v:'07',s:cs({bg:C.STRIPE_A,fc:C.BLUE_MID,bold:true,sz:10,border:true,halign:'center'})},{v:'Freq Distribution',s:cs({bg:C.STRIPE_A,fc:C.BLUE_HDR,bold:true,sz:10,border:true})},{v:'AMS, Statistik & CH Rancangan per Distribusi',s:cs({bg:C.STRIPE_A,fc:C.GRAY_LBL,sz:10,border:true})},{v:'✔',s:cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:10,halign:'center',border:true})}],
     [{v:'08',s:cs({bg:C.STRIPE_B,fc:C.BLUE_MID,bold:true,sz:10,border:true,halign:'center'})},{v:'Intensitas Hujan',s:cs({bg:C.STRIPE_B,fc:C.BLUE_HDR,bold:true,sz:10,border:true})},{v:'Matriks IDF Mononobe — Durasi × Kala Ulang',s:cs({bg:C.STRIPE_B,fc:C.GRAY_LBL,sz:10,border:true})},{v:'✔',s:cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:10,halign:'center',border:true})}],
     [{v:'09',s:cs({bg:C.STRIPE_A,fc:C.BLUE_MID,bold:true,sz:10,border:true,halign:'center'})},{v:'Waktu Konsentrasi',s:cs({bg:C.STRIPE_A,fc:C.BLUE_HDR,bold:true,sz:10,border:true})},{v:'Tc Kirpich / ARR — Whole & Separasi Area',s:cs({bg:C.STRIPE_A,fc:C.GRAY_LBL,sz:10,border:true})},{v:'✔',s:cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:10,halign:'center',border:true})}],
-    [{v:'10',s:cs({bg:C.STRIPE_B,fc:C.BLUE_MID,bold:true,sz:10,border:true,halign:'center'})},{v:'Grafik',s:cs({bg:C.STRIPE_B,fc:C.BLUE_HDR,bold:true,sz:10,border:true})},{v:'Time Series · Tren AMS · CDF · Kurva IDF (embedded charts)',s:cs({bg:C.STRIPE_B,fc:C.GRAY_LBL,sz:10,border:true})},{v:'✔',s:cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:10,halign:'center',border:true})}],
+    [{v:'10',s:cs({bg:C.STRIPE_B,fc:C.BLUE_MID,bold:true,sz:10,border:true,halign:'center'})},{v:'Erosivitas Hujan',s:cs({bg:C.STRIPE_B,fc:C.BLUE_HDR,bold:true,sz:10,border:true})},{v:'Faktor R — Bols (1978) / Lenvain (1975) per bulan',s:cs({bg:C.STRIPE_B,fc:C.GRAY_LBL,sz:10,border:true})},{v:'✔',s:cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:10,halign:'center',border:true})}],
+    [{v:'11',s:cs({bg:C.STRIPE_A,fc:C.BLUE_MID,bold:true,sz:10,border:true,halign:'center'})},{v:'Grafik',s:cs({bg:C.STRIPE_A,fc:C.BLUE_HDR,bold:true,sz:10,border:true})},{v:'Time Series · Tren AMS · CDF · Kurva IDF (embedded charts)',s:cs({bg:C.STRIPE_A,fc:C.GRAY_LBL,sz:10,border:true})},{v:'✔',s:cs({bg:C.GREEN_SOFT,fc:C.GREEN_HDR,bold:true,sz:10,halign:'center',border:true})}],
     null,
     [{v:'© Andyka Adhyaksa Sumarno · Hydrosan v2.0 · '+stamp,s:cs({bg:C.DARK_BG,fc:'FFAACCEE',sz:9,halign:'left',italic:true,border:true})},EM(C.DARK_BG),EM(C.DARK_BG),EM(C.DARK_BG)],
   ].filter(r=>r!=null),[36,24,40,12]);
@@ -11354,8 +12375,8 @@ async function exportExcel() {
       [LB('P90'), cellMode(`PERCENTILE(${raCH},0.9)`,`PERCENTILE(${raCH},0.9)`,s?+s.p90.toFixed(4):0,cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})),colBNM(sw?+sw.p90.toFixed(4):0),LB('mm'),EM()],
       [LB('P95'), cellMode(`PERCENTILE(${raCH},0.95)`,`PERCENTILE(${raCH},0.95)`,s?+s.p95.toFixed(4):0,cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})),colBNM(sw?+sw.p95.toFixed(4):0),LB('mm'),EM()],
       [LB('P99'), cellMode(`PERCENTILE(${raCH},0.99)`,`PERCENTILE(${raCH},0.99)`,s?+s.p99.toFixed(4):0,cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})),colBNM(sw?+sw.p99.toFixed(4):0),LB('mm'),EM()],
-      [LB('Rerata Bulanan'),{v:s?+(s.sum/nM).toFixed(2):0,s:cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})},EM(),LB('mm/bulan'),EM()],
-      [LB('Rerata Tahunan'),{v:s?+(s.sum/nY).toFixed(2):0,s:cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})},EM(),LB('mm/tahun'),EM()],
+      [LB('Rerata Bulanan'),{v:s?+raMonthlyYearlyByMode(mode,s,nM,nY).monthly.toFixed(2):0,s:cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})},EM(),LB(raMonthlyYearlyByMode(mode,s||raStats,nM,nY).mUnit.replace(/ \/ /g,'/')),EM()],
+      [LB('Rerata Tahunan'),{v:s?+raMonthlyYearlyByMode(mode,s,nM,nY).yearly.toFixed(2):0,s:cs({bg:C.WHITE,fc:C.BLUE_HDR,sz:10,halign:'right',border:true})},EM(),LB(raMonthlyYearlyByMode(mode,s||raStats,nM,nY).yUnit.replace(/ \/ /g,'/')),EM()],
       [LB('Jumlah Bulan Data'),EM(),EM(),EM(),{v:nM,s:cs({bg:C.GRAY_SOFT,fc:C.GRAY_LBL,sz:9,halign:'right',border:true})}],
       [LB('Jumlah Tahun Data'),EM(),EM(),EM(),{v:nY,s:cs({bg:C.GRAY_SOFT,fc:C.GRAY_LBL,sz:9,halign:'right',border:true})}],
       [LB('Hari Hujan'),
@@ -13479,6 +14500,90 @@ async function exportExcel() {
     addSS('Waktu Konsentrasi',tc10,[28,24,14,14,14,14,14,18,16]);
   }
 
+  // ═══ SHEET 11: EROSIVITAS HUJAN (R) — formula-based ════════════
+  // Mengikuti metode (Bols/Lenvain) dan data yang sedang dipilih/dihitung di Rainfall Analysis → Step 3
+  try {
+    const er=[]; let erRow=0;
+    const erP=row=>{ if(row==null){ er.push(null); return erRow; } erRow++; er.push(row); return erRow; }; // baris null (spacer) dibuang saat addSS → tidak dihitung agar nomor baris formula tepat
+    const isLv=(typeof raErosMethod!=='undefined')&&raErosMethod==='lenvain';
+    const nCols=5;
+    const pad=(c)=>Array.from({length:nCols},()=>EM(c));
+    const bar=(txt,bg)=>[H2(txt,bg),...Array.from({length:nCols-1},()=>EM(bg))];
+    const hdrRow=(arr,bg)=>{ const r=arr.map(t=>H3(t,bg)); while(r.length<nCols) r.push(EM(bg)); return r; };
+    const note=(t,extra={})=>({v:t,s:cs({bg:C.WHITE,sz:9,border:true,...extra})});
+    const modeLbl=(typeof raErosModeLabel==='function')?raErosModeLabel():'Semua Data';
+    const srcTxt=(typeof raErosAuto!=='undefined'&&raErosAuto&&raErosNYears)
+      ? `Isi otomatis dari data curah hujan harian (${raErosNYears} tahun)`
+      : 'Input manual / diedit pengguna';
+
+    erP([H1('FAKTOR EROSIVITAS HUJAN (R)',C.DARK_BG),...Array.from({length:nCols-1},()=>EM(C.DARK_BG))]);
+    erP(bar('① Informasi Metode',C.GREEN_HDR));
+    erP(hdrRow(['Parameter','Nilai','','Keterangan'],C.GREEN_SOFT));
+    erP([LB('Metode'),{v:isLv?'Lenvain (1975)':'Bols (1978)',s:cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,bold:true,sz:10,border:true})},EM(C.TEAL_SOFT),note(isLv?'Rm = 2,21 × CH^1,36':'R = 6,119 × RAIN^1,21 × DAYS^−0,47 × MAXP^0,53'),EM()]);
+    erP([LB('Sumber Rumus'),{v:isLv?'Lenvain (1975)':'Arsyad (2000)',s:cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,bold:true,sz:10,border:true})},EM(C.TEAL_SOFT),note(isLv?'Lenvain (1975) — erosivitas bulanan dari CH rerata bulanan':'Bols (1978) dalam Arsyad (2000)'),EM()]);
+    erP([LB('Mode Statistik'),{v:modeLbl.replace(/ \(.*$/,''),s:cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,bold:true,sz:10,border:true})},EM(C.TEAL_SOFT),note('Mode Perhitungan Statistik saat tabel diisi: '+modeLbl),EM()]);
+    erP([LB('Sumber Data'),{v:(typeof raErosAuto!=='undefined'&&raErosAuto)?'Otomatis':'Manual',s:cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,bold:true,sz:10,border:true})},EM(C.TEAL_SOFT),note(srcTxt),EM()]);
+    erP([LB('Satuan Input'),{v:'cm',s:cs({bg:C.TEAL_SOFT,fc:C.TEAL_HDR,bold:true,sz:10,border:true})},EM(C.TEAL_SOFT),note('Curah hujan dalam cm (10 mm = 1 cm)'),EM()]);
+    erP(null);
+    erP(bar('② Tabel Perhitungan Erosivitas Hujan Bulanan',C.AMBER_HDR));
+    erP(isLv
+      ? hdrRow(['Bulan','CH rerata (cm)','CH (mm)','Rm'],C.AMBER_SOFT)
+      : hdrRow(['Bulan','RAIN (cm)','DAYS (hari)','MAXP (cm)','R'],C.AMBER_SOFT));
+
+    const firstR=erRow+1;
+    const rVals=[];
+    BULAN_NAMES.forEach((bln,i)=>{
+      const d=raErosivityData[i]||{};
+      const rain=raErosNum(d.rain), days=raErosNum(d.days), maxp=raErosNum(d.maxp);
+      const bg=i%2===0?C.STRIPE_A:C.STRIPE_B;
+      const rr=erRow+1;
+      const inCell=(v)=>(!isNaN(v)&&v>0)
+        ? {v:v,s:cs({bg,fc:C.GRAY_LBL,sz:10,halign:'right',border:true})}
+        : {v:'—',s:cs({bg,fc:C.GRAY_LBL,sz:10,halign:'center',border:true})};
+      const dash=()=>({v:'—',s:cs({bg,fc:C.GRAY_LBL,sz:10,halign:'center',border:true})});
+      const nameCell={v:bln,s:cs({bg,fc:C.BLUE_HDR,bold:true,sz:10,border:true})};
+      const rStyle=cs({bg:C.AMBER_SOFT,fc:C.AMBER_HDR,bold:true,sz:10,halign:'right',border:true});
+      if(isLv){
+        const ok=!isNaN(rain)&&rain>0;
+        const R=ok?raCalcRLenvain(rain):null;
+        if(R!==null) rVals.push(R);
+        erP([nameCell,inCell(rain),ok?FMSx(`B${rr}*10`,rain*10,cs({bg,fc:C.GRAY_LBL,sz:10,halign:'right',border:true})):dash(),
+             R!==null?FMSx(`2.21*B${rr}^1.36`,R,rStyle):{v:'—',s:cs({bg:C.AMBER_SOFT,fc:C.GRAY_LBL,sz:10,halign:'center',border:true})},EM(bg)]);
+      } else {
+        const ok=!isNaN(rain)&&rain>0&&!isNaN(days)&&days>0&&!isNaN(maxp)&&maxp>0;
+        const R=ok?raCalcR(rain,days,maxp):null;
+        if(R!==null) rVals.push(R);
+        erP([nameCell,inCell(rain),inCell(days),inCell(maxp),
+             R!==null?FMSx(`6.119*B${rr}^1.21*C${rr}^(-0.47)*D${rr}^0.53`,R,rStyle):{v:'—',s:cs({bg:C.AMBER_SOFT,fc:C.GRAY_LBL,sz:10,halign:'center',border:true})}]);
+      }
+    });
+    const lastR=erRow;
+    const rCol=isLv?'D':'E';
+    const rng=`${rCol}${firstR}:${rCol}${lastR}`;
+    const nOK=rVals.length;
+    const sum=rVals.reduce((a,b)=>a+b,0);
+    const rIdx=isLv?3:4; // kolom hasil R (D untuk Lenvain, E untuk Bols)
+    const totStyleL=cs({bg:C.BLUE_SOFT,fc:C.BLUE_HDR,bold:true,sz:11,border:true});
+    const totRow=(label,formula,val)=>{
+      const r=Array.from({length:nCols},()=>EM(C.BLUE_SOFT));
+      r[0]={v:label,s:totStyleL};
+      r[rIdx]=nOK?FMTOTx(formula,val):{v:'—',s:cs({bg:C.BLUE_SOFT,fc:C.GRAY_LBL,bold:true,sz:11,halign:'center',border:true})};
+      return r;
+    };
+    erP(totRow(isLv?'Total Erosivitas Tahunan (ΣRm)':'Total Erosivitas Tahunan (ΣR)',`SUM(${rng})`,sum));
+    const statRow=(lab,f,v)=>{ const r=[LB(lab),...Array.from({length:nCols-1},()=>EM())]; r[rIdx]=nOK?FM(f,v):VL('—'); return r; };
+    erP(statRow('Rerata R per bulan',`AVERAGE(${rng})`,nOK?sum/nOK:0));
+    erP(statRow('R bulanan tertinggi',`MAX(${rng})`,nOK?Math.max(...rVals):0));
+    erP(statRow('R bulanan terendah',`MIN(${rng})`,nOK?Math.min(...rVals):0));
+    if(nOK&&nOK<12) erP([note(`* Baru ${nOK} dari 12 bulan yang terhitung — total hanya menjumlahkan bulan yang terisi lengkap.`,{italic:true}),...Array.from({length:nCols-1},()=>EM())]);
+    erP(null);
+    erP([note('Catatan: R tahunan adalah indeks erosivitas hujan pada persamaan USLE (Universal Soil Loss Equation).',{italic:true}),...Array.from({length:nCols-1},()=>EM())]);
+    // Teks panjang di sel yang akan di-merge (diikuti sel kosong) tidak ikut menentukan lebar kolom
+    er.forEach(row=>{ if(!Array.isArray(row)) return; row.forEach((c,i)=>{ const nx=row[i+1];
+      if(c&&typeof c.v==='string'&&c.v.length>14&&nx&&(nx.v===''||nx.v==null)&&!nx.f) c.skipFit=true; }); });
+    addSS('Erosivitas Hujan',er.filter(r=>r!=null),[26,20,20,26,26]);
+  } catch(e) { console.warn('Sheet Erosivitas Hujan dilewati:', e); }
+
   // ═══ SHEET 11: GRAFIK ══════════════════════════════════════
   // Sheet ini berisi data ranges yang direferensikan chart OOXML
   // Layout: 4 blok data vertikal, tiap blok = 1 chart
@@ -13791,7 +14896,7 @@ async function exportExcel() {
     const a=document.createElement('a');a.href=url;a.download='Hydrosan_'+ts+'.xlsx';
     document.body.appendChild(a);a.click();
     setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
-    showToast('✅ Excel berhasil diunduh — 10 sheet + 4 grafik embedded','ok');
+    showToast('✅ Excel berhasil diunduh — 11 sheet + 4 grafik embedded','ok');
   }catch(e){console.error(e);showToast('⚠ Gagal: '+e.message,'error');}
 }
 
@@ -16165,6 +17270,8 @@ function collectState() {
       chartType: getV('ra-chart-type'),
       chartStyle:getV('ra-chart-style'),
       erosivity: (typeof raErosivityData !== 'undefined') ? JSON.parse(JSON.stringify(raErosivityData)) : null,
+      erosMethod: (typeof raErosMethod !== 'undefined') ? raErosMethod : 'bols',
+      erosAuto:   (typeof raErosAuto   !== 'undefined') ? raErosAuto   : false,
     },
     // Snapshot generik SEMUA kolom input/pilihan (dropdown, checkbox, teks) yang punya id —
     // jaring pengaman agar tidak ada pilihan/input yang terlewat.
@@ -16295,8 +17402,12 @@ function restoreState(state) {
     setV('ra-chart-style', ra.chartStyle);
     if (Array.isArray(ra.erosivity) && typeof raErosivityData !== 'undefined') {
       raErosivityData = ra.erosivity.map(e => ({ rain: e.rain ?? '', days: e.days ?? '', maxp: e.maxp ?? '' }));
-      if (typeof raErosivityRenderTable === 'function') raErosivityRenderTable();
     }
+    if (typeof raErosMethod !== 'undefined') {
+      raErosMethod = ra.erosMethod === 'lenvain' ? 'lenvain' : 'bols';
+      raErosAuto   = !!ra.erosAuto;
+    }
+    if (typeof raErosivityRenderTable === 'function') raErosivityRenderTable();
     if (typeof raRender === 'function' && typeof raData !== 'undefined' && raData && raData.length) raRender();
     if (typeof raIntensityCalc === 'function') raIntensityCalc();
     if (typeof raTcCalc === 'function') raTcCalc();
@@ -16870,7 +17981,7 @@ function spUnitAddCatchFromRunoff(uid) {
   mDialog.style.cssText = [
     'position:fixed','top:50%','left:50%',
     'transform:translate(-50%,-50%)',
-    'background:var(--bg-card,#fff)',
+    'background:var(--bg2,#fff)',
     'border:1px solid var(--border,#d0d7de)',
     'border-radius:12px','padding:22px','z-index:9999',
     'min-width:340px','max-width:440px',
@@ -16882,7 +17993,7 @@ function spUnitAddCatchFromRunoff(uid) {
     <div style="font-weight:700;font-size:14px;margin-bottom:4px">Pilih Metode Perhitungan Q</div>
     <div style="font-size:11px;opacity:.7;margin-bottom:16px">Mode Runoff aktif: <strong>Intensitas (I)</strong> — pilih sumber CH ekuivalen:</div>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
-      <label id="sp-mopt-ch-${uid}" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:8px;cursor:pointer;border:2px solid #e0e0e0;background:#fff;">
+      <label id="sp-mopt-ch-${uid}" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:8px;cursor:pointer;border:2px solid var(--border,#e0e0e0);background:var(--card,#fff);">
         <input type="radio" name="sp-meth-${uid}" value="ch" style="margin-top:3px;accent-color:#27ae60">
         <div>
           <div style="font-weight:700;font-size:13px">🌧 Curah Hujan (CH)</div>
@@ -16902,7 +18013,7 @@ function spUnitAddCatchFromRunoff(uid) {
       </label>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button id="sp-meth-cancel-${uid}" style="padding:7px 16px;border-radius:6px;border:1px solid #ccc;background:#f5f5f5;color:#333;cursor:pointer;font-size:12px">Batal</button>
+      <button id="sp-meth-cancel-${uid}" style="padding:7px 16px;border-radius:6px;border:1px solid var(--border,#ccc);background:var(--card,#f5f5f5);color:var(--text,#333);cursor:pointer;font-size:12px">Batal</button>
       <button onclick="spOpenRunoffPickerStep2(${uid})" style="padding:7px 18px;border-radius:6px;border:none;background:#27ae60;color:#fff;cursor:pointer;font-size:12px;font-weight:700">Lanjut →</button>
     </div>`;
 
@@ -16916,8 +18027,8 @@ function spUnitAddCatchFromRunoff(uid) {
       const isCh = document.querySelector(`input[name="sp-meth-${uid}"]:checked`)?.value === 'ch';
       const optCh = document.getElementById(`sp-mopt-ch-${uid}`);
       const optI  = document.getElementById(`sp-mopt-i-${uid}`);
-      if (optCh) { optCh.style.borderColor = isCh ? '#27ae60' : '#e0e0e0'; optCh.style.background = isCh ? 'rgba(39,174,96,0.07)' : '#fff'; }
-      if (optI)  { optI.style.borderColor  = !isCh ? '#1a7fd4' : '#e0e0e0'; optI.style.background  = !isCh ? 'rgba(26,127,212,0.07)' : '#fff'; }
+      if (optCh) { optCh.style.borderColor = isCh ? '#27ae60' : 'var(--border,#e0e0e0)'; optCh.style.background = isCh ? 'rgba(39,174,96,0.07)' : 'var(--card,#fff)'; }
+      if (optI)  { optI.style.borderColor  = !isCh ? '#1a7fd4' : 'var(--border,#e0e0e0)'; optI.style.background  = !isCh ? 'rgba(26,127,212,0.07)' : 'var(--card,#fff)'; }
     });
   });
 }
@@ -16969,9 +18080,9 @@ function spOpenRunoffPicker(uid, meth) {
   const methLabel = meth === 'i' ? '⚡ Intensitas (I×Tc)' : '🌧 Curah Hujan (CH)';
   const methColor = meth === 'i' ? '#1a7fd4' : '#27ae60';
 
-  let html = `<div id="sp-picker-${uid}" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg-card,#fff);border:1px solid var(--border,#d0d7de);border-radius:12px;padding:20px;z-index:9999;min-width:380px;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,0.45);color:var(--text,#1a2332)">
+  let html = `<div id="sp-picker-${uid}" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg2,#fff);border:1px solid var(--border,#d0d7de);border-radius:12px;padding:20px;z-index:9999;min-width:380px;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,0.45);color:var(--text,#1a2332)">
     <div style="font-weight:700;font-size:14px;margin-bottom:6px">Pilih Catchment dari Runoff</div>
-    <div style="font-size:11px;margin-bottom:12px;padding:5px 10px;background:rgba(0,0,0,0.05);border-radius:6px;display:inline-flex;align-items:center;gap:6px">
+    <div style="font-size:11px;margin-bottom:12px;padding:5px 10px;background:var(--card2,rgba(0,0,0,0.05));border-radius:6px;display:inline-flex;align-items:center;gap:6px">
       Metode: <strong style="color:${methColor}">${methLabel}</strong>
     </div>
     <div style="max-height:300px;overflow-y:auto">`;
@@ -16984,7 +18095,7 @@ function spOpenRunoffPicker(uid, meth) {
   });
   html += `</div>
     <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">
-      <button onclick="document.getElementById('sp-picker-${uid}').remove();document.getElementById('sp-overlay-${uid}').remove()" style="padding:7px 16px;border-radius:6px;border:1px solid #ccc;background:#f5f5f5;color:#333;cursor:pointer;font-size:12px">Batal</button>
+      <button onclick="document.getElementById('sp-picker-${uid}').remove();document.getElementById('sp-overlay-${uid}').remove()" style="padding:7px 16px;border-radius:6px;border:1px solid var(--border,#ccc);background:var(--card,#f5f5f5);color:var(--text,#333);cursor:pointer;font-size:12px">Batal</button>
       <button onclick="spPickerConfirm(${uid},'${meth}')" style="padding:7px 16px;border-radius:6px;border:none;background:#e67e22;color:#fff;cursor:pointer;font-size:12px;font-weight:700">Tambahkan</button>
     </div>
   </div>
@@ -21174,7 +22285,7 @@ if (typeof spCriteria === 'undefined') var spCriteria = {};
 function spCriteriaDefault(wtpId) {
   if (!spCriteria[wtpId]) {
     spCriteria[wtpId] = {
-      Dp:      '0,000003', // diameter partikel D (m) — default 3 µm sesuai contoh dokumen
+      Dp:      '0,00003',  // diameter partikel D (m) — default 30 µm (lanau/silt, umum di limpasan tambang); 3 µm = lempung butuh flokulan
       Ps:      '2.500',    // berat jenis padatan PP (kg/m³)
       Pw:      '1.000',    // berat jenis air PA (kg/m³)
       mu:      '0,001007', // viskositas DINAMIK η (Pa·s) — 20°C
@@ -21213,7 +22324,7 @@ const SP_PS_TABLE = [
 /* ─────────────────────────────────────────────────────────────
    KALKULASI STOKES — sesuai dokumen referensi:
    
-   6.  Vt  = g × D² × (PP − PA) / (18 × μ)       μ = viskositas kinematik (m²/s)
+   6.  Vt  = g × D² × (PP − PA) / (18 × μ)       μ = viskositas dinamik (Pa·s)
    7.  A_pond = Q / Vt                             luas kolam pengendapan
    10. tv  = H / Vt                                waktu partikel mengendap
    11. vh  = Q / (b × h) = Q / (Lebar × Kedalaman) kecepatan horizontal
@@ -21530,18 +22641,18 @@ function spCriteriaParamHTML(wtpId) {
       </div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
-      <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Suhu Air — auto-isi μ kinematik</label>
+      <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Suhu Air — auto-isi μ dinamik</label>
         <select onchange="spCriteriaSetMu(${wtpId},this.value)" style="${iS}"><option value="">— Pilih suhu —</option>${muO}</select></div>
-      <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Viskositas Kinematik μ (m²/s)</label>
+      <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Viskositas Dinamik μ (Pa·s)</label>
         <input id="spc-mu-${wtpId}" type="text" inputmode="decimal" value="${cr.mu}" style="${iS}" oninput="spCriteriaSync(${wtpId})">
-        <div style="font-size:10px;color:var(--muted);margin-top:2px">Contoh 20°C: 0,000001007</div></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">Contoh 20°C: 0,001007</div></div>
       <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Berat Jenis Air PA (kg/m³)</label>
         <input id="spc-Pw-${wtpId}" type="text" inputmode="decimal" value="${cr.Pw}" style="${iS}" oninput="spCriteriaSync(${wtpId})"></div>
       <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Fraksi Partikel — auto-isi Dp</label>
         <select onchange="spCriteriaSetDp(${wtpId},this.value)" style="${iS}"><option value="">— Pilih fraksi —</option>${dpO}</select></div>
       <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Diameter Partikel D (m)</label>
         <input id="spc-Dp-${wtpId}" type="text" inputmode="decimal" value="${cr.Dp}" style="${iS}" oninput="spCriteriaSync(${wtpId})">
-        <div style="font-size:10px;color:var(--muted);margin-top:2px">Contoh 3 µm = 0,000003</div></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">Contoh 30 µm = 0,00003 · lempung 3 µm = 0,000003</div></div>
       <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Jenis Padatan — auto-isi PP</label>
         <select onchange="spCriteriaSetPs(${wtpId},this.value)" style="${iS}"><option value="">— Pilih jenis padatan —</option>${psO}</select></div>
       <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Berat Jenis Padatan PP (kg/m³)</label>
@@ -21590,7 +22701,7 @@ function spCriteriaResultHTML(wtpId, totalVol, totalArea) {
     row(1,'Diameter Partikel (D)',fS(r.D,9),'m','D\u00b2 = '+fS(r.D2,14)),
     row(2,'Berat Jenis Padatan (PP)',spFmt(r.PP,0),'kg/m\u00b3','Input pengguna'),
     row(3,'Berat Jenis Air (PA)',spFmt(r.PA,0),'kg/m\u00b3','Input pengguna'),
-    row(4,'Viskositas Kinematik (\u03bc)',fS(r.mu,10),'m\u00b2/s','Dari tabel referensi'),
+    row(4,'Viskositas Dinamik (\u03bc)',fS(r.mu,10),'Pa\u00b7s','Dari tabel referensi'),
     row(5,'Gravitasi (g)',spFmt(r.g,1),'m/s\u00b2','Ketetapan'),
     row(6,'<strong>Kecepatan Pengendapan (Vt)</strong><br><small style="color:var(--muted)">Vt = g \u00d7 D\u00b2 \u00d7 (PP\u2212PA) / (18 \u00d7 \u03bc)</small>',fS(r.Vt,7),'m/detik','= '+spFmt(r.Vt*100,5)+' cm/detik',true),
     row(7,'<strong>Luas Kolam Min. yang Dibutuhkan</strong><br><small style="color:var(--muted)">A<sub>min</sub> = Q / Vt</small>',spFmt(r.A_pond_min,2),'m\u00b2','Q = '+fS(r.Q,8)+' m\u00b3/detik',true),
@@ -22820,7 +23931,7 @@ function rpAddCatchFromRunoff(uid) {
     'position:fixed',
     'top:50%', 'left:50%',
     'transform:translate(-50%,-50%)',
-    'background:var(--bg-card,#fff)',
+    'background:var(--bg2,#fff)',
     'border:1px solid var(--border,#d0d7de)',
     'border-radius:12px',
     'padding:22px',
@@ -22839,8 +23950,8 @@ function rpAddCatchFromRunoff(uid) {
       <label id="rp-mopt-ch-${uid}" style="
         display:flex;align-items:flex-start;gap:12px;
         padding:12px 14px;border-radius:8px;cursor:pointer;
-        border:2px solid #e0e0e0;
-        background:#fff;
+        border:2px solid var(--border,#e0e0e0);
+        background:var(--card,#fff);
       ">
         <input type="radio" name="rp-meth-${uid}" value="ch" style="margin-top:3px;accent-color:#27ae60">
         <div>
@@ -22867,7 +23978,7 @@ function rpAddCatchFromRunoff(uid) {
       </label>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button id="rp-meth-cancel-${uid}" style="padding:7px 16px;border-radius:6px;border:1px solid #ccc;background:#f5f5f5;color:#333;cursor:pointer;font-size:12px">Batal</button>
+      <button id="rp-meth-cancel-${uid}" style="padding:7px 16px;border-radius:6px;border:1px solid var(--border,#ccc);background:var(--card,#f5f5f5);color:var(--text,#333);cursor:pointer;font-size:12px">Batal</button>
       <button onclick="rpAddCatchFromRunoffStep2(${uid})" style="padding:7px 18px;border-radius:6px;border:none;background:#27ae60;color:#fff;cursor:pointer;font-size:12px;font-weight:700">Lanjut →</button>
     </div>`;
 
@@ -22885,8 +23996,8 @@ function rpAddCatchFromRunoff(uid) {
       const isCh = document.querySelector(`input[name="rp-meth-${uid}"]:checked`)?.value === 'ch';
       const optCh = document.getElementById(`rp-mopt-ch-${uid}`);
       const optI  = document.getElementById(`rp-mopt-i-${uid}`);
-      if (optCh) { optCh.style.borderColor = isCh ? '#27ae60' : '#e0e0e0'; optCh.style.background = isCh ? 'rgba(39,174,96,0.07)' : '#fff'; }
-      if (optI)  { optI.style.borderColor  = !isCh ? '#1a7fd4' : '#e0e0e0'; optI.style.background  = !isCh ? 'rgba(26,127,212,0.07)' : '#fff'; }
+      if (optCh) { optCh.style.borderColor = isCh ? '#27ae60' : 'var(--border,#e0e0e0)'; optCh.style.background = isCh ? 'rgba(39,174,96,0.07)' : 'var(--card,#fff)'; }
+      if (optI)  { optI.style.borderColor  = !isCh ? '#1a7fd4' : 'var(--border,#e0e0e0)'; optI.style.background  = !isCh ? 'rgba(26,127,212,0.07)' : 'var(--card,#fff)'; }
     });
   });
 }
@@ -22940,9 +24051,9 @@ function rpOpenRunoffPicker(uid, meth) {
   const methLabel = meth === 'i' ? '⚡ Intensitas (I×Tc)' : '🌧 Curah Hujan (CH)';
   const methColor = meth === 'i' ? '#1a7fd4' : '#27ae60';
 
-  let html = `<div id="rp-picker-${uid}" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg-card,#fff);border:1px solid var(--border,#d0d7de);border-radius:12px;padding:20px;z-index:9999;min-width:380px;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,0.45);color:var(--text,#1a2332)">
+  let html = `<div id="rp-picker-${uid}" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg2,#fff);border:1px solid var(--border,#d0d7de);border-radius:12px;padding:20px;z-index:9999;min-width:380px;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,0.45);color:var(--text,#1a2332)">
     <div style="font-weight:700;font-size:14px;margin-bottom:6px">Pilih Catchment dari Runoff</div>
-    <div style="font-size:11px;margin-bottom:12px;padding:5px 10px;background:rgba(0,0,0,0.05);border-radius:6px;display:inline-flex;align-items:center;gap:6px">
+    <div style="font-size:11px;margin-bottom:12px;padding:5px 10px;background:var(--card2,rgba(0,0,0,0.05));border-radius:6px;display:inline-flex;align-items:center;gap:6px">
       Metode: <strong style="color:${methColor}">${methLabel}</strong>
     </div>
     <div style="max-height:300px;overflow-y:auto">`;
@@ -22955,7 +24066,7 @@ function rpOpenRunoffPicker(uid, meth) {
   });
   html += `</div>
     <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">
-      <button onclick="document.getElementById('rp-picker-${uid}').remove();document.getElementById('rp-overlay-${uid}').remove()" style="padding:7px 16px;border-radius:6px;border:1px solid #ccc;background:#f5f5f5;color:#333;cursor:pointer;font-size:12px">Batal</button>
+      <button onclick="document.getElementById('rp-picker-${uid}').remove();document.getElementById('rp-overlay-${uid}').remove()" style="padding:7px 16px;border-radius:6px;border:1px solid var(--border,#ccc);background:var(--card,#f5f5f5);color:var(--text,#333);cursor:pointer;font-size:12px">Batal</button>
       <button onclick="rpPickerConfirm(${uid},'${meth}')" style="padding:7px 16px;border-radius:6px;border:none;background:#27ae60;color:#fff;cursor:pointer;font-size:12px;font-weight:700">Tambahkan</button>
     </div>
   </div>
@@ -23923,7 +25034,10 @@ if(typeof _rpOrigRestoreState === 'function') {
 const DXF_Z_FLAT_TOL  = 0.05;          // selisih Z maksimum dalam 1 entitas agar dianggap kontur datar (m)
 const DXF_Z_MERGE_TOL = 0.02;          // Z yang selisihnya ≤ ini dianggap elevasi yang sama (m)
 const DXF_ARC_STEP    = Math.PI / 90;  // diskretisasi busur: 2°
+const DXF_BRIDGE_COS  = 0.5;           // jembatan celah: sudut ke arah garis maks 60°
 const DXF_GAP_FRAC    = 0.03;          // celah antar-ujung maksimum = 3% diagonal kontur pada elevasi itu
+const DXF_GENTLE_DZ   = 1.0;           // dasar landai: Δz maksimum dalam 1 cincin tertutup (m)
+const DXF_GENTLE_GRADE = 0.002;        // …dan Δz ≤ 0,2% × keliling
 const DXF_CHORD_MAX   = 0.75;          // kontur terbuka ditutup bila (jarak ujung ke ujung)/(panjang) ≤ ini
 
 function dxfTokenize(text) {
@@ -24207,6 +25321,21 @@ function dxfLinkEnds(chains, maxGap) {
     const k = Math.floor(ex[e] / cell) + ',' + Math.floor(ey[e] / cell);
     const a = grid.get(k); if (a) a.push(e); else grid.set(k, [e]);
   }
+  // Arah singgung tiap ujung (menjauhi badan garis) — jembatan celah hanya sah bila SEARAH dengan
+  // garisnya. Mencegah penyambungan menyilang dinding/tanggul ke kolam sebelah (ujung dari dua sisi
+  // dinding saling berdekatan tetapi jembatannya tegak lurus terhadap garis).
+  const tx = new Float64Array(E), ty = new Float64Array(E);
+  for (let i = 0; i < n; i++) {
+    const c = chains[i], m = c.length;
+    for (let s = 0; s < 2; s++) {
+      const e = 2 * i + s, P = s ? c[m - 1] : c[0];
+      let Q = null;
+      for (let k = 1; k < m; k++) { const R = s ? c[m - 1 - k] : c[k]; if (Math.hypot(R[0] - P[0], R[1] - P[1]) > 0.5) { Q = R; break; } }
+      if (!Q) Q = s ? c[0] : c[m - 1];
+      const dx = P[0] - Q[0], dy = P[1] - Q[1], L = Math.hypot(dx, dy) || 1;
+      tx[e] = dx / L; ty[e] = dy / L;
+    }
+  }
   const pairs = [];
   for (let e = 0; e < E; e++) {
     const cx = Math.floor(ex[e] / cell), cy = Math.floor(ey[e] / cell);
@@ -24215,7 +25344,12 @@ function dxfLinkEnds(chains, maxGap) {
       for (const f of a) {
         if (f <= e) continue;
         const d = Math.hypot(ex[e] - ex[f], ey[e] - ey[f]);
-        if (d <= maxGap) pairs.push([d, e, f]);
+        if (d > maxGap) continue;
+        if (d > 0.5 && (e >> 1) !== (f >> 1)) {
+          const vx = (ex[f] - ex[e]) / d, vy = (ey[f] - ey[e]) / d;
+          if (tx[e] * vx + ty[e] * vy < DXF_BRIDGE_COS || -(tx[f] * vx + ty[f] * vy) < DXF_BRIDGE_COS) continue;
+        }
+        pairs.push([d, e, f]);
       }
     }
   }
@@ -24372,6 +25506,18 @@ function dxfBuildPonds(rings) {
     }
     root[j] = parent[j] < 0 ? j : root[parent[j]];
   }
+  // Penjaga lompatan elevasi: ring yang sudah punya isi sedalam d TIDAK boleh menempel ke induk yang
+  // lebih tinggi > 1.6·d (mis. puncak kolam 105,5 ke garis kontur bukit 115,5).
+  {
+    const depth = new Float64Array(N);
+    for (let j = N - 1; j >= 0; j--) {
+      const p = parent[j]; if (p < 0) continue;
+      const dz = rings[p].z - rings[j].z;
+      if (depth[j] > 0 && dz > 1.6 * depth[j]) { parent[j] = -1; continue; }
+      depth[p] = Math.max(depth[p], depth[j] + dz);
+    }
+    for (let j = 0; j < N; j++) root[j] = parent[j] < 0 ? j : root[parent[j]];
+  }
   const groups = new Map();
   for (let j = 0; j < N; j++) { const g = groups.get(root[j]); if (g) g.push(rings[j]); else groups.set(root[j], [rings[j]]); }
   return Array.from(groups.values());
@@ -24397,17 +25543,105 @@ function dxfLevelArea(rings) {
 
 /* ── Pipeline lengkap: teks DXF → daftar kolam ──
    return { ponds:[{contours:{z:[ring,...]}, notes:[]}], warnings:[], summary:'' }          */
+/* ── Wajah planar terkecil dari jaringan garis 1 elevasi yang melingkupi titik pt ──
+   Dipakai untuk memperbaiki kontur puncak yang terputus-putus & saling berbagi dinding
+   (mis. DXF desain WSP): celah dijembatani hanya bila SEARAH garis (mis. celah weir),
+   jaringan di-planarkan, lalu wajah (poligon) terkecil yang memuat titik dipilih. */
+function dxfSmallestFace(items, pt, gapMax) {
+  const K = 100, key = (x, y) => Math.round(x * K) + ',' + Math.round(y * K);
+  let segs = [];
+  for (const it of items) {
+    const p = it.pts, n = p.length;
+    for (let i = 0; i + 1 < n; i++) segs.push([p[i][0], p[i][1], p[i + 1][0], p[i + 1][1]]);
+    if (it.closed && n > 2) segs.push([p[n - 1][0], p[n - 1][1], p[0][0], p[0][1]]);
+  }
+  segs = segs.filter(s => Math.hypot(s[2] - s[0], s[3] - s[1]) > 1e-6);
+  // derajat simpul → ujung bebas
+  const deg = new Map(), tan = new Map();
+  const touch = (x, y, ox, oy) => {
+    const k = key(x, y); deg.set(k, (deg.get(k) || 0) + 1);
+    const dx = x - ox, dy = y - oy, L = Math.hypot(dx, dy) || 1; tan.set(k, [dx / L, dy / L, x, y]);
+  };
+  for (const s of segs) { touch(s[0], s[1], s[2], s[3]); touch(s[2], s[3], s[0], s[1]); }
+  const free = [];
+  deg.forEach((d, k) => { if (d === 1) free.push(tan.get(k)); });
+  const cand = [];
+  for (let i = 0; i < free.length; i++) for (let j = i + 1; j < free.length; j++) {
+    const a = free[i], b = free[j], d = Math.hypot(b[2] - a[2], b[3] - a[3]);
+    if (d > gapMax || d < 1e-6) continue;
+    const vx = (b[2] - a[2]) / d, vy = (b[3] - a[3]) / d;
+    if (a[0] * vx + a[1] * vy < 0.7 || -(b[0] * vx + b[1] * vy) < 0.7) continue;
+    cand.push([d, i, j]);
+  }
+  cand.sort((p, q) => p[0] - q[0]);
+  const used = new Uint8Array(free.length);
+  for (const [, i, j] of cand) { if (used[i] || used[j]) continue; used[i] = used[j] = 1; segs.push([free[i][2], free[i][3], free[j][2], free[j][3]]); }
+  // planarisasi: pecah di titik potong
+  const S = segs.length, cuts = Array.from({ length: S }, () => []);
+  for (let i = 0; i < S; i++) {
+    const a = segs[i];
+    for (let j = i + 1; j < S; j++) {
+      const b = segs[j];
+      if (Math.max(a[0], a[2]) < Math.min(b[0], b[2]) - 1e-6 || Math.max(b[0], b[2]) < Math.min(a[0], a[2]) - 1e-6 ||
+          Math.max(a[1], a[3]) < Math.min(b[1], b[3]) - 1e-6 || Math.max(b[1], b[3]) < Math.min(a[1], a[3]) - 1e-6) continue;
+      const rx = a[2] - a[0], ry = a[3] - a[1], sx = b[2] - b[0], sy = b[3] - b[1], den = rx * sy - ry * sx;
+      if (Math.abs(den) < 1e-12) continue;
+      const qx = b[0] - a[0], qy = b[1] - a[1], t = (qx * sy - qy * sx) / den, u = (qx * ry - qy * rx) / den;
+      const e = 1e-7;
+      if (t < -e || t > 1 + e || u < -e || u > 1 + e) continue;
+      if (t > e && t < 1 - e) cuts[i].push(t);
+      if (u > e && u < 1 - e) cuts[j].push(u);
+    }
+  }
+  const nodes = new Map(), edges = new Set();
+  const node = (x, y) => { const k = key(x, y); let n = nodes.get(k); if (!n) { n = { x, y, adj: [] }; nodes.set(k, n); } return n; };
+  for (let i = 0; i < S; i++) {
+    const s = segs[i], ts = [0].concat(cuts[i].sort((p, q) => p - q), [1]);
+    for (let k = 0; k + 1 < ts.length; k++) {
+      const x1 = s[0] + (s[2] - s[0]) * ts[k], y1 = s[1] + (s[3] - s[1]) * ts[k], x2 = s[0] + (s[2] - s[0]) * ts[k + 1], y2 = s[1] + (s[3] - s[1]) * ts[k + 1];
+      const A = key(x1, y1), B = key(x2, y2); if (A === B) continue;
+      const ek = A < B ? A + '|' + B : B + '|' + A; if (edges.has(ek)) continue; edges.add(ek);
+      const na = node(x1, y1), nb = node(x2, y2); na.adj.push(nb); nb.adj.push(na);
+    }
+  }
+  nodes.forEach(n => { n.adj.sort((p, q) => Math.atan2(p.y - n.y, p.x - n.x) - Math.atan2(q.y - n.y, q.x - n.x)); n.ang = n.adj.map(m => Math.atan2(m.y - n.y, m.x - n.x)); });
+  const seen = new Set(); let best = null, bestA = Infinity;
+  nodes.forEach(u => {
+    for (const v of u.adj) {
+      const hk = key(u.x, u.y) + '>' + key(v.x, v.y); if (seen.has(hk)) continue;
+      const poly = []; let a = u, b = v, guard = 0;
+      for (;;) {
+        const k = key(a.x, a.y) + '>' + key(b.x, b.y); if (seen.has(k)) break; seen.add(k);
+        poly.push([a.x, a.y]);
+        const idx = b.adj.indexOf(a), nx = b.adj[(idx - 1 + b.adj.length) % b.adj.length];
+        a = b; b = nx; if (++guard > 20000) break;
+      }
+      if (poly.length < 3) continue;
+      let ar = 0; for (let i = 0; i < poly.length; i++) { const p = poly[i], q = poly[(i + 1) % poly.length]; ar += p[0] * q[1] - q[0] * p[1]; }
+      ar /= 2; if (ar <= 1e-6 || ar >= bestA) continue;
+      if (pointInPoly(pt, poly)) { best = poly; bestA = ar; }
+    }
+  });
+  return best;
+}
+
 function dxfAnalyze(text) {
   const tok = dxfTokenize(text);
   const ex = dxfExtractPaths(tok);
   const warnings = [];
 
   // 1) Pisahkan jalur datar (kontur) dari jalur miring
-  let items = [], sloped = 0;
+  let items = [], sloped = 0, gentle = 0;
   for (const p of ex.paths) {
     let zmin = Infinity, zmax = -Infinity, zs = 0;
     for (const q of p.pts) { if (q[2] < zmin) zmin = q[2]; if (q[2] > zmax) zmax = q[2]; zs += q[2]; }
-    if (zmax - zmin > DXF_Z_FLAT_TOL) { sloped++; continue; }
+    if (zmax - zmin > DXF_Z_FLAT_TOL) {
+      // Dasar kolam bergradien landai (mis. lantai miring ke outlet): cincin TERTUTUP dengan Δz kecil
+      // dibanding kelilingnya dianggap datar pada Z rata-rata, bukan ramp.
+      const per = p.closed ? dxfPerimeter(p.pts.map(q => [q[0], q[1]]), true) : 0;
+      if (p.closed && p.pts.length >= 8 && (zmax - zmin) <= Math.min(DXF_GENTLE_DZ, per * DXF_GENTLE_GRADE)) { gentle++; }
+      else { sloped++; continue; }
+    }
     items.push({ z: zs / p.pts.length, pts: p.pts.map(q => [q[0], q[1]]), closed: p.closed, layer: p.layer, n: 1 });
   }
   let zFromLayer = false;
@@ -24425,6 +25659,7 @@ function dxfAnalyze(text) {
       }
     }
   }
+  if (gentle) warnings.push(`${gentle} kontur dasar bergradien landai dibaca datar pada Z rata-rata (mis. lantai kolam miring ke outlet).`);
   if (sloped) warnings.push(`${sloped} garis miring (Z tidak konstan, mis. ramp/saluran) diabaikan.`);
   Object.keys(ex.stats.unsupported).forEach(k => warnings.push(`${ex.stats.unsupported[k]}× ${k} tidak dibaca (EXPLODE dulu di CAD bila berisi kontur).`));
   if (!items.length) return { ponds: [], warnings, summary: 'Tidak ada garis kontur datar yang ditemukan.' };
@@ -24459,9 +25694,47 @@ function dxfAnalyze(text) {
       if (area < minArea || area / (per * per) < 1e-6) continue;
       const bb = polyBBox(pts);
       if (seen.some(s => Math.abs(s.area - area) <= 1e-6 * area && Math.abs(s.bb.minX - bb.minX) < tol * 4 && Math.abs(s.bb.maxY - bb.maxY) < tol * 4)) continue; // duplikat
-      const ring = { z, pts, area, bb, ip: dxfPolyInterior(pts) };
+      const ring = { z, pts, area, bb, ip: dxfPolyInterior(pts), lvl: L };
       seen.push(ring); all.push(ring);
     }
+  }
+  // Perbaikan: cincin puncak yang 'melingkupi' ≥2 dasar terpisah pada elevasi yang sama = hasil
+  // sambungan salah ke kolam sebelah → bangun ulang per kolam lewat wajah planar terkecil.
+  {
+    let fixed = 0; const repaired = new Map();
+    const gapOf = L => {
+      let lb = { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity };
+      L.items.forEach(it => it.pts.forEach(p => { if (p[0] < lb.minX) lb.minX = p[0]; if (p[0] > lb.maxX) lb.maxX = p[0]; if (p[1] < lb.minY) lb.minY = p[1]; if (p[1] > lb.maxY) lb.maxY = p[1]; }));
+      return Math.max(tol, Math.hypot(lb.maxX - lb.minX, lb.maxY - lb.minY) * DXF_GAP_FRAC);
+    };
+    const addFace = (L, z, ip, minArea, maxArea, skipIdx) => {
+      const f = dxfSmallestFace(L.items, ip, gapOf(L)); if (!f) return 0;
+      const pts = dxfRingClean(f); if (pts.length < 3) return 0;
+      const ar = shoelaceArea(pts); if (ar <= minArea || ar >= maxArea) return 0;
+      if (all.some((q, qi) => qi !== skipIdx && Math.abs(q.z - z) < 1e-6 && Math.abs(q.area - ar) <= 1e-4 * ar)) return 1; // sudah ada
+      all.push({ z, pts, area: ar, bb: polyBBox(pts), ip: dxfPolyInterior(pts), lvl: L }); return 1;
+    };
+    for (let ri = all.length - 1; ri >= 0; ri--) {
+      const R = all[ri];
+      const kids = all.filter(r => r.z < R.z - 1e-6 && r.ip[0] >= R.bb.minX && r.ip[0] <= R.bb.maxX && r.ip[1] >= R.bb.minY && r.ip[1] <= R.bb.maxY && pointInPoly(r.ip, R.pts));
+      if (kids.length < 2) continue;
+      const zc = Math.max(...kids.map(k => k.z)), sib = kids.filter(k => Math.abs(k.z - zc) < 1e-6);
+      if (sib.length < 2) continue;
+      all.splice(ri, 1);                       // lepas dulu; bila gagal dipulihkan
+      let ok = 0; for (const s of sib) ok += addFace(R.lvl, R.z, s.ip, s.area, R.area * 0.9, -1);
+      if (!ok) { all.splice(ri, 0, R); continue; }
+      repaired.set(R.lvl, R.z); fixed++;
+    }
+    // dasar yang belum punya puncak pada elevasi yang diperbaiki → cari wajahnya juga
+    repaired.forEach((z, L) => {
+      for (const f of all.slice()) {
+        if (f.z >= z - 1e-6) continue;
+        if (all.some(r => r.z < f.z - 1e-6 && pointInPoly(r.ip, f.pts))) continue;            // bukan dasar terendah
+        if (all.some(r => Math.abs(r.z - z) < 1e-6 && pointInPoly(f.ip, r.pts))) continue;     // sudah punya puncak
+        addFace(L, z, f.ip, f.area, Infinity, -1);
+      }
+    });
+    if (fixed) warnings.push(`${fixed} kontur puncak gabungan dipisah per kolam (kontur terputus/berbagi dinding).`);
   }
   if (stat.gapClosed) warnings.push(`${stat.gapClosed} kontur ditutup otomatis pada celah (maks ${stat.maxGap.toFixed(1)} m).`);
   if (stat.chordClosed) warnings.push(`${stat.chordClosed} kontur terbuka ditutup dengan garis lurus (maks ${stat.maxGap.toFixed(1)} m) — cek preview.`);
@@ -24505,18 +25778,30 @@ function dxfAnalyze(text) {
 /* Pemakaian bersama oleh loader Sediment Pond & Retention Pond */
 function dxfLoadText(text, fileName) {
   const A = dxfAnalyze(text);
+  const srcId = 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
   const results = [];
   A.ponds.forEach((p, ci) => {
     const r = dxfComputeVolume(p.contours);
     if (!r.intervals.length) return;
     r.fileName = A.ponds.length > 1 ? `${fileName} — Kolam ${ci + 1}/${A.ponds.length}` : fileName;
     r.contours = p.contours;
+    r.srcId = srcId; r.srcFile = fileName; r.name = 'Kolam ' + (ci + 1);
+    if (typeof dxfEnrich === 'function') dxfEnrich(r);
     const notes = (p.notes || []).slice();
     const a0 = r.areas[r.elevs[0]], a1 = r.areas[r.elevs[r.elevs.length - 1]];
     if (a1 < a0) notes.push('Luas mengecil ke atas — bentuk ini kemungkinan gundukan, bukan cekungan kolam.');
     if (notes.length) r.notes = notes;
     results.push(r);
   });
+  // Otomatis pisahkan bentuk serpentine (mis. SP1A + SP1B) pada ujung sekat terbawah
+  if (typeof dxfSuggestCut === 'function') {
+    for (let i = results.length - 1; i >= 0; i--) {
+      const N = dxfSuggestCut(results[i]); if (N == null) continue;
+      const parts = dxfSplitResult(results[i], N, [results[i].name + ' (atas)', results[i].name + ' (bawah)']);
+      if (parts && parts.every(Boolean)) { parts.forEach(q => { q.autoSplit = N; }); results.splice(i, 1, ...parts); }
+    }
+    results.forEach((r, k) => { if (!/\(atas\)|\(bawah\)/.test(r.name)) r.name = 'Kolam ' + (k + 1); });
+  }
   return { results, summary: A.summary, warnings: A.warnings };
 }
 
@@ -24652,10 +25937,10 @@ function dxfComputeVolume(contours) {
   return { elevs, areas, intervals, totalVol };
 }
 
-/* ── 5. Preview SVG kontur top-view ── */
+/* ── 5. Preview SVG kontur top-view (versi besar & terbaca) ── */
 function dxfPreviewSVG(contours, elevs, areas) {
   if (!elevs || elevs.length === 0) return '';
-  const W = 320, H = 280, PAD = 30;
+  const W = 640, PAD = 46, TOP = 38, BOT = 66, HMAX = 520;
 
   // Bounding box semua titik
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
@@ -24664,45 +25949,136 @@ function dxfPreviewSVG(contours, elevs, areas) {
       if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y;
     }));
   });
+  if(!isFinite(minX)) return '';
   const rngX = maxX - minX || 1, rngY = maxY - minY || 1;
-  const scX = (W - PAD*2) / rngX, scY = (H - PAD*2 - 30) / rngY;
-  const sc = Math.min(scX, scY);
-  const offX = PAD + (W - PAD*2 - rngX*sc)/2;
-  const offY = PAD + 20 + (H - PAD*2 - 30 - rngY*sc)/2;
+  const availW = W - PAD*2 - 40; // sisakan ruang untuk label di kanan
+  const sc = Math.min(availW / rngX, (HMAX - TOP - BOT - 10) / rngY);
+  const H = Math.max(340, Math.round(TOP + rngY*sc + BOT + 10)); // tinggi menyesuaikan bentuk kolam
+  const offX = PAD + (availW - rngX*sc)/2;
+  const offY = TOP + 5;
   const tx = x => offX + (x - minX)*sc;
-  const ty = y => H - PAD - (y - minY)*sc; // flip Y
+  const ty = y => offY + (maxY - y)*sc; // flip Y
 
-  // Warna gradasi hijau dari luar ke dalam
   const nE = elevs.length;
+  // Gradasi: kontur terendah (dasar) = biru tua, teratas = hijau terang → kontras jelas antar level
   const colors = elevs.map((_,i)=>{
     const t = i / Math.max(nE-1,1);
-    const r = Math.round(39 + (26-39)*t);
-    const g = Math.round(174 + (100-174)*t);
-    const b = Math.round(96 + (30-96)*t);
-    return `rgb(${r},${g},${b})`;
+    const hue = 205 - 95*t;           // 205 (biru) → 110 (hijau)
+    const lig = 30 + 22*t;            // 30% → 52%
+    return `hsl(${hue.toFixed(0)},70%,${lig.toFixed(0)}%)`;
   });
 
-  let paths = '';
+  let fills = '', paths = '', labels = '';
+  const sw = nE>20 ? 1.1 : nE>10 ? 1.4 : 1.8;
+  const placed = []; // posisi label yang sudah terpasang (anti tumpang-tindih)
+  const tryLabel = (txt, px, py, color, force) => {
+    const w = txt.length*6.6 + 6, h = 14;
+    const clash = placed.some(q => Math.abs(q.x-px) < Math.max(q.w,w) && Math.abs(q.y-py) < h);
+    if(clash && !force) return;
+    placed.push({x:px,y:py,w:w});
+    labels += `<text x="${(px).toFixed(1)}" y="${py.toFixed(1)}" font-size="11.5" font-weight="600" fill="${color}" stroke="var(--bg-secondary)" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round" font-family="monospace" dominant-baseline="middle">${txt}</text>`;
+  };
+
   elevs.forEach((z, ei) => {
     (contours[z]||[]).forEach(pts => {
       if(pts.length < 2) return;
       const d = pts.map((p,j)=>`${j===0?'M':'L'}${tx(p[0]).toFixed(1)},${ty(p[1]).toFixed(1)}`).join(' ')+'Z';
-      paths += `<path d="${d}" fill="none" stroke="${colors[ei]}" stroke-width="${nE>12 ? 0.9 : Math.min(3, 1.5 + ei*0.2)}" opacity="0.85"/>`;
+      const isTop = ei === nE-1, isBot = ei === 0;
+      if(isTop) fills += `<path d="${d}" fill="${colors[ei]}" fill-opacity="0.10" stroke="none"/>`;
+      paths += `<path d="${d}" fill="none" stroke="${colors[ei]}" stroke-width="${(isTop||isBot) ? sw+0.9 : sw}" stroke-linejoin="round" opacity="0.95"/>`;
     });
-    // Label elevasi di titik paling kanan kontur (dijarangkan bila kontur banyak)
-    const allPts = (contours[z]||[]).flat();
-    const lblStep = nE>12 ? Math.ceil(nE/4) : 1;
-    if(allPts.length && (ei % lblStep === 0 || ei === nE-1)) {
-      const rightPt = allPts.reduce((m,p)=>p[0]>m[0]?p:m, allPts[0]);
-      paths += `<text x="${(tx(rightPt[0])+4).toFixed(1)}" y="${ty(rightPt[1]).toFixed(1)}" font-size="8" fill="${colors[ei]}" stroke="var(--bg-secondary)" stroke-width="2.5" paint-order="stroke" font-family="monospace" dominant-baseline="middle">${z} m</text>`;
-    }
   });
 
-  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;border:1px solid var(--border);border-radius:6px;background:var(--bg-secondary)">
-    <text x="${W/2}" y="14" font-size="10" font-weight="700" fill="var(--text)" font-family="monospace" text-anchor="middle">Preview Kontur DXF</text>
-    ${paths}
-    <text x="${W/2}" y="${H-6}" font-size="9" fill="var(--muted)" font-family="monospace" text-anchor="middle">${elevs.length} kontur · El. ${elevs[0]}–${elevs[elevs.length-1]} m</text>
-  </svg>`;
+  // Label elevasi: prioritas kontur teratas & terbawah, lalu sisanya jika ada ruang
+  const order = [nE-1, 0];
+  for(let i=nE-2;i>0;i--) order.push(i);
+  order.forEach(ei => {
+    const z = elevs[ei];
+    const allPts = (contours[z]||[]).flat();
+    if(!allPts.length) return;
+    const rightPt = allPts.reduce((m,p)=>p[0]>m[0]?p:m, allPts[0]);
+    tryLabel(`${z} m`, tx(rightPt[0])+6, ty(rightPt[1]), colors[ei], ei===nE-1 || ei===0);
+  });
+
+  // Skala batang (scale bar) & panah utara
+  const nice = [0.5,1,2,5,10,20,25,50,100,200,250,500,1000];
+  let barM = nice[0];
+  nice.forEach(n => { if(n*sc <= 140) barM = n; });
+  const barPx = barM*sc, bx = PAD, by = H - BOT + 24;
+  const scaleBar = `<g font-family="monospace" font-size="11" fill="var(--text)">
+    <line x1="${bx}" y1="${by}" x2="${bx+barPx}" y2="${by}" stroke="var(--text)" stroke-width="2.5"/>
+    <line x1="${bx}" y1="${by-5}" x2="${bx}" y2="${by+5}" stroke="var(--text)" stroke-width="1.5"/>
+    <line x1="${bx+barPx}" y1="${by-5}" x2="${bx+barPx}" y2="${by+5}" stroke="var(--text)" stroke-width="1.5"/>
+    <text x="${bx+barPx+8}" y="${by}" dominant-baseline="middle">${barM} m</text></g>`;
+  const nx = W - PAD + 6, ny = TOP + 6;
+  const north = `<g font-family="monospace" font-size="11" fill="var(--text)" text-anchor="middle">
+    <path d="M${nx},${ny} l-6,18 l6,-5 l6,5 z" fill="var(--text)"/><text x="${nx}" y="${ny+30}">U</text></g>`;
+
+  // Legenda gradasi level
+  const lgX = W - PAD - 130, lgY = H - BOT + 14;
+  const legend = `<g font-family="monospace" font-size="10.5" fill="var(--muted)">
+    <defs><linearGradient id="dxfLg" x1="0" x2="1">
+      <stop offset="0" stop-color="${colors[0]}"/><stop offset="1" stop-color="${colors[nE-1]}"/></linearGradient></defs>
+    <rect x="${lgX}" y="${lgY}" width="100" height="8" rx="2" fill="url(#dxfLg)"/>
+    <text x="${lgX}" y="${lgY+21}">${elevs[0]} m</text>
+    <text x="${lgX+100}" y="${lgY+21}" text-anchor="end">${elevs[nE-1]} m</text></g>`;
+
+  return `<div class="dxf-prev-wrap" style="position:relative;width:100%">
+  <svg class="dxf-prev-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" onclick="dxfOpenPreview(this)" style="width:100%;height:auto;display:block;cursor:zoom-in;border:1px solid var(--border);border-radius:8px;background:var(--bg-secondary)">
+    <text x="${W/2}" y="22" font-size="14" font-weight="700" fill="var(--text)" font-family="monospace" text-anchor="middle">Preview Kontur DXF</text>
+    ${fills}${paths}${labels}${scaleBar}${north}${legend}
+    <text x="${W/2}" y="${H-8}" font-size="11" fill="var(--muted)" font-family="monospace" text-anchor="middle">${nE} kontur · El. ${elevs[0]}–${elevs[nE-1]} m · klik untuk perbesar</text>
+  </svg></div>`;
+}
+
+/* Perbesar preview: overlay layar penuh, scroll = zoom, geser = pan, Esc/klik latar = tutup */
+function dxfOpenPreview(svgEl) {
+  if(!svgEl) return;
+  const old = document.getElementById('dxf-prev-overlay'); if(old) old.remove();
+  const ov = document.createElement('div');
+  ov.id = 'dxf-prev-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:3vmin';
+  const box = document.createElement('div');
+  box.style.cssText = 'position:relative;background:var(--bg,#fff);border-radius:10px;padding:10px;width:min(96vw,1000px);max-height:96vh;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.5)';
+  const svg = svgEl.cloneNode(true);
+  svg.removeAttribute('onclick');
+  svg.id = '';
+  svg.style.cssText = 'width:100%;height:auto;max-height:86vh;display:block;cursor:grab;border:none;background:var(--bg-secondary);border-radius:6px;touch-action:none';
+  const hint = document.createElement('div');
+  hint.style.cssText = 'font-size:11px;color:var(--muted);text-align:center;margin-top:6px';
+  hint.textContent = 'Scroll = zoom · seret = geser · klik dua kali = reset · Esc = tutup';
+  const close = document.createElement('button');
+  close.textContent = '✕';
+  close.style.cssText = 'position:absolute;top:8px;right:10px;z-index:2;font-size:14px;padding:2px 9px;cursor:pointer;border:1px solid var(--border);border-radius:5px;background:var(--bg,#fff);color:var(--text,#000)';
+  box.append(svg, hint, close); ov.appendChild(box); document.body.appendChild(ov);
+
+  const vb0 = svg.viewBox.baseVal; const base = [vb0.x, vb0.y, vb0.width, vb0.height];
+  let vb = base.slice();
+  const apply = () => svg.setAttribute('viewBox', vb.join(' '));
+  const shut = () => { ov.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = e => { if(e.key==='Escape') shut(); };
+  document.addEventListener('keydown', onKey);
+  close.onclick = shut;
+  ov.addEventListener('mousedown', e => { if(e.target===ov) shut(); });
+  svg.addEventListener('wheel', e => {
+    e.preventDefault();
+    const r = svg.getBoundingClientRect();
+    const fx = (e.clientX - r.left)/r.width, fy = (e.clientY - r.top)/r.height;
+    const k = e.deltaY < 0 ? 0.85 : 1/0.85;
+    const nw = Math.min(base[2]*1.5, Math.max(base[2]/20, vb[2]*k));
+    const nh = nw * base[3]/base[2];
+    vb = [vb[0] + (vb[2]-nw)*fx, vb[1] + (vb[3]-nh)*fy, nw, nh]; apply();
+  }, {passive:false});
+  let drag = null;
+  svg.addEventListener('pointerdown', e => { drag = {x:e.clientX,y:e.clientY,vb:vb.slice()}; svg.setPointerCapture(e.pointerId); svg.style.cursor='grabbing'; });
+  svg.addEventListener('pointermove', e => {
+    if(!drag) return;
+    const r = svg.getBoundingClientRect();
+    vb = [drag.vb[0] - (e.clientX-drag.x)*vb[2]/r.width, drag.vb[1] - (e.clientY-drag.y)*vb[3]/r.height, vb[2], vb[3]]; apply();
+  });
+  const up = () => { drag = null; svg.style.cursor='grab'; };
+  svg.addEventListener('pointerup', up); svg.addEventListener('pointercancel', up);
+  svg.addEventListener('dblclick', () => { vb = base.slice(); apply(); });
 }
 
 /* ── 6. HTML tabel interval ── */
@@ -24970,7 +26346,7 @@ function rpDxfRenderResult(uid) {
       </div>
     </div>
     <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start">
-      ${svgStr ? `<div style="flex:0 0 auto">${svgStr}</div>` : ''}
+      ${svgStr ? `<div style="flex:1 1 400px;max-width:640px;min-width:280px">${svgStr}</div>` : ''}
       <div style="flex:1;min-width:260px">${tableStr}</div>
     </div>
   </div>`;
@@ -25221,7 +26597,7 @@ function spDxfRenderResult(uid) {
       </div>
     </div>
     <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start">
-      ${svgStr ? `<div style="flex:0 0 auto">${svgStr}</div>` : ''}
+      ${svgStr ? `<div style="flex:1 1 400px;max-width:640px;min-width:280px">${svgStr}</div>` : ''}
       <div style="flex:1;min-width:260px">${tableStr}</div>
     </div>
   </div>`;
@@ -25473,7 +26849,14 @@ function spUnitGetVolArea(uid) {
   }
   // Dari kompartemen jika tidak ada DXF
   if (H <= 0 && vComps > 0 && aComps > 0) H = vComps / aComps;
-  const totalArea = aComps > 0 ? aComps : topArea;
+  // Luas total = kompartemen manual + jumlah luas puncak tiap kolam DXF (bukan hanya satu interval tertinggi)
+  const dxfTopSum = dxfList.reduce((s, r) => {
+    const ivs = r.intervals || [];
+    if (!ivs.length) return s;
+    const top = ivs.reduce((a, b) => (b.z2 > a.z2 ? b : a), ivs[0]);
+    return s + (top.A2 || top.A1 || 0);
+  }, 0);
+  const totalArea = (aComps || 0) + dxfTopSum;
   const b = topArea > 0 ? Math.sqrt(topArea) : (totalArea > 0 ? Math.sqrt(totalArea) : 0);
   // p = panjang kolam ≈ √(A_atas) untuk kolam kotak, atau bisa 2× lebar
   const p = b;
@@ -25761,5 +27144,455 @@ if(typeof _origRestoreSpDxf === 'function') {
   };
 }
 </script>
+<script id="hydrosan-dxf-detail">
+/* ═══════════════════════════════════════════════════════════════
+   DXF — DETAIL KOLAM (Sediment & Retention Pond)
+   • Peta situasi: semua kolam dari 1 file DXF tampil bersama (bernomor, berkoordinat, berskala)
+   • Nama kolam bisa diedit (DXF tidak menyimpan teks, mis. "CELL-02", "SP1A")
+   • Metrik per kolam: lokasi E/N, kedalaman, luas dasar→atas, talud rata-rata, keliling, MBR
+   • Bagi kolam: satu bentuk gabungan (mis. SP1A+SP1B) dipotong garis Northing → 2 kolam
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+  var PAL=['#2D6FB8','#14a59a','#d98a14','#8b5cf6','#e0526b','#5b8c2a','#0b8fb0','#a0703f','#c026d3','#4f46e5'];
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function fmt(v,d){d=d==null?1:d;return Number(v).toLocaleString('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d});}
+  function ringCentroid(p){var a=0,cx=0,cy=0,n=p.length;for(var i=0;i<n;i++){var j=(i+1)%n,f=p[i][0]*p[j][1]-p[j][0]*p[i][1];a+=f;cx+=(p[i][0]+p[j][0])*f;cy+=(p[i][1]+p[j][1])*f;}
+    if(Math.abs(a)<1e-9){var s=[0,0];p.forEach(function(q){s[0]+=q[0];s[1]+=q[1];});return [s[0]/n,s[1]/n];} a*=3;return [cx/a,cy/a];}
+  function perim(rs){return rs.reduce(function(s,p){return s+dxfPerimeter(p,true);},0);}
+
+  /* ── metrik per kolam ── */
+  window.dxfEnrich=function(r){
+    if(!r||!r.contours||!r.elevs||r.elevs.length<2) return r;
+    var zt=r.elevs[r.elevs.length-1], zb=r.elevs[0];
+    var top=r.contours[zt]||[], bot=r.contours[zb]||[]; if(!top.length) return r;
+    var big=top.slice().sort(function(a,b){return shoelaceArea(b)-shoelaceArea(a);})[0];
+    var c=ringCentroid(big), bb=polyBBox(big), Pt=perim(top), Pb=perim(bot);
+    var At=r.areas?r.areas[zt]:shoelaceArea(big), Ab=r.areas?r.areas[zb]:0, depth=zt-zb, slope=null;
+    if(depth>0&&Pt+Pb>0&&At>=Ab) slope=((At-Ab)/((Pt+Pb)/2))/depth;
+    var mbr=null; try{mbr=minBoundingRect(big);}catch(e){}
+    var compact=Pt>0?4*Math.PI*At/(Pt*Pt):1;
+    r.meta={cx:c[0],cy:c[1],bb:bb,Pt:Pt,Pb:Pb,At:At,Ab:Ab,depth:depth,slope:slope,mbr:mbr,zt:zt,zb:zb,compact:compact};
+    return r;
+  };
+
+  /* ── akses daftar hasil ── */
+  function getList(kind,uid){
+    var u=(kind==='sp'?spUnits:rpUnits).find(function(x){return x.id===uid;});
+    return u?(kind==='sp'?spDxfEnsureArray(u):rpDxfEnsureArray(u)):null;
+  }
+  function rerender(kind,uid){ if(kind==='sp') spDxfRenderResult(uid); else rpDxfRenderResult(uid); }
+
+  /* ── PETA SITUASI ── */
+  function niceStep(rng){var raw=rng/6,p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p;}
+  function siteSVG(group,kind,uid){
+    var W=700,H=470,PL=62,PB=34,PT=14,PR=14;
+    var minX=1e18,maxX=-1e18,minY=1e18,maxY=-1e18;
+    group.forEach(function(g){var b=g.r.meta.bb; ['minX','maxX'].forEach(function(k){}); minX=Math.min(minX,b.minX);maxX=Math.max(maxX,b.maxX);minY=Math.min(minY,b.minY);maxY=Math.max(maxY,b.maxY);});
+    var rx=(maxX-minX)||1, ry=(maxY-minY)||1, pad=Math.max(rx,ry)*0.04; minX-=pad;maxX+=pad;minY-=pad;maxY+=pad; rx=maxX-minX; ry=maxY-minY;
+    var sc=Math.min((W-PL-PR)/rx,(H-PT-PB)/ry), ox=PL+((W-PL-PR)-rx*sc)/2, oy=PT+((H-PT-PB)-ry*sc)/2;
+    var tx=function(x){return ox+(x-minX)*sc;}, ty=function(y){return H-PB-oy+PT-(y-minY)*sc+ (0);};
+    ty=function(y){return PT+oy-PT+ (ry-(y-minY))*sc;};
+    var stepX=niceStep(rx*2.2), stepY=niceStep(ry), s='';
+    for(var gx=Math.ceil(minX/stepX)*stepX;gx<=maxX;gx+=stepX){var X=tx(gx);
+      s+='<line x1="'+X.toFixed(1)+'" y1="'+PT+'" x2="'+X.toFixed(1)+'" y2="'+(H-PB)+'" stroke="var(--border)" stroke-width="1" stroke-dasharray="2 4"/>'+
+         '<text x="'+X.toFixed(1)+'" y="'+(H-PB+14)+'" font-size="9.5" fill="var(--muted)" text-anchor="middle" font-family="monospace">'+fmt(gx,0)+'</text>';}
+    for(var gy=Math.ceil(minY/stepY)*stepY;gy<=maxY;gy+=stepY){var Y=ty(gy);
+      s+='<line x1="'+PL+'" y1="'+Y.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+Y.toFixed(1)+'" stroke="var(--border)" stroke-width="1" stroke-dasharray="2 4"/>'+
+         '<text x="'+(PL-6)+'" y="'+(Y+3).toFixed(1)+'" font-size="9.5" fill="var(--muted)" text-anchor="end" font-family="monospace">'+fmt(gy,0)+'</text>';}
+    s+='<text x="'+(PL+4)+'" y="'+(PT+10)+'" font-size="9" fill="var(--muted)" font-family="monospace">N ↑ (koordinat UTM, m)</text>';
+    group.forEach(function(g,k){
+      var r=g.r, col=PAL[g.i%PAL.length], zt=r.meta.zt, zb=r.meta.zb, d='', db='';
+      (r.contours[zt]||[]).forEach(function(p){d+=p.map(function(q,j){return (j?'L':'M')+tx(q[0]).toFixed(1)+','+ty(q[1]).toFixed(1);}).join('')+'Z';});
+      (r.contours[zb]||[]).forEach(function(p){db+=p.map(function(q,j){return (j?'L':'M')+tx(q[0]).toFixed(1)+','+ty(q[1]).toFixed(1);}).join('')+'Z';});
+      var cx=tx(r.meta.cx), cy=ty(r.meta.cy);
+      s+='<g style="cursor:pointer" onclick="var e=document.getElementById(\'dxf-card-'+kind+'-'+uid+'-'+g.i+'\');if(e)e.scrollIntoView({behavior:\'smooth\',block:\'start\'})">'+
+         '<path d="'+d+'" fill="'+col+'" fill-opacity="0.20" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" fill-rule="evenodd"/>'+
+         '<path d="'+db+'" fill="'+col+'" fill-opacity="0.18" stroke="'+col+'" stroke-width="1.2" stroke-dasharray="4 3" fill-rule="evenodd"/>'+
+         '<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="11" fill="'+col+'" stroke="#fff" stroke-width="2"/>'+
+         '<text x="'+cx.toFixed(1)+'" y="'+(cy+4).toFixed(1)+'" font-size="11" font-weight="700" fill="#fff" text-anchor="middle" font-family="sans-serif">'+(g.i+1)+'</text>'+
+         '<text x="'+cx.toFixed(1)+'" y="'+(cy+24).toFixed(1)+'" font-size="10.5" font-weight="700" fill="'+col+'" stroke="var(--bg-secondary,#fff)" stroke-width="3.5" paint-order="stroke" text-anchor="middle" font-family="sans-serif">'+esc(r.name||('Kolam '+(g.i+1)))+'</text>'+
+         '</g>';
+    });
+    // skala batang
+    var bar=niceStep(rx)*1, bw=bar*sc; if(bw>W*0.35){bar/=2;bw=bar*sc;}
+    s+='<g transform="translate('+(W-PR-bw-10)+','+(PT+14)+')"><line x1="0" y1="0" x2="'+bw+'" y2="0" stroke="var(--text)" stroke-width="3"/><line x1="0" y1="-4" x2="0" y2="4" stroke="var(--text)" stroke-width="2"/><line x1="'+bw+'" y1="-4" x2="'+bw+'" y2="4" stroke="var(--text)" stroke-width="2"/><text x="'+(bw/2)+'" y="15" font-size="10" fill="var(--text)" text-anchor="middle" font-family="monospace">'+fmt(bar,0)+' m</text></g>';
+    return '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:'+W+'px;height:auto;border:1px solid var(--border);border-radius:10px;background:var(--bg-secondary)">'+s+'</svg>';
+  }
+  function overviewHTML(kind,uid,list){
+    var _u=(kind==='sp'?spUnits:rpUnits).find(function(x){return x.id===uid;}), fb=_u?(parseID(_u.fb)||0):0; if(isNaN(fb)||fb<0) fb=0;
+    var sfd=1; if(_u){var _sv=parseID(_u.sfc); if(!isNaN(_sv)&&_sv>0) {var _r=(_u.sfcU==='pct')?_sv/100:_sv; if(_r>0&&_r<1) sfd=1-_r;}}
+    var groups={}, order=[];
+    list.forEach(function(r,i){ if(!r.meta) return; var k=r.srcId||'_'; if(!groups[k]){groups[k]=[];order.push(k);} groups[k].push({r:r,i:i}); });
+    return order.map(function(k){
+      var g=groups[k]; if(g.length<1) return '';
+      var rows=g.map(function(x){var r=x.r,m=r.meta,col=PAL[x.i%PAL.length];
+        return '<tr><td style="padding:4px 6px"><span style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:'+col+';color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center">'+(x.i+1)+'</span></td>'+
+          '<td style="padding:4px 6px;font-weight:700">'+esc(r.name||('Kolam '+(x.i+1)))+'</td>'+
+          '<td style="padding:4px 6px;text-align:right;font-family:var(--mono)">'+fmt(m.zb,2)+' – '+fmt(m.zt,2)+'</td>'+
+          '<td style="padding:4px 6px;text-align:right;font-family:var(--mono)">'+fmt(m.At,0)+'</td>'+
+          '<td style="padding:4px 6px;text-align:right;font-family:var(--mono);font-weight:700">'+fmt(r.totalVol,0)+'</td>'+
+          ((fb||sfd!==1)?'<td style="padding:4px 6px;text-align:right;font-family:var(--mono);font-weight:700;color:#14a59a">'+fmt(dxfNetVolume(r,fb)*sfd,0)+'</td>':'')+
+          '<td style="padding:4px 6px;text-align:right;font-family:var(--mono);color:var(--muted)">'+fmt(m.cx,0)+' / '+fmt(m.cy,0)+'</td></tr>';}).join('');
+      var tot=g.reduce(function(s,x){return s+(x.r.totalVol||0);},0);
+      var src=g[0].r.srcFile||'DXF';
+      return '<div class="card dxf-overview" style="margin-top:12px;padding:14px 16px;border:1.5px solid rgba(45,111,184,0.35)">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">'+
+          '<div><span style="font-weight:700;font-size:13px">🗺 Peta Situasi Kolam — '+esc(src)+'</span>'+
+          '<span style="font-size:11px;color:var(--muted);margin-left:10px">'+g.length+' kolam terbaca · klik kolam untuk loncat ke rinciannya</span></div>'+
+          '<span style="display:inline-flex;gap:6px"><button onclick="dxfDownloadSrc(\''+kind+'\','+uid+',\''+(g[0].r.srcId||'')+'\')" title="Unduh kembali file DXF yang diupload" style="padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #2D6FB8;border-radius:5px;background:rgba(45,111,184,0.10);color:var(--blue2,#2D6FB8)">⬇ DXF asli</button>'+
+          '<button onclick="dxfDownloadSite(this)" style="padding:3px 10px;font-size:11px;cursor:pointer;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--text)">⬇ Unduh SVG</button></span></div>'+
+        '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start">'+
+          '<div style="flex:1 1 380px;min-width:300px">'+siteSVG(g,kind,uid)+'</div>'+
+          '<div style="flex:1 1 300px;min-width:280px;overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr style="background:var(--bg-secondary)">'+
+            '<th style="padding:5px 6px"></th><th style="padding:5px 6px;text-align:left;font-size:10px;color:var(--muted)">Kolam</th><th style="padding:5px 6px;text-align:right;font-size:10px;color:var(--muted)">El. dasar–puncak</th><th style="padding:5px 6px;text-align:right;font-size:10px;color:var(--muted)">Luas atas m²</th><th style="padding:5px 6px;text-align:right;font-size:10px;color:var(--muted)">Volume m³</th>'+(fb?'<th style="padding:5px 6px;text-align:right;font-size:10px;color:#14a59a">Net (FB '+fmt(fb,2)+' m'+(sfd!==1?' · SF −'+fmt((1-sfd)*100,1)+'%':'')+')</th>':'')+'<th style="padding:5px 6px;text-align:right;font-size:10px;color:var(--muted)">E / N</th></tr></thead><tbody>'+rows+
+            '<tr style="border-top:2px solid var(--border)"><td></td><td style="padding:5px 6px;font-weight:700">Σ</td><td></td><td></td><td style="padding:5px 6px;text-align:right;font-family:var(--mono);font-weight:700">'+fmt(tot,0)+'</td>'+((fb||sfd!==1)?'<td style="padding:5px 6px;text-align:right;font-family:var(--mono);font-weight:700;color:#14a59a">'+fmt(g.reduce(function(s,x){return s+dxfNetVolume(x.r,fb)*sfd;},0),0)+'</td>':'')+'<td></td></tr></tbody></table>'+
+            '<div style="font-size:10.5px;color:var(--muted);margin-top:8px;line-height:1.5">Garis tegas = kontur puncak · garis putus = kontur dasar. DXF tidak menyimpan teks, jadi beri nama kolam di rincian masing-masing (mis. CELL-02, SP1A) mengikuti gambar PDF.</div></div>'+
+        '</div></div>';
+    }).join('');
+  }
+  window.dxfDownloadSite=function(btn){
+    var svg=btn.closest('.dxf-overview').querySelector('svg'); if(!svg) return;
+    var s=new XMLSerializer().serializeToString(svg).replace(/var\(--border\)/g,'#c9d6e6').replace(/var\(--muted\)/g,'#5a6b7c').replace(/var\(--text\)/g,'#1c2a3a').replace(/var\(--bg-secondary,#fff\)/g,'#ffffff').replace(/var\(--bg-secondary\)/g,'#f6f9fd').replace(/var\(--card-solid,#fff\)/g,'#ffffff');
+    var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([s],{type:'image/svg+xml'})); a.download='peta-situasi-kolam.svg'; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+  };
+
+  /* ── RINCIAN per kartu ── */
+  function chip(l,v,c){return '<span style="display:inline-flex;gap:5px;align-items:baseline;padding:3px 9px;border-radius:14px;border:1px solid var(--border);background:var(--bg-secondary);font-size:11px"><span style="color:var(--muted)">'+l+'</span><b style="font-family:var(--mono);color:'+(c||'var(--text)')+'">'+v+'</b></span>';}
+  function extraHTML(kind,uid,idx,r){
+    var m=r.meta; if(!m) return '';
+    var tag=kind+'-'+uid+'-'+idx, chips=[
+      chip('Lokasi','E '+fmt(m.cx,0)+' · N '+fmt(m.cy,0)),
+      chip('Kedalaman',fmt(m.depth,2)+' m'),
+      chip('Luas dasar → atas',fmt(m.Ab,0)+' → '+fmt(m.At,0)+' m²'),
+      m.slope!=null?chip('Talud rata-rata','1V : '+fmt(m.slope,2)+'H','#14a59a'):'',
+      chip('Keliling atas',fmt(m.Pt,0)+' m'),
+      m.mbr?chip('Dimensi (MBR)',fmt(m.mbr.length,0)+' × '+fmt(m.mbr.width,0)+' m'):''
+    ].join(' ');
+    var hint=(r.autoSplit!=null)?'<div style="margin-top:8px;padding:6px 10px;border-left:3px solid #14a59a;background:rgba(20,165,154,0.10);border-radius:4px;font-size:11px;color:var(--muted)">✓ Bagian dari strip serpentine yang <b>dipisah otomatis</b> pada N = '+fmt(r.autoSplit,1)+' (ujung sekat terbawah). Geser lewat ↶ Batalkan pembagian bila perlu.</div>':(m.compact<0.30)?'<div style="margin-top:8px;padding:6px 10px;border-left:3px solid #d98a14;background:rgba(217,138,20,0.10);border-radius:4px;font-size:11px;color:var(--muted)">⚠ Bentuk sangat berliku (serpentine/berlekuk) — kemungkinan gabungan beberapa kolam seri (mis. <b>SP1A + SP1B</b>). Gunakan <b>✂ Bagi kolam</b> di bawah untuk memisahkannya.</div>':'';
+    var n0=m.bb.minY, n1=m.bb.maxY, sug=dxfSuggestCut(r), mid=sug!=null?sug:Math.round((n0+n1)/2);
+    var undo=r.splitOrig?'<button onclick="dxfPondUnsplit(\''+kind+'\','+uid+','+idx+')" style="margin-left:8px;padding:3px 10px;font-size:11px;cursor:pointer;border:1px solid #d98a14;border-radius:5px;background:rgba(217,138,20,0.1);color:#d98a14">↶ Batalkan pembagian</button>':'';
+    return '<div class="dxf-extra" style="margin:-2px 0 12px;padding:10px 12px;border:1px dashed var(--border);border-radius:8px">'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px"><label style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px">Nama kolam'+
+      '<input type="text" value="'+esc(r.name||'')+'" placeholder="mis. CELL-02 / SP1A" onchange="dxfPondRename(\''+kind+'\','+uid+','+idx+',this.value)" style="padding:4px 8px;width:190px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:12px;font-weight:700"></label>'+undo+'<button onclick="dxfNamePreset(\''+kind+'\','+uid+')" title="Beri nama otomatis: SP1A, SP1B, CELL-02…05 menurut posisi (butuh 6 kolam)" style="margin-left:auto;padding:3px 10px;font-size:11px;cursor:pointer;border:1px solid var(--border);border-radius:5px;background:var(--bg-secondary);color:var(--text)">🏷 Nama sesuai PDF desain</button><button onclick="dxfDownloadPond(\''+kind+'\','+uid+','+idx+')" title="Unduh DXF berisi kontur kolam ini saja" style="padding:3px 10px;font-size:11px;cursor:pointer;border:1px solid var(--border);border-radius:5px;background:var(--bg-secondary);color:var(--text)">⬇ DXF kolam ini</button></div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+chips+'</div>'+hint+
+      '<details style="margin-top:8px"><summary style="cursor:pointer;font-size:11.5px;font-weight:600;color:var(--blue2,#2D6FB8)">✂ Bagi kolam ini menjadi 2 (garis potong lurus pada Northing tertentu)</summary>'+
+        '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:11.5px"><span style="color:var(--muted)">Northing (N) =</span>'+
+        '<input id="dxf-split-n-'+tag+'" type="text" inputmode="decimal" value="'+mid+'" style="width:110px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:var(--mono)">'+
+        '<span style="color:var(--muted)">'+(sug!=null?'saran otomatis (ujung sekat terbawah) · ':'')+'rentang N '+fmt(n0,0)+' – '+fmt(n1,0)+' (lihat sumbu kiri peta situasi)</span>'+
+        '<button onclick="dxfPondSplit(\''+kind+'\','+uid+','+idx+')" style="padding:4px 12px;font-size:11.5px;font-weight:700;cursor:pointer;border:none;border-radius:6px;background:linear-gradient(135deg,#1D4E89,#2D7BD0);color:#fff">Bagi</button></div></details></div>';
+  }
+
+  /* ── dekorasi hasil render ── */
+  function decorate(kind,uid){
+    var box=document.getElementById(kind+'-dxf-result-'+uid); var list=getList(kind,uid); if(!box||!list||!list.length) return;
+    list.forEach(function(r){ if(!r.meta) dxfEnrich(r); if(!r.name) r.name='Kolam '+(list.indexOf(r)+1); });
+    var cards=[].slice.call(box.children).filter(function(e){return e.classList&&e.classList.contains('card');}).slice(0,list.length);
+    cards.forEach(function(card,i){
+      var r=list[i]; card.id='dxf-card-'+kind+'-'+uid+'-'+i;
+      var head=card.firstElementChild, sp=head&&head.querySelector('span'); if(sp&&r.name) sp.textContent='📁 Kolam '+(i+1)+': '+r.name+(r.srcFile?'  ·  '+r.srcFile:'');
+      var ex=extraHTML(kind,uid,i,r); if(ex&&head) head.insertAdjacentHTML('afterend',ex);
+    });
+    var ov=overviewHTML(kind,uid,list); if(ov) box.insertAdjacentHTML('afterbegin',ov);
+  }
+  function wrap(name,kind){var o=window[name]; if(typeof o!=='function'||o._dxfw) return;
+    window[name]=function(uid){var r=o.apply(this,arguments); try{decorate(kind,uid);}catch(e){console.warn('dxf-detail',e);} return r;}; window[name]._dxfw=true;}
+  wrap('spDxfRenderResult','sp'); wrap('rpDxfRenderResult','rp');
+
+  /* ── aksi ── */
+  window.dxfPondRename=function(kind,uid,idx,val){
+    var list=getList(kind,uid); if(!list||!list[idx]) return; var r=list[idx];
+    r.name=String(val||'').trim()||('Kolam '+(idx+1)); r.fileName=r.name+(r.srcFile?' — '+r.srcFile:'');
+    rerender(kind,uid);
+  };
+  function clipHalf(pts,N,north){
+    var out=[],n=pts.length; function inside(p){return north?p[1]>=N:p[1]<=N;}
+    for(var i=0;i<n;i++){var a=pts[i],b=pts[(i+1)%n],ia=inside(a),ib=inside(b);
+      if(ia) out.push(a);
+      if(ia!==ib){var t=(N-a[1])/(b[1]-a[1]); out.push([a[0]+t*(b[0]-a[0]),N]);}}
+    return out;
+  }
+
+  /* potong hasil kolam pada Northing N → [utara, selatan] atau null */
+  window.dxfSplitResult=function(r,N,names){
+    var parts=[true,false].map(function(north){
+      var c={}; r.elevs.forEach(function(z){var rs=[]; (r.contours[z]||[]).forEach(function(p){var q=clipHalf(p,N,north); if(q.length>=3&&shoelaceArea(q)>1) rs.push(q);}); if(rs.length) c[z]=rs;}); return c;});
+    if(parts.some(function(c){return Object.keys(c).length<2;})) return null;
+    var sid='s'+Date.now().toString(36)+Math.random().toString(36).slice(2,4), base=r.name||'Kolam';
+    return parts.map(function(c,k){
+      var v=dxfComputeVolume(c); if(!v.intervals||!v.intervals.length) return null;
+      v.contours=c; v.srcId=r.srcId; v.srcFile=r.srcFile; v.splitId=sid; v.splitOrig=r;
+      v.name=(names&&names[k])||(base+(k===0?' (utara)':' (selatan)')); v.fileName=v.name+(r.srcFile?' — '+r.srcFile:''); dxfEnrich(v); return v;});
+  };
+  /* cari garis potong otomatis: Northing tempat penampang kolam tiba-tiba menyempit
+     (ujung sekat/baffle serpentine terbawah). Hanya untuk bentuk berliku. */
+  window.dxfSuggestCut=function(r){
+    var m=r.meta||dxfEnrich(r).meta; if(!m||m.compact>=0.30) return null;
+    var top=(r.contours[m.zt]||[]); if(!top.length) return null;
+    var y0=m.bb.minY, y1=m.bb.maxY, step=0.5, prev=[];
+    function L(y){var xs=[]; top.forEach(function(p){var n=p.length; for(var i=0;i<n;i++){var a=p[i],b=p[(i+1)%n]; if((a[1]<=y)!==(b[1]<=y)) xs.push(a[0]+(y-a[1])/(b[1]-a[1])*(b[0]-a[0]));}});
+      xs.sort(function(a,b){return a-b;}); var t=0; for(var k=0;k+1<xs.length;k+=2) t+=xs[k+1]-xs[k]; return t;}
+    for(var y=y0+3;y<y1-3;y+=step){
+      var l=L(y); if(prev.length>=6){var mx=Math.max.apply(null,prev.slice(-6)); if(mx>8&&l<0.7*mx) return Math.round((y-step)*10)/10;}
+      prev.push(l);
+    }
+    return null;
+  };
+  /* preset penamaan sesuai gambar desain (SP1A/SP1B/CELL-02..05) berdasarkan posisi */
+  window.dxfNamePreset=function(kind,uid){
+    var list=getList(kind,uid); if(!list) return;
+    if(list.length!==6){alert('Preset ini butuh 6 kolam (2 kolam seri + 4 cell). Saat ini ada '+list.length+'. Bagi dulu strip serpentine, atau ganti nama manual.');return;}
+    var it=list.map(function(r,i){return {r:r,x:r.meta.cx,y:r.meta.cy};}).sort(function(a,b){return a.x-b.x;});
+    var west=it.slice(0,2).sort(function(a,b){return b.y-a.y;}), strip=it.slice(2,4).sort(function(a,b){return b.y-a.y;}), east=it.slice(4,6).sort(function(a,b){return a.y-b.y;});
+    var nm=[[west[0],'CELL-02'],[west[1],'CELL-03'],[strip[0],'SP1A'],[strip[1],'SP1B'],[east[0],'CELL-04'],[east[1],'CELL-05']];
+    nm.forEach(function(p){p[0].r.name=p[1]; p[0].r.fileName=p[1]+(p[0].r.srcFile?' — '+p[0].r.srcFile:'');});
+    rerender(kind,uid);
+  };
+  window.dxfPondSplit=function(kind,uid,idx){
+    var list=getList(kind,uid); if(!list||!list[idx]) return; var r=list[idx];
+    var el=document.getElementById('dxf-split-n-'+kind+'-'+uid+'-'+idx); var N=parseID(el&&el.value);
+    var m=r.meta||dxfEnrich(r).meta; var allMin=1e18,allMax=-1e18;
+    r.elevs.forEach(function(z){(r.contours[z]||[]).forEach(function(p){p.forEach(function(q){allMin=Math.min(allMin,q[1]);allMax=Math.max(allMax,q[1]);});});});
+    if(isNaN(N)||N<=allMin||N>=allMax){alert('Northing harus berada di antara '+fmt(allMin,0)+' dan '+fmt(allMax,0)+'.');return;}
+    var made=dxfSplitResult(r,N); if(!made||made.some(function(x){return !x;})){alert('Pembagian gagal — tiap bagian harus punya minimal 2 elevasi kontur. Geser garis potong.');return;}
+    list.splice.apply(list,[idx,1].concat(made)); rerender(kind,uid);
+  };
+  window.dxfPondUnsplit=function(kind,uid,idx){
+    var list=getList(kind,uid); if(!list||!list[idx]) return; var sid=list[idx].splitId, orig=list[idx].splitOrig; if(!sid||!orig) return;
+    var first=list.findIndex(function(x){return x.splitId===sid;}); for(var i=list.length-1;i>=0;i--) if(list[i].splitId===sid) list.splice(i,1);
+    list.splice(first,0,orig); rerender(kind,uid);
+  };
+})();
+</script>
+<script id="hydrosan-freeboard">
+/* ═════════════════════════════════════════════════
+   FREEBOARD — Sediment Pond & Retention Pond
+   • Input freeboard (m) per unit kolam (u.fb); default 0 → net = gross.
+   • Volume GROSS = sampai puncak tanggul (perilaku lama).
+   • Volume NET   = sampai (puncak − freeboard). Dipakai untuk uji V min / rekap.
+   • Kompartemen manual: kedalaman efektif T−fb (frustum: luas atas diinterpolasi √A linear).
+   • DXF: interval teratas dipotong pada elevasi puncak − fb (prismatoid, √A linear).
+   ═════════════════════════════════════════════════ */
+(function(){
+  function fbOf(u){var v=parseID(u&&u.fb); return (isNaN(v)||v<0)?0:v;}
+  /* SF kapasitas (terpisah dari u.sf kebutuhan V min): net = V(freeboard) × (1 − SF); sfOf = pengali.
+     satuan 'dec' → faktor = nilai (mis. 1,10); 'pct' → faktor = 1 + nilai/100 (mis. 10% → 1,10). */
+  function sfOf(u){var v=parseID(u&&u.sfc); if(isNaN(v)||v<=0) return 1; var r=(u&&u.sfcU==='pct')?v/100:v; return (r>0&&r<1)?1-r:1;}
+  function fmt(v,d){return Number(v).toLocaleString('id-ID',{minimumFractionDigits:d==null?0:d,maximumFractionDigits:d==null?0:d});}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function frust(Ab,At,T){ if(T<=0) return 0; return (T/3)*(Ab+At+Math.sqrt(Ab*At)); }
+  function topAt(Ab,At,t){var a=Math.sqrt(Ab),b=Math.sqrt(At); return Math.pow(a+(b-a)*t,2);}
+
+  /* DXF: volume sampai elevasi puncak − fb */
+  window.dxfNetVolume=function(r,fb){
+    if(!r) return 0; if(!fb) return r.totalVol||0;
+    var iv=r.intervals||[]; if(!iv.length) return r.totalVol||0;
+    var zc=iv[iv.length-1].z2-fb, v=0;
+    iv.forEach(function(s){
+      if(s.z2<=zc+1e-9) v+=s.V;
+      else if(s.z1<zc){var t=(zc-s.z1)/(s.z2-s.z1); v+=prismatoidVol(s.A1,topAt(s.A1,s.A2,t),zc-s.z1);}
+    });
+    return v;
+  };
+  /* kompartemen Sediment Pond (L×W×T) */
+  function spCompsNet(u,fb){var s=0; ((u.design&&u.design.comps)||[]).forEach(function(c){var T=parseID(c.T)||0,L=parseID(c.L)||0,W=parseID(c.W)||0; if(L&&W&&T) s+=L*W*Math.max(T-fb,0);}); return s;}
+  /* kompartemen Retention Pond (kubus/frustum/area) */
+  function rpCompNet(c,fb){
+    var T=parseID(c.T)||0; if(!T) return 0; var Tn=Math.max(T-fb,0), t=Tn/T;
+    if(c.inputMode==='area'){
+      if(c.shape==='frustum'){var At=parseID(c.Aatas)||0,Ab=parseID(c.Abawah)||At; if(!At) return 0; return frust(Ab,topAt(Ab,At,t),Tn);}
+      return (parseID(c.Amanual)||0)*Tn;
+    }
+    var P=parseID(c.P)||0,L=parseID(c.L)||0; if(!P||!L) return 0;
+    if(c.shape==='cube') return P*L*Tn;
+    var Pa=parseID(c.Patas)||P,La=parseID(c.Latas)||L,Ab2=P*L,At2=Pa*La; return frust(Ab2,topAt(Ab2,At2,t),Tn);
+  }
+  function rpCompsNet(u,fb){return ((u.design&&u.design.comps)||[]).reduce(function(s,c){return s+rpCompNet(c,fb);},0);}
+  function dxfSum(list,fb){return list.reduce(function(s,r){return s+dxfNetVolume(r,fb);},0);}
+  function dxfGross(list){return list.reduce(function(s,r){return s+(r.totalVol||0);},0);}
+
+  /* ── pembungkus getter volume (vol = NET; volGross = GROSS) ── */
+  var _spTot=window.spUnitGetTotalVol;
+  window.spUnitGetTotalVol=function(u){
+    var g=_spTot(u), fb=fbOf(u), sf=sfOf(u); g.volGross=g.vol; if(!fb&&sf===1) return g;
+    return {vol:spCompsNet(u,fb)*sf,area:g.area,volGross:g.vol};
+  };
+  var _spVA=window.spUnitGetVolArea;
+  window.spUnitGetVolArea=function(uid){
+    var r=_spVA(uid), u=spUnits.find(function(x){return x.id===uid;}); if(!u) return r;
+    var fb=fbOf(u), sf=sfOf(u); r.volGross=r.vol; if(!fb&&sf===1) return r;
+    r.vol=(spCompsNet(u,fb)+dxfSum(spDxfEnsureArray(u),fb))*sf; r.fb=fb; r.sfc=sf; return r;
+  };
+  var _rpTot=window.rpGetTotalVol;
+  window.rpGetTotalVol=function(u){
+    var g=_rpTot(u), fb=fbOf(u), sf=sfOf(u); g.volGross=g.vol; if(!u||(!fb&&sf===1)) return g;
+    var vC=rpCompsNet(u,fb)*sf, vD=dxfSum(rpDxfEnsureArray(u),fb)*sf;
+    return {vol:vC+vD,area:g.area,hasDxf:g.hasDxf,hasComps:vC>0,vComps:vC,vDxf:vD,volGross:g.vol,fb:fb};
+  };
+
+  /* ── total gross/net per unit ── */
+  function totals(kind,uid){
+    var u=(kind==='sp'?spUnits:rpUnits).find(function(x){return x.id===uid;}); if(!u) return null;
+    var fb=fbOf(u), sf=sfOf(u), list=kind==='sp'?spDxfEnsureArray(u):rpDxfEnsureArray(u), gross, netFb;
+    if(kind==='sp'){ gross=_spTot(u).vol+dxfGross(list); netFb=spCompsNet(u,fb)+dxfSum(list,fb); }
+    else { gross=_rpTot(u).vol; netFb=rpCompsNet(u,fb)+dxfSum(list,fb); }
+    if(!fb) netFb=gross;
+    return {u:u,fb:fb,sf:sf,gross:gross,netFb:netFb,net:netFb*sf,list:list};
+  }
+  function vminOf(kind,u){
+    var q=u.catchments.filter(function(c){return c.active;}).reduce(function(s,c){return s+(c.q||0);},0);
+    return kind==='sp'?q*(parseID(u.sf)||1)*(parseID(u.hrt)||1):q*(parseID(u.sf)||1)*(parseID(u.rt)||1);
+  }
+
+  /* ── badge ── */
+  var _spBadge=window.spDxfUpdateBadge;
+  window.spDxfUpdateBadge=function(uid){
+    _spBadge(uid);
+    var t=totals('sp',uid); if(!t) return; var el=document.getElementById('spu-dxf-badge-'+uid); fbRefresh('sp',uid);
+    if(!el||!(t.gross>0)) return; var vMin=vminOf('sp',t.u), ok=t.net>=vMin&&t.net>0;
+    el.innerHTML='<div style="font-family:var(--mono);font-size:13px;font-weight:700;color:'+(ok?'#27ae60':'#e74c3c')+'">'+
+      'Volume net: '+fmt(t.net)+' m³'+((t.fb||t.sf!==1)?' <span style="font-weight:400;color:var(--muted)">(gross '+fmt(t.gross)+' m³'+(t.fb?' · freeboard '+fmt(t.fb,2)+' m':'')+(t.sf!==1?' · SF −'+fmt((1-t.sf)*100,1)+'% ('+fmt(t.netFb)+' × '+fmt(t.sf,3)+')':'')+')</span>':'')+
+      ' &nbsp; '+(ok?'✓ Memenuhi V min':'✗ Kurang dari V min '+fmt(vMin)+' m³')+'</div>';
+  };
+  var _rpBadge=window.rpDxfUpdateBadge;
+  window.rpDxfUpdateBadge=function(uid){
+    _rpBadge(uid);
+    var t=totals('rp',uid); if(!t) return; var el=document.getElementById('rpd-badge-'+uid); fbRefresh('rp',uid);
+    if(!el||!(t.gross>0)) return; var vMin=vminOf('rp',t.u), ok=t.net>=vMin;
+    el.innerHTML='<span style="font-weight:700;font-family:var(--mono);font-size:13px;color:'+(ok?'#27ae60':'#e74c3c')+'">'+(ok?'✓':'✗')+' V net = '+fmt(t.net)+' m³</span>'+
+      '<span style="font-size:11px;color:var(--muted);margin-left:8px">'+((t.fb||t.sf!==1)?'(gross '+fmt(t.gross)+' m³'+(t.fb?' · freeboard '+fmt(t.fb,2)+' m':'')+(t.sf!==1?' · SF −'+fmt((1-t.sf)*100,1)+'%':'')+') ':'')+(ok?'(Cukup)':'(Kurang)')+'</span>';
+  };
 
 
+  /* ── baris NET di tabel ringkasan ── */
+  function netRow(html,kind,uid,span,tail){
+    var t=totals(kind,uid); if(!t||(!t.fb&&t.sf===1)||html.indexOf('</tfoot>')<0) return html;
+    var vMin=vminOf(kind,t.u), ok=t.net>=vMin&&t.net>0;
+    var row='<tr style="background:rgba(20,165,154,0.10)"><td colspan="'+span+'" style="padding:7px 10px;font-size:12px;font-weight:700;color:#14a59a">Volume net (freeboard '+fmt(t.fb,2)+' m'+(t.sf!==1?' · SF −'+fmt((1-t.sf)*100,1)+'%':'')+')</td>'+
+      '<td style="padding:7px 10px;font-family:var(--mono);font-weight:800;text-align:right;font-size:13px;color:'+(ok?'#27ae60':'#e74c3c')+'">'+fmt(t.net,2)+' m³ '+(ok?'✓':'✗')+'</td>'+tail+'</tr>';
+    var i=html.lastIndexOf('</tfoot>'); return html.slice(0,i)+row+html.slice(i);
+  }
+  var _spDim=window.spUnitDimSummaryHTML;
+  if(typeof _spDim==='function') window.spUnitDimSummaryHTML=function(u){return netRow(_spDim(u),'sp',u.id,3,'');};
+  var _rpSum=window.rpDesignSummaryHTML;
+  if(typeof _rpSum==='function') window.rpDesignSummaryHTML=function(uid){return netRow(_rpSum.apply(this,arguments),'rp',uid,3,'<td></td>');};
+  var _rpUP=window.rpDesignUpdatePanel;
+  if(typeof _rpUP==='function') window.rpDesignUpdatePanel=function(uid){var r=_rpUP.apply(this,arguments); try{window.rpDxfUpdateBadge(uid);}catch(e){} return r;};
+  var _rpDB=window.rpDesignUpdateBadge;
+  if(typeof _rpDB==='function') window.rpDesignUpdateBadge=function(uid){ var r=_rpDB.apply(this,arguments); try{window.rpDxfUpdateBadge(uid);}catch(e){} return r; };
+
+  /* ── kotak input freeboard ── */
+  function boxHTML(kind,uid){
+    var t=totals(kind,uid); if(!t) return '';
+    return '<div id="fb-box-'+kind+'-'+uid+'" style="margin:10px 0;padding:10px 12px;border:1px dashed var(--border);border-radius:8px;background:var(--bg-secondary)">'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">'+
+      '<label style="font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px">🌊 Freeboard'+
+      '<input id="fb-in-'+kind+'-'+uid+'" type="text" inputmode="decimal" value="'+esc(t.u.fb==null?'':t.u.fb)+'" placeholder="0" onchange="fbSet(\''+kind+'\','+uid+',this.value)" style="width:80px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:var(--mono);text-align:right"> m</label>'+
+      '<label style="font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px">🛡 SF'+
+      '<input id="sf-in-'+kind+'-'+uid+'" type="text" inputmode="decimal" value="'+esc(t.u.sfc==null?'':t.u.sfc)+'" placeholder="0" onchange="sfSet(\''+kind+'\','+uid+',this.value)" style="width:70px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:var(--mono);text-align:right">'+
+      '<select id="sf-un-'+kind+'-'+uid+'" onchange="sfUnit(\''+kind+'\','+uid+',this.value)" style="padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)"><option value="dec"'+(t.u.sfcU==='pct'?'':' selected')+'>desimal</option><option value="pct"'+(t.u.sfcU==='pct'?' selected':'')+'>%</option></select></label>'+
+      '<span id="fb-chips-'+kind+'-'+uid+'" style="display:flex;gap:6px;flex-wrap:wrap"></span></div>'+
+      '<div style="font-size:10.5px;color:var(--muted);margin-top:6px;line-height:1.5">Gross = volume sampai puncak tanggul. Net = volume sampai (puncak − freeboard), lalu dikurangi SF (× (1 − SF)); inilah yang dibandingkan dengan V min. '+
+      'SF 10% atau 0,10 → net × 0,90. Kosong = tidak dipakai. Kompartemen: kedalaman efektif T − freeboard. DXF: dipotong pada elevasi puncak − freeboard.</div></div>';
+  }
+  function chip(l,v,c){return '<span style="display:inline-flex;gap:5px;align-items:baseline;padding:3px 9px;border-radius:14px;border:1px solid var(--border);background:var(--bg);font-size:11px"><span style="color:var(--muted)">'+l+'</span><b style="font-family:var(--mono);color:'+(c||'var(--text)')+'">'+v+'</b></span>';}
+  function fbRefresh(kind,uid){
+    var el=document.getElementById('fb-chips-'+kind+'-'+uid); if(!el) return; var t=totals(kind,uid); if(!t) return;
+    var diff=t.gross-t.net;
+    el.innerHTML=chip('Volume gross',fmt(t.gross)+' m³')+(t.sf!==1?chip('Setelah freeboard',fmt(t.netFb)+' m³'):'')+(t.sf!==1?chip('SF','− '+fmt((1-t.sf)*100,1)+'% (× '+fmt(t.sf,3)+')','#8e6bd8'):'')+chip('Volume net',fmt(t.net)+' m³','#14a59a')+((t.fb||t.sf!==1)?chip('Selisih total',fmt(diff)+' m³ ('+(t.gross>0?fmt(diff/t.gross*100,1):'0')+'%)','#d98a14'):'');
+  }
+  window.fbSet=function(kind,uid,val){
+    var t=totals(kind,uid); if(!t) return; var v=parseID(val); if(isNaN(v)||v<0) v=0;
+    t.u.fb=v?String(val).trim():''; var inp=document.getElementById('fb-in-'+kind+'-'+uid); if(inp&&v===0) inp.value='';
+    if(kind==='sp'){ spDxfUpdateBadge(uid); if(spDxfEnsureArray(t.u).length) spDxfRenderResult(uid); }
+    else { rpDxfUpdateBadge(uid); if(rpDxfEnsureArray(t.u).length) rpDxfRenderResult(uid); try{rpDesignUpdatePanel(uid);}catch(e){} }
+    fbRefresh(kind,uid);
+  };
+  function sfRefresh(kind,uid,t){
+    if(kind==='sp'){ spDxfUpdateBadge(uid); if(spDxfEnsureArray(t.u).length) spDxfRenderResult(uid); }
+    else { rpDxfUpdateBadge(uid); if(rpDxfEnsureArray(t.u).length) rpDxfRenderResult(uid); try{rpDesignUpdatePanel(uid);}catch(e){} }
+    fbRefresh(kind,uid);
+  }
+  window.sfSet=function(kind,uid,val){
+    var t=totals(kind,uid); if(!t) return; var v=parseID(val); if(isNaN(v)||v<=0){v=0;}
+    t.u.sfc=v?String(val).trim():''; var inp=document.getElementById('sf-in-'+kind+'-'+uid); if(inp&&!v) inp.value='';
+    sfRefresh(kind,uid,t);
+  };
+  window.sfUnit=function(kind,uid,un){
+    var t=totals(kind,uid); if(!t) return; t.u.sfcU=(un==='pct')?'pct':'dec';
+    var inp=document.getElementById('sf-in-'+kind+'-'+uid); if(inp) inp.placeholder='0';
+    sfRefresh(kind,uid,t);
+  };
+  function inject(kind,uid,panelId,badgeId){
+    var panel=document.getElementById(panelId); if(!panel||document.getElementById('fb-box-'+kind+'-'+uid)) return;
+    var html=boxHTML(kind,uid); if(!html) return;
+    var badge=document.getElementById(badgeId);
+    if(badge&&badge.parentNode) badge.insertAdjacentHTML('beforebegin',html);
+    else { var first=panel.querySelector('div')||panel; first.insertAdjacentHTML('afterbegin',html); }
+    fbRefresh(kind,uid);
+  }
+  var _spR=window.spUnitDesignRender;
+  window.spUnitDesignRender=function(uid){ var r=_spR.apply(this,arguments); try{inject('sp',uid,'spu-design-panel-'+uid,'spu-dxf-badge-'+uid); window.spDxfUpdateBadge(uid);}catch(e){console.warn('freeboard',e);} return r; };
+  var _rpR=window.rpDesignRender;
+  window.rpDesignRender=function(uid){ var r=_rpR.apply(this,arguments); try{inject('rp',uid,'rp-design-panel-'+uid,'rpd-badge-'+uid); window.rpDxfUpdateBadge(uid);}catch(e){console.warn('freeboard',e);} return r; };
+})();
+</script>
+<script id="hydrosan-dxf-download">
+/* ═════════════════════════════════════════════════
+   DXF — UNDUH KEMBALI
+   • File DXF asli disimpan (memori sesi + IndexedDB browser, TIDAK ikut file simpan proyek
+     agar ukuran tidak membengkak) → tombol "⬇ DXF asli" pada peta situasi.
+   • Jika file asli tak tersedia (mis. proyek dibuka di perangkat lain) → otomatis dibuat
+     DXF dari kontur yang terbaca. Tiap kolam juga bisa diunduh sendiri (kontur kolam itu).
+   ═════════════════════════════════════════════════ */
+(function(){
+  var MEM={}, DB=null;
+  function idb(){return new Promise(function(res){ if(DB) return res(DB); try{var q=indexedDB.open('hydrosan-dxf',1); q.onupgradeneeded=function(){q.result.createObjectStore('files');}; q.onsuccess=function(){DB=q.result;res(DB);}; q.onerror=function(){res(null);};}catch(e){res(null);} });}
+  function idbPut(id,val){idb().then(function(db){if(!db)return; try{db.transaction('files','readwrite').objectStore('files').put(val,id);}catch(e){}});}
+  function idbGet(id){return idb().then(function(db){return new Promise(function(res){ if(!db) return res(null); try{var r=db.transaction('files').objectStore('files').get(id); r.onsuccess=function(){res(r.result||null);}; r.onerror=function(){res(null);};}catch(e){res(null);} });});}
+
+  var _l=window.dxfLoadText;
+  window.dxfLoadText=function(text,name){
+    var out=_l.apply(this,arguments);
+    try{ if(out&&out.results&&out.results.length){ var id=out.results[0].srcId, v={name:name,text:text}; MEM[id]=v; idbPut(id,v); } }catch(e){}
+    return out;
+  };
+
+  function save(name,text){
+    var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'application/dxf'})); a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},3000);
+  }
+  function toast(m){ if(typeof showToast==='function') showToast(m); }
+  function getList(kind,uid){var u=(kind==='sp'?spUnits:rpUnits).find(function(x){return x.id===uid;}); return u?(kind==='sp'?spDxfEnsureArray(u):rpDxfEnsureArray(u)):[];}
+
+  /* DXF dari kontur yang terbaca (LWPOLYLINE tertutup pada elevasi masing-masing) */
+  function buildDxf(ponds){
+    var o=['0','SECTION','2','HEADER','9','$ACADVER','1','AC1015','9','$INSUNITS','70','6','0','ENDSEC','0','SECTION','2','ENTITIES'];
+    ponds.forEach(function(r){
+      var layer=String(r.name||'KOLAM').replace(/[<>\/\\":;?*|=`]/g,'_').slice(0,60)||'KOLAM';
+      (r.elevs||[]).forEach(function(z){ (r.contours[z]||[]).forEach(function(p){
+        if(!p||p.length<3) return;
+        o.push('0','LWPOLYLINE','100','AcDbEntity','8',layer,'100','AcDbPolyline','90',String(p.length),'70','1','38',String(z));
+        p.forEach(function(q){o.push('10',String(q[0]),'20',String(q[1]));});
+      });});
+    });
+    o.push('0','ENDSEC','0','EOF'); return o.join('\r\n')+'\r\n';
+  }
+  function safe(s){return String(s||'kolam').replace(/[^\w\-. ]+/g,'_').trim().replace(/\s+/g,'_');}
+
+  window.dxfDownloadSrc=function(kind,uid,srcId){
+    var list=getList(kind,uid).filter(function(r){return r.srcId===srcId;});
+    function fallback(){
+      if(!list.length){toast('Tidak ada data DXF untuk diunduh.');return;}
+      var base=(list[0].srcFile||'dxf').replace(/\.dxf$/i,'');
+      save(base+'_kontur-terbaca.dxf',buildDxf(list));
+      toast('File asli tidak tersedia di browser ini — diunduh DXF dari kontur yang terbaca.');
+    }
+    var v=MEM[srcId]; if(v) return save(v.name,v.text);
+    idbGet(srcId).then(function(x){ if(x&&x.text){MEM[srcId]=x; save(x.name,x.text);} else fallback(); });
+  };
+  window.dxfDownloadPond=function(kind,uid,idx){
+    var list=getList(kind,uid), r=list[idx]; if(!r||!r.contours){toast('Kontur kolam tidak tersedia.');return;}
+    save(safe(r.name)+'.dxf',buildDxf([r]));
+  };
+})();
+</script>
