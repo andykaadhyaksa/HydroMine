@@ -27853,15 +27853,8 @@ function dxfLoadText(text, fileName) {
     if (notes.length) r.notes = notes;
     results.push(r);
   });
-  // Otomatis pisahkan bentuk serpentine (mis. SP1A + SP1B) pada ujung sekat terbawah
-  if (typeof dxfSuggestCut === 'function') {
-    for (let i = results.length - 1; i >= 0; i--) {
-      const N = dxfSuggestCut(results[i]); if (N == null) continue;
-      const parts = dxfSplitResult(results[i], N, [results[i].name + ' (atas)', results[i].name + ' (bawah)']);
-      if (parts && parts.every(Boolean)) { parts.forEach(q => { q.autoSplit = N; }); results.splice(i, 1, ...parts); }
-    }
-    results.forEach((r, k) => { if (!/\(atas\)|\(bawah\)/.test(r.name)) r.name = 'Kolam ' + (k + 1); });
-  }
+  // Kolam TIDAK dipisah otomatis. Bentuk berliku (serpentine) hanya diberi saran;
+  // pengguna memisah/menggabung sendiri lewat tombol ✂ Pisah / ⟲ Gabung di Peta Situasi Kolam.
   return { results, summary: A.summary, warnings: A.warnings };
 }
 
@@ -29650,6 +29643,7 @@ if(typeof _origRestoreSpDxf === 'function') {
       var rows=g.map(function(x){var r=x.r,m=r.meta,col=PAL[x.i%PAL.length];
         return '<tr><td style="padding:4px 6px"><span style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:'+col+';color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center">'+(x.i+1)+'</span></td>'+
           '<td style="padding:4px 6px;font-weight:700">'+esc(r.name||('Kolam '+(x.i+1)))+'</td>'+
+          '<td style="padding:4px 6px;white-space:nowrap">'+splitBtn(kind,uid,x.i,r)+'</td>'+
           '<td style="padding:4px 6px;text-align:right;font-family:var(--mono)">'+fmt(m.zb,2)+' – '+fmt(m.zt,2)+'</td>'+
           '<td style="padding:4px 6px;text-align:right;font-family:var(--mono)">'+fmt(m.At,0)+'</td>'+
           '<td style="padding:4px 6px;text-align:right;font-family:var(--mono);font-weight:700">'+fmt(r.totalVol,0)+'</td>'+
@@ -29666,12 +29660,124 @@ if(typeof _origRestoreSpDxf === 'function') {
         '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start">'+
           '<div style="flex:1 1 380px;min-width:300px">'+siteViewer(g,kind,uid)+'</div>'+
           '<div style="flex:1 1 300px;min-width:280px;overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr style="background:var(--bg-secondary)">'+
-            '<th style="padding:5px 6px"></th><th style="padding:5px 6px;text-align:left;font-size:10px;color:var(--muted)">Kolam</th><th style="padding:5px 6px;text-align:right;font-size:10px;color:var(--muted)">El. dasar–puncak</th><th style="padding:5px 6px;text-align:right;font-size:10px;color:var(--muted)">Luas atas m²</th><th style="padding:5px 6px;text-align:right;font-size:10px;color:var(--muted)">Volume m³</th>'+((fb||sfd!==1)?'<th style="padding:5px 6px;text-align:right;font-size:10px;color:#14a59a">Net (FB '+fmt(fb,2)+' m'+(sfd!==1?' · SF −'+fmt((1-sfd)*100,1)+'%':'')+')</th>':'')+'<th style="padding:5px 6px;text-align:right;font-size:10px;color:var(--muted)">E / N</th></tr></thead><tbody>'+rows+
-            '<tr style="border-top:2px solid var(--border)"><td></td><td style="padding:5px 6px;font-weight:700">Σ</td><td></td><td></td><td style="padding:5px 6px;text-align:right;font-family:var(--mono);font-weight:700">'+fmt(tot,0)+'</td>'+((fb||sfd!==1)?'<td style="padding:5px 6px;text-align:right;font-family:var(--mono);font-weight:700;color:#14a59a">'+fmt(g.reduce(function(s,x){return s+dxfNetVolume(x.r,fb)*sfd;},0),0)+'</td>':'')+'<td></td></tr></tbody></table>'+
+            '<th style="padding:5px 6px"></th><th style="padding:5px 6px;text-align:left;font-size:10px;color:var(--muted)">Kolam</th><th style="padding:5px 6px;text-align:left;font-size:10px;color:var(--muted)">Pisah / Gabung</th><th style="padding:5px 6px;text-align:right;font-size:10px;color:var(--muted)">El. dasar–puncak</th><th style="padding:5px 6px;text-align:right;font-size:10px;color:var(--muted)">Luas atas m²</th><th style="padding:5px 6px;text-align:right;font-size:10px;color:var(--muted)">Volume m³</th>'+((fb||sfd!==1)?'<th style="padding:5px 6px;text-align:right;font-size:10px;color:#14a59a">Net (FB '+fmt(fb,2)+' m'+(sfd!==1?' · SF −'+fmt((1-sfd)*100,1)+'%':'')+')</th>':'')+'<th style="padding:5px 6px;text-align:right;font-size:10px;color:var(--muted)">E / N</th></tr></thead><tbody>'+rows+
+            '<tr style="border-top:2px solid var(--border)"><td></td><td style="padding:5px 6px;font-weight:700">Σ</td><td></td><td></td><td></td><td style="padding:5px 6px;text-align:right;font-family:var(--mono);font-weight:700">'+fmt(tot,0)+'</td>'+((fb||sfd!==1)?'<td style="padding:5px 6px;text-align:right;font-family:var(--mono);font-weight:700;color:#14a59a">'+fmt(g.reduce(function(s,x){return s+dxfNetVolume(x.r,fb)*sfd;},0),0)+'</td>':'')+'<td></td></tr></tbody></table>'+
             '<div style="font-size:10.5px;color:var(--muted);margin-top:8px;line-height:1.5">Garis tegas = kontur puncak · garis putus = kontur dasar. DXF tidak menyimpan teks, jadi beri nama kolam di rincian masing-masing (mis. CELL-02, SP1A) mengikuti gambar PDF.</div></div>'+
-        '</div></div>';
+        '</div>'+splitPanel(kind,uid,list,g)+'</div>';
     }).join('');
   }
+
+  /* ── PISAH / GABUNG kolam (manual, satu ketuk) ── */
+  var SPL=null;   // {kind,uid,idx,ax,pos,min,max,sug}
+  function splitRange(r,ax){var k=ax==='x'?0:1,a=1e18,b=-1e18; r.elevs.forEach(function(z){(r.contours[z]||[]).forEach(function(p){p.forEach(function(q){if(q[k]<a)a=q[k]; if(q[k]>b)b=q[k];});});}); return [a,b];}
+  function splitBtn(kind,uid,i,r){
+    var st='padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;border-radius:6px;';
+    if(r.splitId&&r.splitOrig) return '<button onclick="dxfPondUnsplit(\''+kind+'\','+uid+','+i+')" title="Satukan kembali dengan pasangannya" style="'+st+'border:1px solid #d98a14;background:rgba(217,138,20,0.12);color:#d98a14">⟲ Gabung</button>';
+    var on=SPL&&SPL.kind===kind&&SPL.uid===uid&&SPL.idx===i;
+    return '<button onclick="dxfSplitOpen(\''+kind+'\','+uid+','+i+')" title="Pisah kolam ini menjadi 2" style="'+st+'border:1px solid #2D6FB8;background:'+(on?'#2D6FB8':'rgba(45,111,184,0.10)')+';color:'+(on?'#fff':'var(--blue2,#2D6FB8)')+'">✂ Pisah</button>';
+  }
+  var SP_A='#14a59a', SP_B='#e8890c';
+  function splitNames(){return SPL.ax==='x'?['kanan','kiri']:['atas','bawah'];}
+  function splitPartVol(r,pos,ax,north){
+    var c={}; r.elevs.forEach(function(z){var rs=[]; (r.contours[z]||[]).forEach(function(p){var q=clipHalf(p,pos,north,ax); if(q.length>=3&&shoelaceArea(q)>1) rs.push(q);}); if(rs.length) c[z]=rs;});
+    if(Object.keys(c).length<2) return null; var v=dxfComputeVolume(c); return v.totalVol>0?v.totalVol:null;
+  }
+  function splitMini(r){
+    var m=r.meta, bb=m.bb, W=300, H=400, P=16, rx=Math.max(bb.maxX-bb.minX,1e-6), ry=Math.max(bb.maxY-bb.minY,1e-6), sc=Math.min((W-2*P-22)/rx,(H-2*P)/ry);
+    var ox=(W-22-rx*sc)/2, oy=(H-ry*sc)/2, tx=function(x){return ox+(x-bb.minX)*sc;}, ty=function(y){return H-oy-(y-bb.minY)*sc;};
+    SPL.tx=tx; SPL.ty=ty; SPL.W=W; SPL.H=H;
+    var d=''; (r.contours[m.zt]||[]).forEach(function(p){d+=p.map(function(q,j){return (j?'L':'M')+tx(q[0]).toFixed(1)+','+ty(q[1]).toFixed(1);}).join('')+'Z';});
+    var db=''; (r.contours[m.zb]||[]).forEach(function(p){db+=p.map(function(q,j){return (j?'L':'M')+tx(q[0]).toFixed(1)+','+ty(q[1]).toFixed(1);}).join('')+'Z';});
+    var cand=''; if(SPL.ax==='y') (SPL.cands||[]).forEach(function(y,i){var yy=ty(y).toFixed(1);
+      cand+='<line x1="0" x2="'+(W-24)+'" y1="'+yy+'" y2="'+yy+'" stroke="#7a8aa0" stroke-width="0.8" stroke-dasharray="2 4" opacity="0.7"/>'+
+        '<g style="cursor:pointer" onpointerdown="event.stopPropagation();dxfSplitCand('+i+')"><circle cx="'+(W-13)+'" cy="'+yy+'" r="9" fill="#fff" stroke="#2D6FB8" stroke-width="1.5"/><text x="'+(W-13)+'" y="'+(parseFloat(yy)+4)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#2D6FB8" font-family="sans-serif">'+(i+1)+'</text></g>';});
+    return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;max-width:'+W+'px;height:auto;border:1px solid var(--border);border-radius:8px;background:#f4f8fd;touch-action:none;cursor:crosshair;flex:0 0 auto" id="dxf-split-svg" onpointerdown="dxfSplitDrag(event)" onpointermove="if(event.buttons||event.pointerType===\'touch\')dxfSplitDrag(event)">'+
+      '<defs><clipPath id="dxf-split-clip"><path d="'+d+'" clip-rule="evenodd"/></clipPath></defs>'+
+      '<path d="'+d+'" fill="#ffffff" fill-rule="evenodd"/>'+
+      '<g clip-path="url(#dxf-split-clip)"><rect id="dxf-split-ra" x="0" y="0" width="0" height="0" fill="'+SP_A+'" fill-opacity="0.38"/><rect id="dxf-split-rb" x="0" y="0" width="0" height="0" fill="'+SP_B+'" fill-opacity="0.38"/></g>'+
+      '<path d="'+d+'" fill="none" stroke="#1D4E89" stroke-width="1.8" fill-rule="evenodd"/>'+
+      '<path d="'+db+'" fill="none" stroke="#1D4E89" stroke-width="1" stroke-dasharray="4 3"/>'+cand+
+      '<line id="dxf-split-line" x1="0" y1="0" x2="0" y2="0" stroke="#e03131" stroke-width="2.8" stroke-dasharray="7 4"/>'+
+      '<text id="dxf-split-t1" font-size="12" font-weight="700" fill="'+SP_A+'" font-family="sans-serif" stroke="#fff" stroke-width="3" paint-order="stroke"></text><text id="dxf-split-t2" font-size="12" font-weight="700" fill="'+SP_B+'" font-family="sans-serif" stroke="#fff" stroke-width="3" paint-order="stroke"></text></svg>';
+  }
+  function splitDraw(){
+    if(!SPL||!SPL.tx) return; var ln=document.getElementById('dxf-split-line'); if(!ln) return;
+    var t1=document.getElementById('dxf-split-t1'), t2=document.getElementById('dxf-split-t2'), ra=document.getElementById('dxf-split-ra'), rb=document.getElementById('dxf-split-rb'), nm=splitNames(), W=SPL.W, H=SPL.H;
+    if(SPL.ax==='x'){var x=SPL.tx(SPL.pos); ln.setAttribute('x1',x);ln.setAttribute('x2',x);ln.setAttribute('y1',4);ln.setAttribute('y2',H-4);
+      ra.setAttribute('x',x);ra.setAttribute('y',0);ra.setAttribute('width',Math.max(0,W-x));ra.setAttribute('height',H); rb.setAttribute('x',0);rb.setAttribute('y',0);rb.setAttribute('width',Math.max(0,x));rb.setAttribute('height',H);
+      t1.setAttribute('x',Math.min(W-60,x+6));t1.setAttribute('y',16);t1.textContent=nm[0]; t2.setAttribute('x',Math.max(4,x-8-nm[1].length*7));t2.setAttribute('y',16);t2.textContent=nm[1];}
+    else{var y=SPL.ty(SPL.pos); ln.setAttribute('y1',y);ln.setAttribute('y2',y);ln.setAttribute('x1',4);ln.setAttribute('x2',W-26);
+      ra.setAttribute('x',0);ra.setAttribute('y',0);ra.setAttribute('width',W);ra.setAttribute('height',Math.max(0,y)); rb.setAttribute('x',0);rb.setAttribute('y',y);rb.setAttribute('width',W);rb.setAttribute('height',Math.max(0,H-y));
+      t1.setAttribute('x',8);t1.setAttribute('y',Math.max(14,y-7));t1.textContent=nm[0]; t2.setAttribute('x',8);t2.setAttribute('y',Math.min(H-6,y+17));t2.textContent=nm[1];}
+    var sl=document.getElementById('dxf-split-range'), nb=document.getElementById('dxf-split-num'); if(sl&&document.activeElement!==sl) sl.value=SPL.pos; if(nb&&document.activeElement!==nb) nb.value=fmt(SPL.pos,1);
+    var r=getList(SPL.kind,SPL.uid)[SPL.idx], inf=document.getElementById('dxf-split-info');
+    if(inf&&r){var va=splitPartVol(r,SPL.pos,SPL.ax,true), vb=splitPartVol(r,SPL.pos,SPL.ax,false), tot=(va||0)+(vb||0);
+      var cell=function(c,n,v){return '<div style="flex:1;min-width:120px;padding:8px 10px;border-radius:8px;border:1.5px solid '+c+';background:'+c+'1f"><div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase">'+n+'</div><div style="font-family:var(--mono);font-weight:800;font-size:15px;color:var(--text)">'+(v?fmt(v,0)+' m³':'—')+'</div><div style="font-size:11px;color:var(--muted)">'+(v&&tot?fmt(v/tot*100,0)+'% dari total':'terlalu kecil')+'</div></div>';};
+      inf.innerHTML=cell(SP_A,nm[0],va)+cell(SP_B,nm[1],vb);
+      var ap=document.getElementById('dxf-split-ok'); if(ap){ap.disabled=!(va&&vb); ap.style.opacity=(va&&vb)?'1':'0.45';}}
+  }
+  function splitEqual(){
+    var r=getList(SPL.kind,SPL.uid)[SPL.idx], lo=SPL.min, hi=SPL.max;
+    for(var i=0;i<28;i++){var mid=(lo+hi)/2, a=splitPartVol(r,mid,SPL.ax,true)||0, b=splitPartVol(r,mid,SPL.ax,false)||0; if(a>b) lo=mid; else hi=mid;}
+    return Math.round((lo+hi)/2*10)/10;
+  }
+  function splitPanel(kind,uid,list,g){
+    var sugg=g.filter(function(x){return !x.r.splitId&&dxfSuggestCut(x.r)!=null;});
+    var tip=(sugg.length&&!(SPL&&SPL.kind===kind&&SPL.uid===uid))?'<div style="margin-top:10px;padding:8px 10px;border-left:3px solid #2D6FB8;background:rgba(45,111,184,0.08);border-radius:4px;font-size:11.5px;color:var(--muted);line-height:1.5">💡 <b style="color:var(--text)">'+sugg.map(function(x){return esc(x.r.name||('Kolam '+(x.i+1)));}).join(', ')+'</b> berbentuk berliku (serpentine) dan dibaca sebagai <b>satu kolam</b>. Bila memang ingin dipisah menjadi 2, tekan <b>✂ Pisah</b> pada barisnya, tanpa perlu tahu koordinat.</div>':'';
+    if(!SPL||SPL.kind!==kind||SPL.uid!==uid||!list[SPL.idx]||!g.some(function(x){return x.i===SPL.idx;})) return tip;
+    var r=list[SPL.idx], bt='padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;border-radius:7px;';
+    var axb=function(ax,lbl){var on=SPL.ax===ax; return '<button onclick="dxfSplitAxis(\''+ax+'\')" style="'+bt+'border:1px solid #2D6FB8;background:'+(on?'#2D6FB8':'transparent')+';color:'+(on?'#fff':'var(--blue2,#2D6FB8)')+'">'+lbl+'</button>';};
+    var qb=function(act,lbl,ttl){return '<button onclick="'+act+'" title="'+ttl+'" style="'+bt+'border:1px solid var(--border);background:var(--bg-secondary);color:var(--text)">'+lbl+'</button>';};
+    var cands=(SPL.ax==='y'&&SPL.cands&&SPL.cands.length)?'<div style="margin-top:10px"><div style="font-size:11.5px;color:var(--muted);margin-bottom:5px">Ujung sekat (nomor di gambar) — ketuk untuk memotong di situ:</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+SPL.cands.map(function(y,i){return '<button onclick="dxfSplitCand('+i+')" style="'+bt+'min-width:38px;border:1.5px solid #2D6FB8;background:rgba(45,111,184,0.08);color:var(--blue2,#2D6FB8)">'+(i+1)+'</button>';}).join('')+'</div>'+'</div>':'';
+    setTimeout(splitDraw,0);
+    return '<div id="dxf-split-panel" style="margin:14px auto 0;max-width:820px;padding:14px;border:1.5px solid #2D6FB8;border-radius:10px;background:rgba(45,111,184,0.05)">'+
+      '<div style="font-weight:700;font-size:13px;margin-bottom:8px">✂ Pisah '+esc(r.name||('Kolam '+(SPL.idx+1)))+' menjadi 2</div>'+
+      '<div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;justify-content:center">'+
+      '<div style="flex:0 1 300px;min-width:0;width:100%;max-width:300px">'+splitMini(r)+'<div style="font-size:11px;color:var(--muted);margin-top:5px">Ketuk / seret di gambar untuk menggeser garis merah.</div></div>'+
+      '<div style="flex:1 1 300px;min-width:0;max-width:460px">'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><span style="font-size:11.5px;color:var(--muted)">Arah potong:</span>'+axb('y','━ Mendatar')+axb('x','┃ Tegak')+'</div>'+
+      '<div id="dxf-split-info" style="display:flex;gap:8px;flex-wrap:wrap"></div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">'+qb('dxfSplitEqual()','⚖ Bagi sama volume','Cari garis yang membagi volume menjadi dua bagian sama besar')+qb('dxfSplitMid()','◫ Tepat di tengah','Garis di tengah-tengah kolam')+'</div>'+
+      cands+
+      '<div style="font-size:11.5px;color:var(--muted);margin:12px 0 4px">Atau geser halus:</div>'+
+      '<input id="dxf-split-range" type="range" min="'+SPL.min+'" max="'+SPL.max+'" step="0.1" value="'+SPL.pos+'" oninput="dxfSplitMove(this.value)" style="width:100%">'+
+      '<details style="margin-top:6px"><summary style="font-size:11.5px;color:var(--muted);cursor:pointer">Ketik koordinat (opsional)</summary><div style="display:flex;gap:8px;align-items:center;margin-top:6px"><span style="font-size:11.5px;color:var(--muted)">'+(SPL.ax==='x'?'Easting (E)':'Northing (N)')+' =</span>'+
+      '<input id="dxf-split-num" type="text" inputmode="decimal" value="'+fmt(SPL.pos,1)+'" onchange="dxfSplitMove(parseID(this.value))" style="width:120px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:var(--mono)"></div></details>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:14px">'+
+      '<button onclick="dxfSplitClose()" style="'+bt+'border:1px solid var(--border);background:transparent;color:var(--text)">Batal</button>'+
+      '<button id="dxf-split-ok" onclick="dxfSplitApply()" style="'+bt+'border:none;background:linear-gradient(135deg,#1D4E89,#2D7BD0);color:#fff">✂ Pisah di sini</button></div>'+
+      '</div></div></div>';
+  }
+  function splitSetAxis(ax){var r=getList(SPL.kind,SPL.uid)[SPL.idx], rg=splitRange(r,ax), pad=(rg[1]-rg[0])*0.02;
+    SPL.ax=ax; SPL.min=Math.round((rg[0]+pad)*10)/10; SPL.max=Math.round((rg[1]-pad)*10)/10;
+    SPL.sug=(ax==='y')?dxfSuggestCut(r):null; SPL.cands=(ax==='y')?dxfCutCandidates(r).filter(function(y){return y>SPL.min&&y<SPL.max;}):[];
+    SPL.pos=(SPL.sug!=null&&SPL.sug>SPL.min&&SPL.sug<SPL.max)?SPL.sug:Math.round((rg[0]+rg[1])/2*10)/10;}
+  window.dxfSplitOpen=function(kind,uid,idx){
+    var list=getList(kind,uid); if(!list||!list[idx]) return;
+    if(SPL&&SPL.kind===kind&&SPL.uid===uid&&SPL.idx===idx){SPL=null; rerender(kind,uid); return;}
+    SPL={kind:kind,uid:uid,idx:idx}; splitSetAxis('y'); rerender(kind,uid);
+    setTimeout(function(){var e=document.getElementById('dxf-split-panel'); if(e&&e.scrollIntoView) e.scrollIntoView({behavior:'smooth',block:'nearest'});},80);
+  };
+  window.dxfSplitAxis=function(ax){ if(!SPL) return; splitSetAxis(ax); rerender(SPL.kind,SPL.uid); };
+  window.dxfSplitMove=function(v){ if(!SPL) return; v=parseFloat(v); if(isNaN(v)) return; SPL.pos=Math.min(SPL.max,Math.max(SPL.min,Math.round(v*10)/10)); splitDraw(); };
+  window.dxfSplitDrag=function(ev){ if(!SPL) return; var svg=document.getElementById('dxf-split-svg'); if(!svg) return; ev.preventDefault();
+    var bx=svg.getBoundingClientRect(), px=(ev.clientX-bx.left)/bx.width*SPL.W, py=(ev.clientY-bx.top)/bx.height*SPL.H;
+    var r=getList(SPL.kind,SPL.uid)[SPL.idx], bb=r.meta.bb;
+    var x0=SPL.tx(bb.minX), x1=SPL.tx(bb.maxX), y0=SPL.ty(bb.minY), y1=SPL.ty(bb.maxY);
+    var v=(SPL.ax==='x')?bb.minX+(px-x0)/(x1-x0)*(bb.maxX-bb.minX):bb.minY+(py-y0)/(y1-y0)*(bb.maxY-bb.minY);
+    if(SPL.ax==='y'&&SPL.cands) SPL.cands.forEach(function(c){ if(Math.abs(SPL.ty(c)-py)<7) v=c; });  /* tarik ke ujung sekat terdekat */
+    dxfSplitMove(v); };
+  window.dxfSplitCand=function(i){ if(!SPL||!SPL.cands||SPL.cands[i]==null) return; dxfSplitMove(SPL.cands[i]); };
+  window.dxfSplitMid=function(){ if(!SPL) return; dxfSplitMove((SPL.min+SPL.max)/2); };
+  window.dxfSplitEqual=function(){ if(!SPL) return; dxfSplitMove(splitEqual()); };
+  window.dxfSplitClose=function(){ if(!SPL) return; var k=SPL.kind,u=SPL.uid; SPL=null; rerender(k,u); };
+  window.dxfSplitApply=function(){ if(!SPL) return; var list=getList(SPL.kind,SPL.uid), r=list&&list[SPL.idx]; if(!r) return;
+    var made=dxfSplitResult(r,SPL.pos,null,SPL.ax);
+    if(!made||made.some(function(x){return !x;})){alert('Pemisahan gagal — tiap bagian harus punya minimal 2 elevasi kontur. Geser garis potong lalu coba lagi.');return;}
+    made.forEach(function(q){ if(SPL.ax==='y') q.autoSplit=SPL.pos; });
+    var k=SPL.kind,u=SPL.uid; list.splice.apply(list,[SPL.idx,1].concat(made)); SPL=null; rerender(k,u);
+    if(typeof showToast==='function') showToast('✂ Kolam dipisah menjadi 2 — tekan ⟲ Gabung untuk menyatukan kembali','success');
+  };
   window.dxfDownloadSite=function(btn){
     var svg=btn.closest('.dxf-overview').querySelector('svg'); if(!svg) return;
     var s=new XMLSerializer().serializeToString(svg).replace(/var\(--border\)/g,'#c9d6e6').replace(/var\(--muted\)/g,'#5a6b7c').replace(/var\(--text\)/g,'#1c2a3a').replace(/var\(--bg-secondary,#fff\)/g,'#ffffff').replace(/var\(--bg-secondary\)/g,'#f6f9fd').replace(/var\(--card-solid,#fff\)/g,'#ffffff');
@@ -29690,7 +29796,7 @@ if(typeof _origRestoreSpDxf === 'function') {
       chip('Keliling atas',fmt(m.Pt,0)+' m'),
       m.mbr?chip('Dimensi (MBR)',fmt(m.mbr.length,0)+' × '+fmt(m.mbr.width,0)+' m'):''
     ].join(' ');
-    var hint=(r.autoSplit!=null)?'<div style="margin-top:8px;padding:6px 10px;border-left:3px solid #14a59a;background:rgba(20,165,154,0.10);border-radius:4px;font-size:11px;color:var(--muted)">✓ Bagian dari strip serpentine yang <b>dipisah otomatis</b> pada N = '+fmt(r.autoSplit,1)+' (ujung sekat terbawah). Geser lewat ↶ Batalkan pembagian bila perlu.</div>':(m.compact<0.30)?'<div style="margin-top:8px;padding:6px 10px;border-left:3px solid #d98a14;background:rgba(217,138,20,0.10);border-radius:4px;font-size:11px;color:var(--muted)">⚠ Bentuk sangat berliku (serpentine/berlekuk) — kemungkinan gabungan beberapa kolam seri (mis. <b>SP1A + SP1B</b>). Gunakan <b>✂ Bagi kolam</b> di bawah untuk memisahkannya.</div>':'';
+    var hint=(r.autoSplit!=null)?'<div style="margin-top:8px;padding:6px 10px;border-left:3px solid #14a59a;background:rgba(20,165,154,0.10);border-radius:4px;font-size:11px;color:var(--muted)">✓ Bagian dari strip serpentine yang dipisah pada N = '+fmt(r.autoSplit,1)+'. Tekan ⟲ Gabung di Peta Situasi untuk menyatukan kembali.</div>':(m.compact<0.30)?'<div style="margin-top:8px;padding:6px 10px;border-left:3px solid #d98a14;background:rgba(217,138,20,0.10);border-radius:4px;font-size:11px;color:var(--muted)">⚠ Bentuk sangat berliku (serpentine/berlekuk) — kemungkinan gabungan beberapa kolam seri (mis. <b>SP1A + SP1B</b>). Gunakan <b>✂ Bagi kolam</b> di bawah untuk memisahkannya.</div>':'';
     var n0=m.bb.minY, n1=m.bb.maxY, sug=dxfSuggestCut(r), mid=sug!=null?sug:Math.round((n0+n1)/2);
     var undo=r.splitOrig?'<button onclick="dxfPondUnsplit(\''+kind+'\','+uid+','+idx+')" style="margin-left:8px;padding:3px 10px;font-size:11px;cursor:pointer;border:1px solid #d98a14;border-radius:5px;background:rgba(217,138,20,0.1);color:#d98a14">↶ Batalkan pembagian</button>':'';
     return '<div class="dxf-extra" style="margin:-2px 0 12px;padding:10px 12px;border:1px dashed var(--border);border-radius:8px">'+
@@ -29726,24 +29832,25 @@ if(typeof _origRestoreSpDxf === 'function') {
     r.name=String(val||'').trim()||('Kolam '+(idx+1)); r.fileName=r.name+(r.srcFile?' — '+r.srcFile:'');
     rerender(kind,uid);
   };
-  function clipHalf(pts,N,north){
-    var out=[],n=pts.length; function inside(p){return north?p[1]>=N:p[1]<=N;}
+  function clipHalf(pts,N,north,ax){
+    var k=(ax==='x')?0:1, o=1-k;
+    var out=[],n=pts.length; function inside(p){return north?p[k]>=N:p[k]<=N;}
     for(var i=0;i<n;i++){var a=pts[i],b=pts[(i+1)%n],ia=inside(a),ib=inside(b);
       if(ia) out.push(a);
-      if(ia!==ib){var t=(N-a[1])/(b[1]-a[1]); out.push([a[0]+t*(b[0]-a[0]),N]);}}
+      if(ia!==ib){var t=(N-a[k])/(b[k]-a[k]); var q=[0,0]; q[k]=N; q[o]=a[o]+t*(b[o]-a[o]); out.push(q);}}
     return out;
   }
 
   /* potong hasil kolam pada Northing N → [utara, selatan] atau null */
-  window.dxfSplitResult=function(r,N,names){
+  window.dxfSplitResult=function(r,N,names,ax){
     var parts=[true,false].map(function(north){
-      var c={}; r.elevs.forEach(function(z){var rs=[]; (r.contours[z]||[]).forEach(function(p){var q=clipHalf(p,N,north); if(q.length>=3&&shoelaceArea(q)>1) rs.push(q);}); if(rs.length) c[z]=rs;}); return c;});
+      var c={}; r.elevs.forEach(function(z){var rs=[]; (r.contours[z]||[]).forEach(function(p){var q=clipHalf(p,N,north,ax); if(q.length>=3&&shoelaceArea(q)>1) rs.push(q);}); if(rs.length) c[z]=rs;}); return c;});
     if(parts.some(function(c){return Object.keys(c).length<2;})) return null;
     var sid='s'+Date.now().toString(36)+Math.random().toString(36).slice(2,4), base=r.name||'Kolam';
     return parts.map(function(c,k){
       var v=dxfComputeVolume(c); if(!v.intervals||!v.intervals.length) return null;
       v.contours=c; v.srcId=r.srcId; v.srcFile=r.srcFile; v.splitId=sid; v.splitOrig=r;
-      v.name=(names&&names[k])||(base+(k===0?' (utara)':' (selatan)')); v.fileName=v.name+(r.srcFile?' — '+r.srcFile:''); dxfEnrich(v); return v;});
+      v.name=(names&&names[k])||(base+(ax==='x'?(k===0?' (kanan)':' (kiri)'):(k===0?' (atas)':' (bawah)'))); v.fileName=v.name+(r.srcFile?' — '+r.srcFile:''); dxfEnrich(v); return v;});
   };
   /* cari garis potong otomatis: Northing tempat penampang kolam tiba-tiba menyempit
      (ujung sekat/baffle serpentine terbawah). Hanya untuk bentuk berliku. */
@@ -29758,6 +29865,19 @@ if(typeof _origRestoreSpDxf === 'function') {
       prev.push(l);
     }
     return null;
+  };
+  /* semua ujung sekat serpentine (Northing, dari bawah ke atas); [0] = saran otomatis */
+  window.dxfCutCandidates=function(r){
+    var m=r.meta||dxfEnrich(r).meta; if(!m||m.compact>=0.30) return [];
+    var top=(r.contours[m.zt]||[]); if(!top.length) return [];
+    var y0=m.bb.minY, y1=m.bb.maxY, step=0.5, prev=[], out=[];
+    function L(y){var xs=[]; top.forEach(function(p){var n=p.length; for(var i=0;i<n;i++){var a=p[i],b=p[(i+1)%n]; if((a[1]<=y)!==(b[1]<=y)) xs.push(a[0]+(y-a[1])/(b[1]-a[1])*(b[0]-a[0]));}});
+      xs.sort(function(a,b){return a-b;}); var t=0; for(var k=0;k+1<xs.length;k+=2) t+=xs[k+1]-xs[k]; return t;}
+    for(var y=y0+3;y<y1-3;y+=step){
+      var l=L(y); if(prev.length>=6){var mx=Math.max.apply(null,prev.slice(-6)); if(mx>8&&l<0.7*mx){out.push(Math.round((y-step)*10)/10); prev=[l]; continue;}}
+      prev.push(l);
+    }
+    return out;
   };
   /* preset penamaan sesuai gambar desain (SP1A/SP1B/CELL-02..05) berdasarkan posisi */
   window.dxfNamePreset=function(kind,uid){
