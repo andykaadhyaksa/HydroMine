@@ -3646,6 +3646,107 @@ body.dark #page-home .hm-hero, body:not(.dark) #page-home .hm-hero {
 
 @media (max-width: 820px) { #psy-canvas { max-width: none !important; width: 680px !important; height: auto !important; display: block; } }
 
+/* ═══════════ v2 — penyempurnaan tampilan HP ═══════════ */
+.tbl-hint { display: none; }
+@media (max-width: 820px) {
+  /* Tipografi dasar proporsional */
+  .page { font-size: 14px; line-height: 1.5; }
+  .section-title { font-size: 14.5px !important; line-height: 1.3; }
+  .form-label, label.form-label { font-size: 12.5px !important; }
+  .input-hint, .form-hint { font-size: 12px !important; line-height: 1.5; }
+  .stat-val { font-size: 20px !important; }
+  .stat-label, .stat-lbl { font-size: 11.5px !important; }
+  .btn-primary, .btn-secondary, .btn-ghost, .eva-wiz-btn-next, .eva-wiz-btn-prev { font-size: 14px !important; padding: 10px 16px !important; border-radius: 10px; }
+  .grpby-btn { font-size: 12.5px !important; padding: 8px 12px !important; min-height: 38px; }
+
+  /* Stepper: langkah non-aktif tetap terlihat (mode terang & gelap) */
+  .eva-wiz-tab { opacity: 1 !important; }
+  .eva-wiz-tab .eva-wiz-num { width: 30px; height: 30px; min-width: 30px; font-size: 13px !important; display: inline-flex; align-items: center; justify-content: center; }
+  body:not(.dark) .eva-wiz-tab:not(.active):not(.done) .eva-wiz-num { background: #fff !important; color: #1D4E89 !important; border: 1.5px solid rgba(29,78,137,.45) !important; }
+  body:not(.dark) .eva-wiz-line { background: rgba(29,78,137,.3) !important; min-width: 12px; height: 2px; }
+  .eva-wiz-label { font-size: 13px !important; }
+
+  /* Tombol navigasi wizard: lebar penuh, mudah dijangkau jempol */
+  .eva-wiz-nav { display: flex !important; flex-wrap: nowrap !important; gap: 10px !important; }
+  .eva-wiz-nav > span:empty { display: none; }
+  .eva-wiz-nav > button { flex: 1 1 0; justify-content: center; min-height: 46px; white-space: normal; text-align: center; }
+
+  /* Petunjuk tabel bisa digeser */
+  .tbl-hint { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted); margin: 4px 0 4px; font-weight: 600; }
+  .tbl-scroll th { font-size: 11.5px !important; }
+  .tbl-scroll td { font-size: 13px !important; }
+  .tbl-scroll th, .tbl-scroll td { padding: 9px 10px !important; }
+
+  /* Flow diagram: ukuran asli, geser horizontal */
+  #flow-svg { max-width: none !important; }
+  .flow-legend { flex-wrap: wrap; gap: 8px 14px !important; }
+
+  /* Groundwater: tabel muat tanpa geser */
+  #page-groundwater .tbl-scroll > table { width: 100% !important; table-layout: auto; }
+  #page-groundwater .tbl-scroll td, #page-groundwater .tbl-scroll th { white-space: normal !important; padding: 9px 8px !important; }
+  #page-groundwater td input:not([type="checkbox"]) { width: 108px !important; min-width: 0 !important; }
+
+  /* Rekap: baris neraca */
+  #page-rekap .neraca-row { display: grid !important; grid-template-columns: 26px minmax(0,1fr) auto; gap: 2px 10px !important; align-items: center; }
+  #page-rekap .neraca-bar-wrap { display: none !important; }
+  #page-rekap .neraca-icon { grid-row: 1 / span 2; }
+  #page-rekap .neraca-label { font-size: 13.5px !important; grid-row: 1 / span 2; }
+  #page-rekap .neraca-val { min-width: 0 !important; font-size: 13.5px !important; grid-column: 3; }
+  #page-rekap .neraca-pct { grid-column: 3; font-size: 11.5px !important; }
+  #page-rekap .param-row { flex-wrap: nowrap !important; align-items: flex-start !important; }
+  #page-rekap .param-row > *:first-child { flex: 1; min-width: 0; }
+  #page-rekap .param-row > *:last-child { text-align: right; max-width: 55%; }
+  #page-rekap [id$="-content"] { padding-left: 14px !important; padding-right: 14px !important; }
+
+  /* Laporan */
+  .lap-stat-row { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  .lap-stat-num { font-size: 17px !important; overflow-wrap: anywhere; }
+  .lap-stat-lbl { font-size: 11.5px !important; }
+  .lap-stat-u { font-size: 11px !important; }
+  .lap-export-card-title { font-size: 17px !important; }
+  .lap-export-card-sub { font-size: 12.5px !important; }
+  .lap-export-card-hint { font-size: 11.5px !important; }
+  [class^="lap-neraca"] { min-width: 0 !important; }
+  .lap-neraca-row, [class*="lap-neraca-row"] { flex-wrap: wrap !important; }
+
+  /* Riwayat: tombol aksi di bawah kartu, tidak menghimpit isi */
+  .hst-card > div { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; }
+  .hst-card > div > div:last-child { flex-direction: row !important; flex-wrap: wrap !important; gap: 8px !important; }
+  .hst-card > div > div:last-child > button { flex: 1 1 calc(50% - 8px); min-height: 42px; font-size: 13px !important; }
+  .hst-kpi { flex: 1 1 calc(50% - 8px); min-width: 0 !important; }
+  .hst-kpi-lbl { font-size: 11px !important; }
+
+  /* Kartu catchment */
+  .catchment-row .cr-f > .cr-lbl { font-size: 11.5px; }
+
+  /* Beranda */
+  .hm-hero-title { font-size: 24px !important; line-height: 1.2 !important; }
+  .hm-card-desc, .hm-step-desc { font-size: 12.5px !important; line-height: 1.5 !important; }
+  .hm-card-title, .hm-step-title { font-size: 15px !important; }
+}
+@media (max-width: 420px) {
+  .lap-stat-row { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+}
+@media (max-width: 820px) {
+  .lap-neraca-row { display: grid !important; grid-template-columns: 22px minmax(0,1fr) auto; gap: 2px 10px !important; align-items: center; flex-wrap: nowrap !important; }
+  .lap-neraca-bar-bg { display: none !important; }
+  .lap-neraca-ic, .lap-neraca-lbl { grid-row: 1 / span 2; }
+  .lap-neraca-lbl { font-size: 13px !important; }
+  .lap-neraca-num { grid-column: 3; min-width: 0 !important; font-size: 13px !important; }
+  .lap-neraca-pct { grid-column: 3; min-width: 0 !important; font-size: 11.5px !important; }
+  .lap-block-hd { flex-wrap: wrap; gap: 6px 10px !important; }
+  .lap-block-hd-title { font-size: 14px !important; flex: 1 1 auto; white-space: nowrap; }
+  #page-groundwater td input:not([type="checkbox"]) { width: 92px !important; }
+}
+@media (max-width: 820px) {
+  .catchment-row { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  .catchment-row .cr-f.w2 { grid-column: span 1 !important; }
+}
+@media (max-width: 820px) {
+  .catatan-card, .catatan-body, #rekap-catatan, #rekap-catatan * { white-space: normal !important; overflow-wrap: anywhere; min-width: 0 !important; }
+  #rekap-catatan > * { display: block !important; }
+}
+
 </style>
 </head>
 <body>
@@ -29986,7 +30087,7 @@ if(typeof _origRestoreSpDxf === 'function') {
       var r = orig.apply(this, arguments);
       curPage = page; syncActive(page); closeSheet();
       var m = document.querySelector('.main'); if (m) m.scrollTop = 0;
-      setTimeout(function () { decorateCatch(); wrapTables(); fixGrids(); }, 150); setTimeout(function () { decorateCatch(); wrapTables(); fixGrids(); }, 800);
+      setTimeout(function () { decorateCatch(); wrapTables(); fixGrids(); }, 150); setTimeout(function () { decorateCatch(); wrapTables(); fixGrids(); minFont(); tblHints(); }, 800);
       return r;
     };
     w.__mb = true; window.nav = w;
@@ -30038,7 +30139,31 @@ if(typeof _origRestoreSpDxf === 'function') {
       if (Math.abs(c.scrollLeft - target) > 4) c.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
     });
   }
-  var tmr; function schedWrap() { clearTimeout(tmr); tmr = setTimeout(function () { decorateCatch(); wrapTables(); fixGrids(); centerTabs(); }, 250); }
+  /* ukuran huruf minimum 11px agar terbaca */
+  function minFont() {
+    if (!MQ.matches) return;
+    var els = document.querySelectorAll('.page.active *');
+    for (var i = 0; i < els.length; i++) {
+      var e = els[i]; if (e.dataset.mbf || e.closest('svg')) continue;
+      var has = false; for (var k = 0; k < e.childNodes.length; k++) { var n = e.childNodes[k]; if (n.nodeType === 3 && n.textContent.trim()) { has = true; break; } }
+      if (!has) continue; e.dataset.mbf = '1';
+      var fs = parseFloat(getComputedStyle(e).fontSize);
+      if (fs && fs < 11) e.style.setProperty('font-size', '11px', 'important');
+    }
+  }
+  /* petunjuk "geser" untuk tabel yang lebih lebar dari layar */
+  function tblHints() {
+    if (!MQ.matches) return;
+    var fs = document.getElementById('flow-svg');
+    if (fs && fs.parentElement && !fs.parentElement.classList.contains('tbl-scroll')) fs.parentElement.classList.add('tbl-scroll');
+    document.querySelectorAll('.page.active .tbl-scroll').forEach(function (w) {
+      var prev = w.previousElementSibling, has = prev && prev.classList.contains('tbl-hint');
+      var need = w.scrollWidth > w.clientWidth + 8;
+      if (need && !has) { var h = document.createElement('div'); h.className = 'tbl-hint'; h.textContent = w.querySelector('svg#flow-svg, canvas') ? '↔ Geser gambar ke samping' : '↔ Geser tabel ke samping'; w.parentElement.insertBefore(h, w); }
+      else if (!need && has) prev.remove();
+    });
+  }
+  var tmr; function schedWrap() { clearTimeout(tmr); tmr = setTimeout(function () { decorateCatch(); wrapTables(); fixGrids(); centerTabs(); minFont(); tblHints(); }, 250); }
 
   function init() {
     hookNav(); build();
@@ -30060,6 +30185,51 @@ if(typeof _origRestoreSpDxf === 'function') {
   /* tombol "Pasang aplikasi" jika browser mendukung */
   var deferred = null;
   window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; window.hydrosanInstall = function () { if (deferred) { deferred.prompt(); deferred = null; } }; });
+})();
+
+/* ═══════════ Buka file proyek (.hydromine) dari "Bagikan" / "Buka dengan" ═══════════ */
+(function () {
+  'use strict';
+  function openText(text, name) {
+    try {
+      var state = JSON.parse(text);
+      if (!state || typeof state !== 'object') throw new Error('format tidak dikenali');
+      window.restoreState(state);
+      if (typeof window.scheduleAutoSave === 'function') window.scheduleAutoSave();
+      if (typeof window.nav === 'function') window.nav('home');
+      window.showToast('📂 "' + (name || 'Proyek') + '" berhasil dibuka', 'success');
+    } catch (e) {
+      if (typeof window.showToast === 'function') window.showToast('❌ File bukan proyek Hydrosan yang valid: ' + e.message, 'error');
+    }
+  }
+  window.hydrosanOpenText = openText;
+
+  /* 1) Bagikan → Hydrosan (Android): file dititipkan service worker di cache */
+  function takeShared() {
+    if (!/[?&]shared=1/.test(location.search) || !('caches' in window)) return;
+    caches.open('hydrosan-share').then(function (c) {
+      return c.match('./__shared__').then(function (r) {
+        try { history.replaceState(null, '', location.pathname); } catch (e) { }
+        if (!r) { window.showToast && window.showToast('⚠️ Tidak ada file yang diterima', 'error'); return; }
+        var nm = 'Proyek'; try { nm = decodeURIComponent(r.headers.get('X-File-Name') || nm); } catch (e) { }
+        return r.text().then(function (t) { openText(t, nm); return c.delete('./__shared__'); });
+      });
+    }).catch(function () { });
+  }
+  /* 2) Buka dengan → Hydrosan (PWA terpasang di Windows/ChromeOS/macOS) */
+  if ('launchQueue' in window && window.launchQueue && window.launchQueue.setConsumer) {
+    window.launchQueue.setConsumer(function (p) {
+      if (!p || !p.files || !p.files.length) return;
+      p.files[0].getFile().then(function (f) { return f.text().then(function (t) { setTimeout(function () { openText(t, f.name); }, 700); }); }).catch(function () { });
+    });
+  }
+  window.addEventListener('load', function () { setTimeout(takeShared, 700); });
+
+  /* 3) Tombol Buka di HP: jangan saring ekstensi (.hydromine sering tampil abu-abu di Android) */
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!('ontouchstart' in window) && !navigator.maxTouchPoints) return;
+    var inp = document.getElementById('load-file-input'); if (inp) inp.removeAttribute('accept');
+  });
 })();
 
 </script>
