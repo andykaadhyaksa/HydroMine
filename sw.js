@@ -1,5 +1,5 @@
 /* Hydrosan service worker — app shell offline + cache library CDN */
-const VER = 'hydrosan-v10';
+const VER = 'hydrosan-v44';
 const SHARE = 'hydrosan-share';
 const SHELL = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 self.addEventListener('install', e => {
