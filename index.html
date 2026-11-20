@@ -4152,6 +4152,20 @@ body.dark #page-home .hm-hero, body:not(.dark) #page-home .hm-hero {
         <span class="status-pill" id="ra-status"></span>
         <span class="error-pill" id="ra-error"></span>
       </div>
+      <div class="ra-ai-box" style="margin-top:12px;padding:12px;border:1px dashed var(--border);border-radius:10px;background:var(--bg-secondary)">
+        <div style="font-weight:700;font-size:12.5px">🤖 Data mentah / berantakan? Rapikan dengan AI</div>
+        <div class="input-hint" style="font-size:11px;line-height:1.6;margin:4px 0 8px">
+          <b>1.</b> Tekan <b>Salin Prompt AI</b> &nbsp;·&nbsp; <b>2.</b> Tempel di AI lain (ChatGPT, Gemini, dll.) <u>sambil melampirkan file data hujan</u> &nbsp;·&nbsp; <b>3.</b> Jika AI memberi <b>file</b> (.txt/.csv), tekan <b>📂 Buka file hasil AI</b>; jika memberi teks, salin lalu tempel di kotak data di atas (boleh bertahap: hasil tiap balasan digabung otomatis, tanggal ganda dihapus). Lalu tekan <b>Analisis</b>.
+        </div>
+        <input id="ra-ai-note" type="text" placeholder="Catatan untuk AI (opsional): mis. stasiun Gorontalo, kolom &quot;CH&quot;, tahun 2010–2024" oninput="raBuildPrompt()" style="width:100%;box-sizing:border-box;font-size:12px;margin-bottom:8px">
+        <div class="btn-row">
+          <button class="btn-primary" onclick="raCopyPrompt()">📋 Salin Prompt AI</button>
+          <button class="btn-secondary" onclick="raTogglePrompt()">👁 Lihat prompt</button>
+          <button class="btn-secondary" onclick="document.getElementById('ra-ai-file').click()" title="Buka satu atau beberapa file .txt / .csv hasil AI">📂 Buka file hasil AI</button>
+          <input type="file" id="ra-ai-file" accept=".txt,.csv,.tsv,.text,text/plain,text/csv" multiple style="display:none" onchange="raLoadAIFiles(this.files); this.value=''">
+        </div>
+        <textarea id="ra-ai-prompt" readonly rows="12" style="display:none;margin-top:8px;font-size:11px;font-family:var(--mono);width:100%;box-sizing:border-box"></textarea>
+      </div>
     </div>
 
     <!-- Mini stat pills -->
@@ -7160,29 +7174,55 @@ function classifyVal(v) {
 /* ═══════════════════════════════════
    PARSE
 ═══════════════════════════════════ */
+const RA_MON = {jan:0,feb:1,mar:2,apr:3,mei:4,may:4,jun:5,jul:6,agu:7,aug:7,ags:7,sep:8,okt:9,oct:9,nov:10,des:11,dec:11};
+const RA_DATE_LIKE = /^(\d{1,4}[\/\-.]\d{1,2}[\/\-.]\d{1,4}|\d{8}(?!\d)|\d{1,2}[\s\-\/.]*[A-Za-z]{3,9}[\s\-\/.,]*\d{2,4})/;
+
+/* Pembaca data CH yang toleran: menerima tempelan dari Excel (TAB) maupun hasil AI
+   (blok kode ```, tabel markdown | a | b |, pemisah ; atau koma, desimal koma/titik,
+   header, komentar, tanggal DD/MM/YYYY · YYYY-MM-DD · DD.MM.YYYY · 5 Jan 2020 · 20200105).
+   Nilai 8888 / 9999 (kode BMKG: tidak diukur / tidak ada data) dianggap data hilang. */
 function parseInput(raw) {
-  const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+  const src = String(raw || '').replace(/ /g, ' ').replace(/[​﻿]/g, '');
+  const lines = src.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
   const results = [], skipped = [];
+  let ignored = 0;
   for (let i = 0; i < lines.length; i++) {
-    let parts = lines[i].split('\t').map(p => p.trim()).filter(p => p.length > 0);
-    if (parts.length < 2) parts = lines[i].split(/;|,|\s{2,}/).map(p => p.trim()).filter(p => p.length > 0);
-    if (parts.length < 2) { skipped.push(i + 1); continue; }
-    const dateStr = parts[0];
-    const valStr  = parts[parts.length - 1].replace(',', '.');
-    const val     = parseFloat(valStr);
-    if (isNaN(val) || val < 0) { skipped.push(i + 1); continue; }
-    const date = parseDate(dateStr);
+    let ln = lines[i];
+    if (/^```/.test(ln)) continue;                                  // pagar blok kode
+    if (/^[\s|:+\-=]+$/.test(ln)) continue;                         // garis pemisah tabel markdown
+    if (ln.indexOf('|') >= 0) ln = ln.replace(/^\||\|$/g, '').split('|').map(x => x.trim()).join('\t');
+    ln = ln.replace(/[`"']/g, '').replace(/^[-*•]\s+/, '').trim();
+    if (!ln) continue;
+    if (/^(#|\/\/)/.test(ln) || !/^\d/.test(ln) && !RA_DATE_LIKE.test(ln)) { ignored++; continue; }   // judul/komentar/teks lain
+    const m = ln.match(RA_DATE_LIKE);
+    if (!m) { skipped.push(i + 1); continue; }
+    const date = parseDate(m[0].trim());
     if (!date) { skipped.push(i + 1); continue; }
+    let rest = ln.slice(m[0].length).replace(/^[T ]\d{1,2}:\d{2}(:\d{2})?(\.\d+)?Z?/, '').replace(/^[\s;,\t:]+/, '');
+    rest = rest.replace(/\s*mm\b.*$/i, '').trim();
+    if (!rest) { skipped.push(i + 1); continue; }
+    const fields = /^[-+]?\d+(,\d+)?$/.test(rest) ? [rest] : rest.split(/[\t;]+|,|\s{2,}/).map(x => x.trim()).filter(Boolean);
+    const valStr = (fields[fields.length - 1] || '').replace(',', '.');
+    if (!/^[-+]?\d+(\.\d+)?$/.test(valStr)) { skipped.push(i + 1); continue; }
+    const val = parseFloat(valStr);
+    if (isNaN(val) || val < 0 || val >= 8888) { skipped.push(i + 1); continue; }
     results.push({ date, value: val });
   }
-  return { results, skipped };
+  return { results, skipped, ignored };
 }
 
 function parseDate(s) {
-  let m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  s = String(s).trim();
+  let m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
   if (m) { const d = new Date(+m[3], +m[2]-1, +m[1]); if (!isNaN(d) && d.getMonth() === +m[2]-1) return d; }
-  m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+  m = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/);
   if (m) { const d = new Date(+m[1], +m[2]-1, +m[3]); if (!isNaN(d) && d.getMonth() === +m[2]-1) return d; }
+  m = s.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if (m) { const d = new Date(+m[1], +m[2]-1, +m[3]); if (!isNaN(d) && d.getMonth() === +m[2]-1) return d; }
+  m = s.match(/^(\d{1,2})[\s\-\/.]*([A-Za-z]{3,9})[\s\-\/.,]*(\d{2,4})$/);
+  if (m) { const mo = RA_MON[m[2].slice(0,3).toLowerCase()]; if (mo !== undefined) { let y = +m[3]; if (y < 100) y += y <= 49 ? 2000 : 1900; const d = new Date(y, mo, +m[1]); if (!isNaN(d) && d.getMonth() === mo) return d; } }
+  m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2})$/);
+  if (m) { let y = +m[3]; y += y <= 49 ? 2000 : 1900; const d = new Date(y, +m[2]-1, +m[1]); if (!isNaN(d) && d.getMonth() === +m[2]-1) return d; }
   return null;
 }
 
@@ -9702,7 +9742,7 @@ function raAnalyze() {
   const ep  = document.getElementById('ra-error');
   sp.style.display = ep.style.display = 'none';
 
-  const { results, skipped } = parseInput(raw);
+  const { results, skipped, ignored } = parseInput(raw);
   if (!results.length) {
     ep.textContent = '⚠ Tidak ada data valid. Periksa format.';
     ep.style.display = 'inline-flex'; return;
@@ -9734,7 +9774,7 @@ function raAnalyze() {
   });
 
   const nYears = Object.keys(maxByYear).length;
-  sp.textContent = `✓ ${results.length.toLocaleString('id-ID')} baris · ${nYears} tahun` + (skipped.length ? `  ·  ${skipped.length} dilewati` : '');
+  sp.textContent = `✓ ${results.length.toLocaleString('id-ID')} baris · ${nYears} tahun` + (skipped.length ? `  ·  ${skipped.length} dilewati` : '') + (ignored ? `  ·  ${ignored} baris teks diabaikan` : '');
   sp.style.display = 'inline-flex';
 
   raRender();
@@ -10928,6 +10968,115 @@ function raSample() {
   raAnalyze();
   raWizAfterAnalyze();
 }
+
+/* ── Prompt untuk AI lain: ubah data hujan mentah → format baku yang langsung terbaca app ── */
+function raBuildPrompt() {
+  const note = ((document.getElementById('ra-ai-note') || {}).value || '').trim();
+  const st = ((document.getElementById('ra-station-name') || {}).value || '').trim();
+  const extra = [st ? 'Stasiun: ' + st : '', note].filter(Boolean).join(' | ');
+  const t = [
+'PERAN: Kamu analis data hidrologi/klimatologi yang teliti. Terlampir file data curah hujan harian saya. Bentuk file bisa APA SAJA: Excel dengan banyak sheet, CSV, PDF, foto/screenshot tabel, teks, laporan stasiun BMKG/BBWS/perusahaan, atau tabel buatan sendiri. Tugasmu: membaca SEMUA data hujan di file itu, memahami strukturnya sendiri, lalu mengubahnya menjadi satu daftar harian baku untuk aplikasi analisis hidrologi.',
+'',
+'LANGKAH 1 — PETAKAN STRUKTUR FILE (lakukan dulu, jangan langsung menulis hasil):',
+'a. Daftar semua sheet/halaman/tabel dan tentukan mana yang berisi data HARIAN. Abaikan sheet rekap/ringkasan/grafik/statistik/jumlah bulanan atau tahunan, supaya data tidak terhitung dua kali.',
+'b. Kenali pola penyusunan data, misalnya: (1) kolom tanggal + kolom CH; (2) matriks baris = tanggal 1–31, kolom = bulan (satu tahun per tabel/sheet); (3) matriks baris = bulan, kolom = tanggal 1–31; (4) satu sheet per bulan (nama sheet = bulan atau bulan-tahun, isi = tanggal 1–31 dan CH); (5) satu sheet per tahun; (6) satu sheet per stasiun; (7) beberapa blok tabel berdampingan atau bertumpuk dalam satu sheet; (8) kolom tahun, bulan, dan tanggal terpisah; (9) data per jam, per 3 jam, atau per dekade/pentad; (10) format panjang/database (stasiun, tanggal, nilai).',
+'c. Tentukan dari mana TAHUN dan BULAN diambil: kolom tanggal, judul tabel, sel di atas tabel, nama sheet, nama file, atau header kolom. Judul yang digabung (merged cell), header bertingkat, dan tahun yang hanya tertulis sekali di atas harus dipakai untuk seluruh blok di bawahnya.',
+'d. Tulis di luar kotak kode satu paragraf pendek tentang pola yang kamu temukan (mis. "12 sheet, satu per bulan, tahun 2023 dari judul sel A1, tanggal di kolom A, CH di kolom C").',
+'',
+'LANGKAH 2 — KONVERSI KE FORMAT KELUARAN (wajib, persis):',
+'- Satu baris = satu hari, ditulis: TANGGAL;CH',
+'- TANGGAL berformat DD/MM/YYYY (contoh: 05/01/2020). CH = curah hujan harian dalam milimeter (mm), TITIK sebagai desimal (contoh: 12.5), tanpa satuan dan tanpa pemisah ribuan.',
+'- Pemisah tanggal dan CH adalah titik koma (;) tanpa spasi. Urut dari tanggal paling lama ke paling baru, gabungkan semua sheet/blok/tahun menjadi satu urutan kronologis. Tanpa header, tanpa nomor urut, tanpa kolom lain.',
+'- Tulis seluruh daftar di DALAM SATU code block (kotak kode, tipe teks polos / plain text) agar mudah disalin, tanpa komentar di dalam kotak.',
+'- Jika kamu tidak bisa membuat code block, tulis sebagai teks polos biasa: satu baris per hari dengan format yang sama.',
+'',
+'Contoh isi kotak kode (3 baris):',
+'01/01/2020;0',
+'02/01/2020;12.5',
+'03/01/2020;3.2',
+'',
+'ATURAN ISI DATA:',
+'1. Hujan nol (0) tetap ditulis 0 — itu data sah. Tulis juga 0 bila tabel memakai tanda yang jelas berarti tidak hujan (mis. "0,0"; "-" HANYA jika legenda file menyatakan artinya tidak hujan).',
+'2. Hari tanpa data (sel kosong, "-", "NA", "TTU", "tidak ada data", "TAD", kode 8888 atau 9999) JANGAN ditulis dan JANGAN diisi 0 atau diinterpolasi: buang barisnya. Bedakan dengan jelas antara "0 mm" dan "tidak diukur". Jika arti tanda "-" atau sel kosong tidak jelas, anggap tidak ada data dan sebutkan di ringkasan.',
+'3. Salin angka apa adanya. Jangan membulatkan, menjumlah ulang, mengoreksi, atau menebak angka yang tidak terbaca jelas (foto/PDF hasil scan) — laporkan di luar kotak kode beserta lokasinya.',
+'4. Angka tersimpan sebagai teks atau bercampur satuan (mis. "12,5 mm", "T" untuk trace/jejak, "<0.5") — ambil angkanya; untuk "T"/trace tulis 0 dan sebutkan di ringkasan.',
+'5. Tanggal yang tidak ada di kalender (30–31 Februari, 31 April, dst.) dan sel di luar jumlah hari bulan itu: abaikan. Perhatikan tahun kabisat (Februari 29 hari).',
+'6. Abaikan baris/kolom JUMLAH, TOTAL, RERATA, MAKS, MIN, HARI HUJAN, dan catatan. Itu bukan data harian.',
+'7. Data per jam / per 3 jam / per 6 jam: jumlahkan menjadi total harian (hari hujan jam 00–24, atau jam pengamatan 07.00–07.00 bila file menyebutkannya) dan sebutkan aturan yang dipakai. Data per dekade/pentad/bulanan saja (tidak ada nilai harian) TIDAK boleh dipecah menjadi harian — beri tahu saya.',
+'8. Jika satuan bukan mm (cm, inci, mikron) konversi ke mm dan sebutkan.',
+'9. Jika ada lebih dari satu stasiun/lokasi/alat (mis. manual vs otomatis), JANGAN digabung. Tanyakan dulu yang mana yang dipakai, atau bila saya sudah menyebutnya di CATATAN SAYA, pakai itu.',
+'10. Tanggal ganda dengan nilai berbeda: tulis keduanya dan beri tahu saya. Tanggal yang bolong tidak perlu diisi.',
+'11. Data yang dibaca dari foto/PDF scan: baca per baris dengan teliti; tandai angka yang ragu-ragu.',
+'',
+'LANGKAH 3 — PERIKSA DIRIMU SENDIRI sebelum menjawab:',
+'- Hitung jumlah baris per tahun dan per bulan; bandingkan dengan jumlah hari kalender, lalu daftar bulan/tahun yang datanya tidak lengkap.',
+'- Jika file memuat baris jumlah/total bulanan atau tahunan, cocokkan dengan penjumlahan nilai harian yang kamu tulis; laporkan selisih yang berarti.',
+'- Tandai nilai harian yang tampak janggal (negatif, lebih dari 300 mm, atau tiba-tiba sama berderet) TANPA mengubahnya.',
+'- Pastikan tidak ada sheet/blok yang terlewat dan tidak ada yang terhitung dua kali, dan urutan tanggal sudah menaik.',
+'',
+'CARA MENYAJIKAN HASIL (data bisa ribuan baris / puluhan tahun — ikuti urutan ini):',
+'A. Jika kamu bisa menjalankan kode atau membuat file (code interpreter / analisis data / pembuatan file): proses SELURUH data dengan kode (mis. Python), gabungkan SEMUA sheet dan SEMUA tahun menjadi SATU file teks bernama curah_hujan_harian.txt (isi: baris TANGGAL;CH seperti di atas, urut kronologis, tanpa header), lalu berikan file itu sebagai unduhan. Di chat cukup tampilkan ringkasan serta 10 baris pertama dan 10 baris terakhir sebagai bukti. JANGAN mengetik ribuan baris di chat dan JANGAN menampilkan hanya satu tahun.',
+'B. Hanya jika kamu benar-benar tidak bisa membuat file: tulis di chat sebanyak mungkin baris per balasan (target minimal 2–3 tahun; bila ruang habis berhenti di akhir bulan penuh, jangan memotong di tengah bulan), lalu tulis "LANJUT dari <tanggal berikutnya>" agar saya membalas "lanjut". Tiap balasan berisi satu code block dan tidak boleh memakai tanda "..." atau ringkasan pengganti baris.',
+'',
+'SETELAH KOTAK KODE, tulis ringkasan maksimal 6 baris: pola file yang dikenali, jumlah baris, tanggal awal–akhir, jumlah hari yang dibuang/kosong, bulan yang tidak lengkap, dan hal yang perlu saya periksa. Jika ada keraguan yang memengaruhi hasil, tanyakan secara spesifik.'
+  ];
+  if (extra) t.push('', 'CATATAN SAYA: ' + extra);
+  const txt = t.join('\n');
+  const ta = document.getElementById('ra-ai-prompt'); if (ta) ta.value = txt;
+  return txt;
+}
+function raTogglePrompt() {
+  const ta = document.getElementById('ra-ai-prompt'); if (!ta) return;
+  raBuildPrompt(); ta.style.display = (ta.style.display === 'none') ? 'block' : 'none';
+}
+function raCopyPrompt() {
+  const txt = raBuildPrompt(), ok = () => showToast('📋 Prompt disalin — tempel di AI bersama file data hujan', 'success');
+  const fallback = () => { const ta = document.getElementById('ra-ai-prompt'); if (!ta) return;
+    const was = ta.style.display; ta.style.display = 'block'; ta.focus(); ta.select();
+    try { document.execCommand('copy'); ok(); } catch (e) { showToast('Salin manual: blok teks prompt lalu Ctrl+C', 'warn'); }
+    if (was === 'none') ta.style.display = 'none'; };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, fallback); else fallback();
+}
+/* Gabungkan data baru ke kotak input: urut tanggal, tanggal ganda → nilai terbaru menimpa */
+function raMergeIntoInput(results, meta, srcLabel) {
+  const ta = document.getElementById('ra-input'); if (!ta) return;
+  const pad = n => String(n).padStart(2, '0'), key = d => d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  const map = new Map(); let dup = 0, before = 0;
+  if (ta.value.trim()) { const old = parseInput(ta.value).results; before = old.length; old.forEach(r => map.set(key(r.date), r)); }
+  results.forEach(r => { const k = key(r.date); if (map.has(k)) dup++; map.set(k, r); });
+  const all = Array.from(map.values()).sort((x, y) => x.date - y.date);
+  ta.value = all.map(d => pad(d.date.getDate()) + '/' + pad(d.date.getMonth() + 1) + '/' + d.date.getFullYear() + '\t' + d.value).join('\n');
+  ta.scrollTop = 0;
+  const sp = document.getElementById('ra-status'), ep = document.getElementById('ra-error'); if (ep) ep.style.display = 'none';
+  if (sp) { sp.textContent = '✓ ' + (srcLabel || 'Hasil AI') + ' dibaca rapi: +' + results.length.toLocaleString('id-ID') + ' baris' + (before ? ' (total ' + all.length.toLocaleString('id-ID') + ')' : '') + (meta.skipped ? ' · ' + meta.skipped + ' dilewati' : '') + (meta.ignored ? ' · ' + meta.ignored + ' baris teks diabaikan' : '') + (dup ? ' · ' + dup + ' tanggal ganda ditimpa' : '') + ' — tekan Analisis'; sp.style.display = 'inline-flex'; }
+}
+/* Tempel hasil AI (kode ```, tabel markdown, ; , TAB, teks ringkasan) → dibersihkan & digabung */
+function raInitPasteClean() {
+  const ta = document.getElementById('ra-input'); if (!ta || ta._cleanBound) return; ta._cleanBound = true;
+  ta.addEventListener('paste', function (e) {
+    const t = (e.clipboardData || window.clipboardData || { getData: () => '' }).getData('text'); if (!t) return;
+    const dirty = /```|\||;/.test(t) || /^[A-Za-z#]/m.test(t) || (RA_DATE_LIKE.test(t.trim()) && /\d{1,2}\s*[A-Za-z]{3,9}\s*\d{2,4}/.test(t));
+    if (!dirty) return;                               // tempelan Excel biasa dibiarkan apa adanya
+    const p = parseInput(t); if (!p.results.length) return;
+    e.preventDefault(); raMergeIntoInput(p.results, { skipped: p.skipped.length, ignored: p.ignored }, 'Hasil AI');
+  });
+  ['dragover', 'drop'].forEach(ev => ta.addEventListener(ev, function (e) {
+    if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+    e.preventDefault(); if (ev === 'drop') raLoadAIFiles(e.dataTransfer.files);
+  }));
+}
+/* Buka satu / beberapa file .txt/.csv hasil AI (juga bisa di-drop ke kotak data) */
+function raLoadAIFiles(files) {
+  const list = Array.from(files || []).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })); if (!list.length) return;
+  Promise.all(list.map(f => f.text().catch(() => ''))).then(texts => {
+    const all = [], meta = { skipped: 0, ignored: 0 };
+    texts.forEach(t => { const p = parseInput(t); p.results.forEach(r => all.push(r)); meta.skipped += p.skipped.length; meta.ignored += p.ignored; });
+    if (!all.length) { const ep = document.getElementById('ra-error'); if (ep) { ep.textContent = '⚠ Tidak ada data valid di file. Pastikan formatnya TANGGAL;CH (mis. 01/01/2020;5.5).'; ep.style.display = 'inline-flex'; } return; }
+    raMergeIntoInput(all, meta, list.length > 1 ? 'File hasil AI (' + list.length + ' file)' : 'File "' + list[0].name + '"');
+    if (typeof showToast === 'function') showToast('📂 ' + all.length.toLocaleString('id-ID') + ' baris dimuat — tekan Analisis', 'success');
+  });
+}
+document.addEventListener('DOMContentLoaded', raInitPasteClean); raInitPasteClean();
 
 function raClear() {
   document.getElementById('ra-input').value = '';
